@@ -47,17 +47,36 @@ class account_analytic_expense(osv.osv):
     _description = 'Analytic expense'
 
     _columns = {
-        'name': fields.char('Progressive', size=64, required=True, 
-            help="ID in accounting for link the record of OpenERP"),
+        'name': fields.char('Protocol #', size=64, required=True, 
+            help='ID in accounting for link the record of OpenERP'),
+        'amount': fields.float('Amount', required=True, 
+            help='Amount for total of accounting record line')
+        'note': fields.text('Note')
+            
+        # Header description:    
+        'causal': fields.char('Causal', size=2, required=True),
+        'series': fields.char('Series', size=2, required=True),
+        'number': fields.char('Document', size=12, required=True),
+            
+        # Period:    
+        'date': fields.date('Ref. date', required=True),
+        'date_to': fields.date('To date'),
+        'date_from': fields.date('From date'),
+
+        # Split possibilities:    
+        'split_type': fields.selection([
+            ('all', 'All'), 
+            ('department', 'Department'), 
+            ('contract', 'Contract'), 
+            #('contracts', 'Contracts'), 
+            ], 'Split type'),        
         'department_id': fields.many2one(
             'hr.department', 'Department', 
             help="Department if directly associated"),
-        'contract_id': fields.many2one(
-            'account.analytic.account', 'Contract', 
+        'contract_ids': fields.many2one(
+            'account.analytic.account', 'expense_account_analitic_rel', 
+            'expense_id', 'contract_id', 'Contract', 
             help="Contract if directly associated"),
-        'note': fields.text('Note')
-        'date_to': date('To date', required=True),
-        'date_from': date('From date', required=True),                 
         }
 account_analytic_expense()
 
@@ -97,12 +116,13 @@ class hr_department_extra(osv.osv):
     _columns = {
         'inactive': fields.boolean('Inactive', required=False),
         'for_extra_department': fields.boolean('For extra cost', required=False, help="If cheched all extra department cost can be assigned to the analytic account of this department"),
+        'code': fields.char('Account code', size=5),
+        }
         
-    }
     _defaults = {
         'inactive': lambda *a: False,
         'for_extra_department': lambda *a: True,
-    }
+        }
 hr_department_extra()
 
 class res_city(osv.osv):
@@ -277,7 +297,11 @@ class account_analytic_line_extra_fields(osv.osv):
          'activity_id': fields.many2one('account.analytic.intervent.activity', 'Activity', required=False),          
          'mail_raccomanded': fields.boolean('Is raccomanded', required=False, help="Mail is a raccomanded"),
          #'location_site': fields.char('Location', size=50, required=False, readonly=False, help="Location of intervent"),
+         
+         # Expense:
+         'expense_id': fields.many2one('account.analytic.expense', 'Expense', ondelete='cascade'),
     }    
+
     _defaults = {
         'import_type': lambda *a: False,
     }
@@ -450,5 +474,19 @@ class account_analytic_superintervent_group(osv.osv):
         'timesheet_ids':fields.one2many('hr.analytic.timesheet', 'superintervent_group_id', 'Timesheet line created', required=False, help="List of analytic line / timesheet line that are created from this group"),        
     }    
 account_analytic_superintervent_group()
+
+class account_analytic_expense(osv.osv):
+    ''' *many fields added after
+    '''
+    
+    _inherit = 'account.analytic.expense'
+
+    _columns = {
+        'analytic_line_ids': fields.one2many(
+            'account.analytic.account', 'expense_id', 'Analytic line', 
+            help="Analytic line child of this expense"),
+        }
+account_analytic_expense()
+
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
