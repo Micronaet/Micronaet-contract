@@ -48,8 +48,7 @@ class account_analytic_expense(osv.osv):
     _columns = {
         'name': fields.char('Protocol #', size=64, required=True,
             help='ID in accounting for link the record of OpenERP'),
-        'amount': fields.float('Amount', required=True, digits(16, 2),
-            help='Amount for total of accounting record line'),
+        'amount': fields.float('Amount', digits=(16, 2), required=True), 
         'note': fields.text('Note'),
             
         # Header description:    
