@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+    
+       <!-- etl.relevation.header.wizard -->
+       <record id="etl_relevation_header_wizard" model="ir.ui.view">
+            <field name="name">Intervent wizard</field>
+            <field name="model">etl.relevation.header.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Intervent report">
+                   <field name="all"/>
+                   <field name="department_id" attrs="{'invisible':[('all','=',True)],'required':[('all','=',False)]}" widget="selection" />
+                   <field name="start_date"/>
+                   <field name="end_date"/>
+                   <newline />
+
+                   <button string="Cancel" special="cancel" colspan="2"/>                   
+                   <button name="print_invoice" type="object" string="Print" icon="gtk-print" colspan="2" />
+                </form>
+            </field>
+      </record>
+
+      <record id="etl_relevation_header_wizard_action" model="ir.actions.act_window">
+        <field name="name">Intervent wizard</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">etl.relevation.header.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+      </record>
+
+      <menuitem action="etl_relevation_header_wizard_action" 
+                id="etl_relevation_header_wizard_menuitem" 
+                sequence="30"
+                parent="contract_manage_report.contract_report_intervent_wizard_root_menuitem"
+                groups="analytic.group_analytic_accounting"
+                icon="STOCK_EXECUTE" />
+    </data>
+</openerp>

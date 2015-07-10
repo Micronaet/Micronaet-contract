@@ -1,0 +1,6 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_contract_employee_timesheet_tipology_user","contract.employee.timesheet.tipology","model_contract_employee_timesheet_tipology","base.group_user",1,1,1,1
+"access_contract_employee_timesheet_tipology_line_user","contract.employee.timesheet.tipology.line","model_contract_employee_timesheet_tipology_line","base.group_user",1,1,1,1
+"access_contract_employee_festivity_user","contract.employee.festivity","model_contract_employee_festivity","base.group_user",1,1,1,1
+
+

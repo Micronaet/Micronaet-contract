@@ -1,0 +1,319 @@
+# Translation of OpenERP Server.
+# This file contains the translation of the following modules:
+# 	* contract_manage_report
+# <> <>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenERP Server 6.0.4\n"
+"Report-Msgid-Bugs-To: support@openerp.com\n"
+"POT-Creation-Date: 2013-05-17 07:21+0000\n"
+"PO-Revision-Date: 2013-05-17 09:32+0200\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: contract_manage_report
+#: field:contract.department.report.wizard,invoice:0
+msgid "With invoice"
+msgstr "Blocco fatture"
+
+#. module: contract_manage_report
+#: model:ir.actions.act_window,name:contract_manage_report.contract_report_intervent_dept_wizard_action
+#: model:ir.ui.menu,name:contract_manage_report.contract_report_intervent_dept_wizard_menuitem
+msgid "Intervent per dept. wizard"
+msgstr "Wizard interventi (dipart. attuale)"
+
+#. module: contract_manage_report
+#: model:ir.actions.act_window,name:contract_manage_report.contract_department_report_wizard_action
+#: model:ir.ui.menu,name:contract_manage_report.contract_department_report_wizard_menuitem
+msgid "Contract list wizard"
+msgstr "Wizard lista contratti"
+
+#. module: contract_manage_report
+#: view:contract.department.report.wizard:0
+#: view:contract.report.intervent.wizard:0
+msgid "Print"
+msgstr "Stampa"
+
+#. module: contract_manage_report
+#: selection:contract.report.intervent.wizard,mode:0
+msgid "Absence"
+msgstr "Assenze"
+
+#. module: contract_manage_report
+#: model:ir.actions.report.xml,name:contract_manage_report.report_aeroo_dept_contract_list
+msgid "Contratti per dipartimento"
+msgstr "Contratti per dipartimento"
+
+#. module: contract_manage_report
+#: model:ir.actions.report.xml,name:contract_manage_report.report_aeroo_intervent
+msgid "Riepilogo interventi"
+msgstr "Riepilogo interventi"
+
+#. module: contract_manage_report
+#: help:contract.department.report.wizard,start_date:0
+msgid "Start date of period, for evaluate costs, intervent, invoice"
+msgstr "Data iniziale periodo, per valutare: costi, interventi, fatture"
+
+#. module: contract_manage_report
+#: field:contract.department.report.wizard,department_id:0
+#: field:contract.report.intervent.wizard,department_id:0
+msgid "Department"
+msgstr "Dipartimento"
+
+#. module: contract_manage_report
+#: field:contract.department.report.wizard,start_date:0
+msgid "Start date"
+msgstr "Data inizio"
+
+#. module: contract_manage_report
+#: model:ir.model,name:contract_manage_report.model_contract_department_report_wizard
+msgid "Contract dept. report wizard"
+msgstr "Wizard stampa contratti per dip."
+
+#. module: contract_manage_report
+#: view:contract.department.report.wizard:0
+msgid "Report mode:"
+msgstr "Modalità stampa:"
+
+#. module: contract_manage_report
+#: selection:contract.report.intervent.wizard,month:0
+msgid "March"
+msgstr "Marzo"
+
+#. module: contract_manage_report
+#: selection:contract.report.intervent.wizard,month:0
+msgid "August"
+msgstr "Agosto"
+
+#. module: contract_manage_report
+#: report:ir.actions.report.xml:contract_manage_report.report_aeroo_dept_contract_list
+msgid "open"
+msgstr "aperto"
+
+#. module: contract_manage_report
+#: model:ir.actions.report.xml,name:contract_manage_report.report_aeroo_absence
+msgid "Riepilogo assenze"
+msgstr "Riepilogo assenze"
+
+#. module: contract_manage_report
+#: selection:contract.report.intervent.wizard,month:0
+msgid "October"
+msgstr "Ottobre"
+
+#. module: contract_manage_report
+#: model:ir.actions.report.xml,name:contract_manage_report.report_aeroo_contracts
+msgid "Situazione contratti"
+msgstr "Situazione contratti"
+
+#. module: contract_manage_report
+#: selection:contract.report.intervent.wizard,month:0
+msgid "June"
+msgstr "Giugno"
+
+#. module: contract_manage_report
+#: field:contract.department.report.wizard,all:0
+#: field:contract.report.intervent.wizard,all:0
+msgid "All department"
+msgstr "Tutti i dipartimenti"
+
+#. module: contract_manage_report
+#: model:ir.actions.act_window,name:contract_manage_report.contract_report_intervent_wizard_action
+#: model:ir.ui.menu,name:contract_manage_report.contract_report_intervent_wizard_menuitem
+msgid "Intervent wizard"
+msgstr "Wizard interventi"
+
+#. module: contract_manage_report
+#: help:contract.department.report.wizard,end_date:0
+msgid "End date of period, for evaluate cost, intervent, invoice"
+msgstr "Data finale periodo, per valutare: costi, interventi, fatture"
+
+#. module: contract_manage_report
+#: view:contract.department.report.wizard:0
+msgid "Filter: Parameter for detailed report"
+msgstr "Filtro: parametri per dettaglio report"
+
+#. module: contract_manage_report
+#: model:ir.ui.menu,name:contract_manage_report.menu_reports_root
+msgid "Report"
+msgstr "Stampe"
+
+#. module: contract_manage_report
+#: selection:contract.report.intervent.wizard,month:0
+msgid "July"
+msgstr "Luglio"
+
+#. module: contract_manage_report
+#: selection:contract.report.intervent.wizard,month:0
+msgid "Maj"
+msgstr "Maggio"
+
+#. module: contract_manage_report
+#: field:contract.department.report.wizard,end_date:0
+msgid "End Date"
+msgstr "Data finale"
+
+#. module: contract_manage_report
+#: selection:contract.report.intervent.wizard,month:0
+msgid "February"
+msgstr "Febbraio"
+
+#. module: contract_manage_report
+#: field:contract.department.report.wizard,active_contract:0
+msgid "Active contract"
+msgstr "Solo movimentate"
+
+#. module: contract_manage_report
+#: field:contract.department.report.wizard,hour:0
+msgid "With hours"
+msgstr "Blocco interventi"
+
+#. module: contract_manage_report
+#: selection:contract.report.intervent.wizard,month:0
+msgid "January"
+msgstr "Gennaio"
+
+#. module: contract_manage_report
+#: field:contract.report.intervent.wizard,absence_account_id:0
+msgid "Absence type"
+msgstr "Tipo di assenza"
+
+#. module: contract_manage_report
+#: selection:contract.department.report.wizard,mode:0
+msgid "Short list"
+msgstr "Lista breve"
+
+#. module: contract_manage_report
+#: field:contract.department.report.wizard,contract_id:0
+msgid "Contract"
+msgstr "Contratto"
+
+#. module: contract_manage_report
+#: selection:contract.department.report.wizard,mode:0
+msgid "Summary"
+msgstr "Riepilogo"
+
+#. module: contract_manage_report
+#: selection:contract.report.intervent.wizard,month:0
+msgid "April"
+msgstr "Aprile"
+
+#. module: contract_manage_report
+#: field:contract.department.report.wizard,mode:0
+#: field:contract.report.intervent.wizard,mode:0
+msgid "Mode"
+msgstr "Modalità"
+
+#. module: contract_manage_report
+#: view:contract.report.intervent.wizard:0
+msgid "Intervent report"
+msgstr "Report interventi"
+
+#. module: contract_manage_report
+#: field:contract.department.report.wizard,balance:0
+msgid "With balance"
+msgstr "Blocco bilancio"
+
+#. module: contract_manage_report
+#: selection:contract.report.intervent.wizard,mode:0
+#: model:ir.ui.menu,name:contract_manage_report.contract_report_intervent_wizard_root_menuitem
+msgid "Intervent"
+msgstr "Interventi"
+
+#. module: contract_manage_report
+#: help:contract.department.report.wizard,contract_id:0
+msgid ""
+"All 'working' contract in contract list (absence fake contract not visible)"
+msgstr ""
+"Tutti i contratti \"lavorativi\" nella lista contratti (assenze e contratti "
+"fittizi non sono visibili)"
+
+#. module: contract_manage_report
+#: selection:contract.report.intervent.wizard,month:0
+msgid "November"
+msgstr "Novembre"
+
+#. module: contract_manage_report
+#: view:contract.department.report.wizard:0
+msgid "Filter: Contract"
+msgstr "Filtro: Contratto"
+
+#. module: contract_manage_report
+#: selection:contract.department.report.wizard,mode:0
+msgid "Detailed"
+msgstr "Dettagliato"
+
+#. module: contract_manage_report
+#: field:contract.department.report.wizard,all_contract:0
+msgid "All contract"
+msgstr "Tutti i contratti"
+
+#. module: contract_manage_report
+#: view:contract.department.report.wizard:0
+msgid "Filter: Parameter for summary report"
+msgstr "Filtro: Parametri per report riassuntivo"
+
+#. module: contract_manage_report
+#: model:ir.model,name:contract_manage_report.model_contract_report_intervent_wizard
+msgid "Intervent report wizard"
+msgstr "Wizard report interventi"
+
+#. module: contract_manage_report
+#: view:contract.department.report.wizard:0
+msgid "Filter: Department"
+msgstr "Filtro: Dipartimento"
+
+#. module: contract_manage_report
+#: selection:contract.report.intervent.wizard,month:0
+msgid "December"
+msgstr "Dicembre"
+
+#. module: contract_manage_report
+#: help:contract.report.intervent.wizard,absence_account_id:0
+msgid "If absence report is only for one type of account"
+msgstr "Se il report di assenze e' relativo ad un solo tipo di conto"
+
+#. module: contract_manage_report
+#: field:contract.department.report.wizard,cost:0
+msgid "With cost"
+msgstr "Blocco costi"
+
+#. module: contract_manage_report
+#: field:contract.report.intervent.wizard,month:0
+msgid "Month"
+msgstr "Mese"
+
+#. module: contract_manage_report
+#: selection:contract.report.intervent.wizard,month:0
+msgid "September"
+msgstr "Settembre"
+
+#. module: contract_manage_report
+#: model:ir.actions.report.xml,name:contract_manage_report.report_aeroo_contracts_summary
+msgid "Sommario contratti"
+msgstr "Sommario contratti"
+
+#. module: contract_manage_report
+#: field:contract.department.report.wizard,date_summary:0
+msgid "With date summary"
+msgstr "Con riepilogo data"
+
+#. module: contract_manage_report
+#: field:contract.report.intervent.wizard,year:0
+msgid "Year"
+msgstr "Anno"
+
+#. module: contract_manage_report
+#: view:contract.department.report.wizard:0
+#: view:contract.report.intervent.wizard:0
+msgid "Cancel"
+msgstr "Annulla"
+
+#. module: contract_manage_report
+#: view:contract.department.report.wizard:0
+msgid "Contract per dept. report"
+msgstr "Stampa contratti per dipartimento"

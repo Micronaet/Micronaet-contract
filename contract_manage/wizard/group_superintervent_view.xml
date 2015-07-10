@@ -1,0 +1,66 @@
+<?xml version="1.0" ?>
+<openerp>
+<data>
+    <!--VIEWS: -->
+    <record id="account_analytic_superintervent_wizard" model="ir.ui.view">
+        <field name="name">Group super intervent and create analytic entries</field>
+        <field name="model">account.analytic.superintervent.wizard</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Group super intervent and create analytic entries">
+                <group colspan="4">
+                    <button string="Cancel" special="cancel" icon="gtk-cancel"/>
+                    <button string="Create" name="create_superintervent_function" type="object" icon="gtk-ok"/>
+                </group>
+
+                <separator string="Filter (not mandatory)" colspan="4" />
+                <field name="comment" colspan="4" nolabel="1"/>
+
+                <separator string="Date:" colspan="4" />
+                <field name="from_date" />
+                <field name="to_date" />
+
+                <separator string="User:" colspan="4" />
+                <field name="all_users" on_change="on_change_all_user(all_users)" />
+                <field name="user_id" attrs="{'invisible': [('all_users','=',True)], 'required': [('all_users','=',False)],}"/>
+                <newline />
+
+                <separator string="Department:" colspan="4" />
+                <group colspan="4" col="6">
+                   <field name="extra_department"  on_change="on_change_all_department(extra_department,all_department)"/>
+                   <field name="all_department" attrs="{'invisible': [('extra_department','!=',False)]}"  on_change="on_change_all_department(extra_department,all_department)"/>
+                   <field name="department_id" attrs="{'invisible': ['|',('extra_department','=',True),('all_department','=',True)], 'required': [('extra_department','=',False),('all_department','=',False)],}"/>
+                </group>
+
+                <separator string="Importation comment" colspan="4" />
+                <field name="name" colspan="4" nolabel="1"/>
+            </form>
+        </field>
+    </record>
+
+    <!--ACTION: -->
+      <record id="account_analytic_superintervent_wizard_action" model="ir.actions.act_window">
+        <field name="name">Assign cost grouping superintervent</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.analytic.superintervent.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_user_id':uid,}</field>
+      </record>
+
+    <!--<act_window name="Group and divide costs"
+        context="{'active_id': active_id,}"
+        res_model="account.analytic.superintervent.wizard"
+        src_model="account.analytic.superintervent"
+        id="account_analytic_superintervent_wizard_action_right"/>-->
+
+    <!-- MENUITEM -->
+            <menuitem id="menu_account_analytic_superintervent_wizard"
+                 name="Assign cost grouping superintervent"
+                 action="account_analytic_superintervent_wizard_action" 
+                 sequence="50"
+                 parent="menu_action_account_analytic_superintervent_root" />
+</data>
+</openerp>
+

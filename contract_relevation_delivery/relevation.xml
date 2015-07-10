@@ -1,0 +1,242 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+    <!--<data>
+        <record id='view_partner_add_fiam_fields' model='ir.ui.view'>
+            <field name='name'>Partner extra field</field>
+            <field name='model'>res.partner</field>
+            <field name="inherit_id" ref="base.view_partner_form"/>
+            <field name='type'>form</field>
+            <field name='arch' type='xml'>
+                <field name="ref" position="after">
+                     <field name="imported" invisible="1" />
+                     <field name="mexal_c" attrs="{'invisible':[('imported','=',False)]}" />
+                     <field name="mexal_s" attrs="{'invisible':[('imported','=',False)]}" />
+                     <field name="mexal_d" attrs="{'invisible':[('imported','=',False)]}" />                 
+                </field>
+            </field>
+        </record>    
+    </data>-->
+    <!-- Inherited view: -->
+
+        <!-- res.company -->
+        <record id='view_base_view_company_form_blacklist' model='ir.ui.view'>
+            <field name='name'>Lector blacklisted</field>
+            <field name='model'>res.company</field>
+            <field name="inherit_id" ref="base.view_company_form"/>
+            <field name='type'>form</field>
+            <field name='arch' type='xml'>
+                <xpath expr="/form/notebook/page" position="after">
+                     <page string="Relevation">
+                         <separator string="Lector blacklisted" colspan="4"/>
+                         <field name="relevation_blacklist" colspan="4" nolabel="1"/>
+                     </page>
+                </xpath>
+            </field>
+        </record>    
+
+        <!-- res.users -->
+        <record id='view_res_users_add_fields_search' model='ir.ui.view'>
+            <field name='name'>User extra lecture</field>
+            <field name='model'>res.users</field>
+            <field name="inherit_id" ref="base.view_users_search"/>
+            <field name='type'>search</field>
+            <field name='arch' type='xml'>
+                <field name="login" position="after">
+                     <field name="relevation_code" />
+                </field>
+            </field>
+        </record>    
+    
+        <record id='view_res_users_add_fields_tree' model='ir.ui.view'>
+            <field name='name'>User extra lecture</field>
+            <field name='model'>res.users</field>
+            <field name="inherit_id" ref="base.view_users_tree"/>
+            <field name='type'>tree</field>
+            <field name='arch' type='xml'>
+                <field name="login" position="after">
+                     <field name="relevation_code" />
+                </field>
+            </field>
+        </record>    
+
+        <record id='view_res_users_add_fields' model='ir.ui.view'>
+            <field name='name'>User extra fields</field>
+            <field name='model'>res.users</field>
+            <field name="inherit_id" ref="base.view_users_form"/>
+            <field name='type'>form</field>
+            <field name='arch' type='xml'>
+                <field name="new_password" position="after">
+                     <field name="relevation_code" />
+                </field>
+            </field>
+        </record>    
+
+    <!-- View: -->
+       <!--etl.relevation.line-->
+    <record id="view_etl_relevation_line_search" model="ir.ui.view">
+        <field name="name">Importation line</field>
+        <field name="model">etl.relevation.line</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+           <search string="Search importation line">
+                <field name="header_date" />
+                <field name="name" />
+                <field name="user_id" />
+                <field name="line_import_error" />
+            </search>
+        </field>
+    </record>    
+           
+    <record id="view_etl_relevation_line_tree" model="ir.ui.view">
+        <field name="name">Importation line</field>
+        <field name="model">etl.relevation.line</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Elements" editable="bottom" colors="red:line_import_error">
+                <field name="name" />
+                <field name="user_id" />
+                <field name="total" />
+                <field name="error" />
+                <field name="location" />
+                <!--<field name="header_date" readonly="1"/>-->
+                <field name="date" readonly="1"/>
+                <field name="timesheet_id" domain="[('user_id','=',user_id),('date','=',date)]" on_change="onchange_timesheet_id(timesheet_id)"/>
+                <field name="line_import_error" />
+                <field name="error_description" readonly="1" />
+            </tree>
+        </field>
+    </record>    
+
+    <record id="view_etl_relevation_line_form" model="ir.ui.view">
+        <field name="name">Importation line</field>
+        <field name="model">etl.relevation.line</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Relevation line">
+                <field name="name" />
+                <field name="user_id" />
+                <field name="location" />
+                <!--<field name="header_date" readonly="1"/>-->
+                <field name="date" readonly="1"/>
+                <field name="timesheet_id" domain="[('user_id','=',user_id),('date','=',date)]" on_change="onchange_timesheet_id(timesheet_id)"/>
+                <field name="total" />
+                <field name="error" />
+                <field name="line_import_error" />
+                <field name="error_description" readonly="1"/>
+            </form>
+        </field>
+    </record>    
+
+    <record id="action_view_etl_relevation_line" model="ir.actions.act_window">
+         <field name="name">Importation line</field>
+         <field name="type">ir.actions.act_window</field>
+         <field name="res_model">etl.relevation.line</field>
+         <field name="view_type">form</field>
+         <field name="view_mode">tree,form</field>
+         <field name="view_id" ref="view_etl_relevation_line_tree"/>
+         <field name="domain">[('line_import_error','=',True)]</field>
+         <field name="search_view_id" ref="view_etl_relevation_line_search"/>
+    </record>
+
+       <!--etl.relevation.header-->
+    <record id="view_etl_relevation_header_search" model="ir.ui.view">
+        <field name="name">Importation search</field>
+        <field name="model">etl.relevation.header</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+           <search string="Search importation header">
+                <field name="name" />
+                <field name="date" />
+                <field name="import_error" />
+            </search>
+        </field>
+    </record>    
+           
+    <record id="view_etl_relevation_header_tree" model="ir.ui.view">
+        <field name="name">Importation header</field>
+        <field name="model">etl.relevation.header</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+           <tree string="Importation header" colors="red:import_error">
+                <field name="name" />
+                <field name="date" />
+                <field name="import_error" />
+            </tree>
+        </field>
+    </record>    
+
+    <record id="view_etl_relevation_header_form" model="ir.ui.view">
+        <field name="name">Importation header</field>
+        <field name="model">etl.relevation.header</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+           <form string="Importation header">
+                <group colspan="4" col="6">
+                   <field name="name" />
+                   <field name="date" />
+                   <field name="import_error" />
+                </group>
+                <separator string="Elements imported" colspan="4"/>
+                <field name="relevation_line_ids" nolabel="1"  colspan="4">
+                    <tree string="Elements" editable="bottom" colors="red:line_import_error">
+                        <field name="name" />
+                        <field name="user_id" />
+                        <field name="total" />
+                        <field name="error" />
+                        <field name="location" />
+                        <field name="date" invisible="1"/>
+                        <field name="timesheet_id" domain="[('user_id','=',user_id),('date','=',date)]" on_change="onchange_timesheet_id(timesheet_id)"/>
+                        <field name="line_import_error" />
+                        <field name="error_description" readonly="1" />
+                    </tree>
+                    <form>
+                        <field name="name" />
+                        <field name="user_id" />
+                        <field name="location" />
+                        <field name="date" invisible="1"/>
+                        <field name="timesheet_id" domain="[('user_id','=',user_id),('date','=',date)]" on_change="onchange_timesheet_id(timesheet_id)"/>
+                        <field name="total" />
+                        <field name="error" />
+                        <field name="line_import_error" />
+                        <field name="error_description" readonly="1" />
+                    </form>
+                </field>
+            </form>
+        </field>
+    </record>    
+
+    <record id="action_view_etl_relevation_header" model="ir.actions.act_window">
+         <field name="name">Importation header</field>
+         <field name="type">ir.actions.act_window</field>
+         <field name="res_model">etl.relevation.header</field>
+         <field name="view_type">form</field>
+         <field name="view_mode">tree,form</field>
+         <field name="view_id" ref="view_etl_relevation_header_tree"/>
+         <field name="search_view_id" ref="view_etl_relevation_header_search"/>
+    </record>
+
+    <!-- Menuitems:-->
+        <menuitem id="menu_importation_root"
+             name="Importation"
+             sequence="80"                 
+             parent="contract_manage.menu_contract_manage_root" 
+             groups="analytic.group_analytic_accounting" />
+
+            <menuitem id="menu_importation_relevation"
+                 name="Relevation"
+                 sequence="10"                 
+                 parent="menu_importation_root" 
+                 action="action_view_etl_relevation_header"
+                 groups="analytic.group_analytic_accounting" />
+
+            <menuitem id="menu_importation_relevation_error"
+                 name="Error importation"
+                 sequence="20"                 
+                 parent="menu_importation_root" 
+                 action="action_view_etl_relevation_line"
+                 groups="analytic.group_analytic_accounting" />
+
+    </data>    
+</openerp>
+

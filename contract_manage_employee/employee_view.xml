@@ -1,0 +1,204 @@
+<?xml version="1.0" ?>
+<openerp>
+<data>
+    <!-- INHERIT VIEWS -->  
+      <!-- hr.employee -->
+        <record id="view_hr_employee_extra_fields" model="ir.ui.view">
+            <field name="name">Employee work time</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="base_import_fraternita.view_view_employee_form_extra_field"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+               <field name="patent_type" position="after">
+                  <field name="contract_tipology_id" />
+               </field>               
+           </field>
+        </record>	  
+
+        <record id="view_hr_employee_tree_add_contract_type" model="ir.ui.view">
+            <field name="name">Employee contract type</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_tree"/>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                 <field name="department_id" position="after">
+                     <field name="contract_tipology_id" />
+                 </field>
+            </field>
+        </record>
+                
+   <!-- NORMAL VIEWS: -->   
+   <!-- contract.employee.timesheet.tipology -->
+    <record id="view_contract_employee_timesheet_tipology_search" model="ir.ui.view">
+        <field name="name">Contract tipology</field>
+        <field name="model">contract.employee.timesheet.tipology</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search string="Contract tipology">
+               <field name="name"/>
+            </search>
+        </field>    
+    </record>
+
+    <record id="view_contract_employee_timesheet_tipology_tree" model="ir.ui.view">
+        <field name="name">Contract tipology</field>
+        <field name="model">contract.employee.timesheet.tipology</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Contract tipology">
+               <field name="name"/>
+            </tree>
+        </field>    
+    </record>
+
+    <record id="view_contract_employee_timesheet_tipology_form" model="ir.ui.view">
+        <field name="name">Contract tipology</field>
+        <field name="model">contract.employee.timesheet.tipology</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Contract tipology">
+               <field name="name" />
+               <separator string="Details" colspan="4" />
+               <field name="line_ids" nolabel="1" colspan="4">
+                   <tree editable="bottom">
+                       <field name="week_day" />    
+                       <field name="name" />    
+                   </tree>
+                   <form>
+                       <field name="week_day" />    
+                       <field name="name" />    
+                   </form>
+               </field>
+            </form>
+        </field>    
+    </record>
+
+    <record id="action_view_contract_employee_timesheet_tipology" model="ir.actions.act_window">
+        <field name="name">Contract tipology</field>
+        <field name="res_model">contract.employee.timesheet.tipology</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_contract_employee_timesheet_tipology_tree"/>
+        <field name="search_view_id" ref="view_contract_employee_timesheet_tipology_search"/>
+    </record>
+
+   <!-- contract.employee.festivity -->
+    <record id="view_contract_employee_festivity_search" model="ir.ui.view">
+        <field name="name">Festivity</field>
+        <field name="model">contract.employee.festivity</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search string="Festivity">
+               <field name="name"/>
+            </search>
+        </field>    
+    </record>
+
+    <record id="view_contract_employee_festivity_tree" model="ir.ui.view">
+        <field name="name">Festivity (static)</field>
+        <field name="model">contract.employee.festivity</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Festivity">
+               <field name="name"/>
+               <field name="day" />
+               <field name="month" />
+               <field name="periodic" />                   
+               <field name="periodic_from" />
+               <field name="periodic_to" />
+            </tree>
+        </field>    
+    </record>
+
+    <record id="view_contract_employee_festivity_dynamic_tree" model="ir.ui.view">
+        <field name="name">Festivity (dynamic)</field>
+        <field name="model">contract.employee.festivity</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Festivity">
+               <field name="name"/>
+               <field name="dynamic_date" />
+            </tree>
+        </field>    
+    </record>
+
+    <record id="view_contract_employee_festivity_form" model="ir.ui.view">
+        <field name="name">Festivity</field>
+        <field name="model">contract.employee.festivity</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Festivity">
+               <field name="static" />
+               <field name="name" />
+               <group name="static_group" colspan="4"  attrs="{'invisible':[('static','=',False)]}">
+                   <separator string="Static date" colspan="4" />
+                   <field name="day" />
+                   <field name="month" />
+                   
+                   <group name="periodic_group" colspan="4" col="6">
+                      <field name="periodic" />                   
+                      <field name="periodic_from" attrs="{'invisible':[('periodic','!=',True)]}"/>
+                      <field name="periodic_to" attrs="{'invisible':[('periodic','!=',True)]}"/>
+                   </group>   
+               </group>
+               <group name="dynamic_group" colspan="4" attrs="{'invisible':[('static','=',True)]}">
+                   <separator string="Dynamic date" colspan="4" />
+                   <field name="dynamic_date" />
+               </group>
+            </form>
+        </field>    
+    </record>
+
+    <record model="ir.actions.act_window" id="action_view_contract_employee_festivity">
+        <field name="name">Festivity (static)</field>
+        <field name="res_model">contract.employee.festivity</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_contract_employee_festivity_tree"/>
+        <field name="search_view_id" ref="view_contract_employee_festivity_search"/>
+        <field name="domain">[('static','=',True)]</field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_view_contract_employee_festivity_dynamic">
+        <field name="name">Festivity (dynamic)</field>
+        <field name="res_model">contract.employee.festivity</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_contract_employee_festivity_dynamic_tree"/>
+        <field name="search_view_id" ref="view_contract_employee_festivity_search"/>
+        <field name="domain">[('static','=',False)]</field>
+    </record>
+
+    <!-- MENUITEM -->
+    <!-- (in configuration menuitem of contract_manage) -->
+    <menuitem id="menu_configuration_contract_tipology"
+         name="Contract tipology"
+         sequence="0"
+         parent="contract_manage.menu_configuration_root" />
+
+        <menuitem id="menu_configuration_contract_tipology_contract"
+             name="Contracts"
+             sequence="20"
+             action="action_view_contract_employee_timesheet_tipology"
+             parent="menu_configuration_contract_tipology" />
+
+        <menuitem id="menu_configuration_festivity"
+             name="Festivity"
+             sequence="10"
+             parent="menu_configuration_contract_tipology" />
+             
+            <menuitem id="menu_configuration_contract_festivity_static"
+                 name="Static"
+                 sequence="10"
+                 action="action_view_contract_employee_festivity"
+                 parent="menu_configuration_festivity" />
+                 
+            <menuitem id="menu_configuration_contract_festivity_dynamic"
+                 name="Dynamic"
+                 sequence="20"
+                 action="action_view_contract_employee_festivity_dynamic"
+                 parent="menu_configuration_festivity" />
+
+</data>
+</openerp>
+

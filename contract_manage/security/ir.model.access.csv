@@ -1,0 +1,8 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_account_analytic_intervent_type_user","account.analytic.intervent.type","model_account_analytic_intervent_type","base.group_user",1,1,1,1
+"access_account_analytic_superintervent_group_user","account.analytic.superintervent.group","model_account_analytic_superintervent_group","base.group_user",1,1,1,1
+"access_account_analytic_superintervent_user","account.analytic.superintervent","model_account_analytic_superintervent","base.group_user",1,1,1,1
+"access_account_analytic_intervent_activity_user","account.analytic.intervent.activity","model_account_analytic_intervent_activity","base.group_user",1,1,1,1
+"access_res_city_relation_user","res.city.relation","model_res_city_relation","base.group_user",1,1,1,1
+"access_hr_analytic_timesheet_stat_user","hr.analytic.timesheet.stat","model_hr_analytic_timesheet_stat","base.group_user",1,1,1,1
+

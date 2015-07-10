@@ -1,0 +1,212 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+    <data>
+    
+    <!--Action for dashboard elements-->
+      <!-- deadline contracts -->
+       <!-- List Total contract deadlined -->
+        <record id="action_account_analytic_contract_list_deadline" model="ir.actions.act_window">
+            <field name="name">Contract list (deadlined)</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.analytic.account</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,graph,form</field>
+            <field name="domain">[('parent_id','=',False),('state','=','open'),('date','&lt;',datetime.datetime.today().strftime('%Y-%m-%d 23:59:59'))]</field>
+            <field name="view_id" ref="account.view_account_analytic_account_tree"/>
+            <field name="search_view_id" ref="account.view_account_analytic_account_search"/>
+        </record>       
+
+       <!-- List Total contract to close -->
+        <record id="action_account_analytic_contract_list_to_close" model="ir.actions.act_window">
+            <field name="name">Contract list (to close)</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.analytic.account</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,graph,form</field>
+            <field name="domain">[('parent_id','=',False),('actual_perc_amount_operation','&gt;',0.50)]</field>
+            <field name="view_id" ref="account.view_account_analytic_account_tree"/>
+            <field name="search_view_id" ref="account.view_account_analytic_account_search"/>
+        </record>       
+         
+        <!-- Graph Total contracts per department (created this year) --> 
+        <record id="action_account_analytic_contract_graph_total_per_year" model="ir.actions.act_window">
+            <field name="name">Total graph (started this year)</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.analytic.account</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">graph,tree,form</field>
+            <field name="domain">[('parent_id','=',False),('date_start','&gt;',datetime.datetime.today().strftime('%Y-01-01 00:00:00')),('date_start','&lt;',datetime.datetime.today().strftime('%Y-12-31 23:59:59'))]</field>
+            <field name="view_id" ref="account.view_account_analytic_account_tree"/>
+            <field name="context">{'graph_view_ref':'contract_manage.view_account_analytic_account_contract_graph_total'}</field>
+        </record>       
+
+        <!-- Employee last 2 month with >= 12 h a day-->
+        <!--<record id="action_hr_timesheet_maybe_wrong_intervent" model="ir.actions.act_window">
+            <field name="name">Employee maybe wrong intervent</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.analytic.timesheet</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_hr_timesheet_intervent_tree_not_editable"/>
+        </record>-->
+
+        <!-- Employee with < 4 hours -->
+        <record id="action_hr_timesheet_less_today" model="ir.actions.act_window">
+            <field name="name">Employee less presence today</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.analytic.timesheet</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">graph,tree,form</field>
+            <field name="view_id" ref="view_hr_timesheet_intervent_tree_not_editable"/>
+            <field name="domain">[('date','=',datetime.datetime.today().strftime('%Y-%m-%d')),]</field>
+            <field name="search_view_id" ref="hr_timesheet.hr_timesheet_line_search"/>
+        </record>
+        
+        <record id="action_hr_timesheet_less_today2" model="ir.actions.act_window">
+            <field name="name">Employee presence </field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.analytic.timesheet</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">graph,tree,form</field>
+            <field name="view_id" ref="view_hr_timesheet_intervent_tree_not_editable"/>
+            <field name="search_view_id" ref="hr_timesheet.hr_timesheet_line_search"/>
+            <field name="context">{'graph_view_ref':'contract_manage.view_hr_analytic_timesheet_graph'}</field> <!--'search_default_today':True-->
+        </record>
+        <record id="action_hr_timesheet_date_today" model="ir.actions.act_window">
+            <field name="name">Emplyoee presence (date)</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.analytic.timesheet</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">graph,tree,form</field>
+            <field name="view_id" ref="view_hr_timesheet_intervent_tree_not_editable"/>
+            <field name="search_view_id" ref="hr_timesheet.hr_timesheet_line_search"/>
+            <field name="context">{'graph_view_ref':'contract_manage.view_hr_analytic_timesheet_graph_date'}</field> <!--'search_default_today':True-->
+        </record>
+        <record id="action_hr_timesheet_department" model="ir.actions.act_window">
+            <field name="name">Department total hour</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.analytic.timesheet</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">graph,tree,form</field>
+            <field name="view_id" ref="view_hr_timesheet_intervent_tree_not_editable"/>
+            <field name="search_view_id" ref="hr_timesheet.hr_timesheet_line_search"/>
+            <field name="context">{'graph_view_ref': 'contract_manage.view_hr_analytic_timesheet_dept_graph'}</field> <!--'search_default_today':True-->
+        </record>
+        <!--red:(date<current_date);black:(date>=current_date);black:(date==False)-->
+
+        <!-- Employee without product -->
+        <record id="action_hr_employee_no_product" model="ir.actions.act_window">
+            <field name="name">Employee without product</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.employee</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,graph</field>
+            <field name="domain">[('product_id','=',False)]</field>
+        </record>
+
+        <!-- Employee without department -->
+        <record id="action_hr_employee_no_department" model="ir.actions.act_window">
+            <field name="name">Employee without department</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.employee</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,graph</field>
+            <field name="domain">[('department_id','=',False),('id','!=',1)]</field>
+        </record>
+
+        <!-- User without department -->
+        <record id="action_hr_user_no_department" model="ir.actions.act_window">
+            <field name="name">User without department</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">res.users</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,graph</field>
+            <field name="domain">[('context_department_id','=',False),('id','!=',1)]</field>
+        </record>
+
+   <!-- Dashboard view -->     
+   <record id="board_board_contract" model="ir.ui.view">
+        <field name="name">Contract dashboard</field>
+        <field name="model">board.board</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Dashboard support">
+                <vpaned position="800" >
+                    <child1 groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager">
+                        <group groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager" colspan="4">
+                           <separator string="Intervent check:" colspan="4" groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager"/> 
+                           <action colspan="4" name="%(action_hr_timesheet_intervent_stat)d" string="Intervent check" width="800" groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager"/>
+                           
+                           <separator string="Employee without product:" colspan="4" groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager"/> 
+                           <action colspan="4" name="%(action_hr_employee_no_product)d" string="Employee without product" width="800" groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager"/>
+                           
+                           <separator string="Employee without department:" colspan="4" groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager" /> 
+                           <action colspan="4" name="%(action_hr_employee_no_department)d" string="Employee without department" width="800" groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager"/>
+                           
+                           <separator string="User without department:" colspan="4" groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager" /> 
+                           <action colspan="4" name="%(action_hr_user_no_department)d" string="User without department" width="800" groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager"/>
+                           
+                           <separator string="Deadlined contract:" colspan="4" groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager" /> 
+                           <action colspan="4" name="%(action_account_analytic_contract_list_deadline)d" string="Deadline contract (deadline&lt;today)" width="800" groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager"/>
+                           
+                           <separator string="Employee intervent today:" colspan="4" groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager" /> 
+                           <action colspan="4" name="%(action_hr_timesheet_less_today)d" string="Employee today" width="800" groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager"/>                        
+                           
+                           <separator string="Contracts started this year:" colspan="4" groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager" /> 
+                           <action colspan="4" name="%(action_account_analytic_contract_graph_total_per_year)d" string="Total contract started this year (per department)" width="800" groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager"/>
+                        </group>
+                    </child1>
+                </vpaned>
+            </form>
+        </field>
+    </record>
+    
+    <record id="action_contract_dashboard" model="ir.actions.act_window">
+        <field name="name">Action contract dashboard</field>
+        <field name="res_model">board.board</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="groups">analytic.group_analytic_accounting,contract_manage.group_contract_department_manager</field>
+        <field name="view_id" ref="board_board_contract"/>
+    </record>        
+
+    <!-- MENUITEM -->
+    <!-- override for insert dashboard -->
+   <menuitem id="menu_contract_manage_root"
+             name="Contract Manage"
+             icon="terp-stock" 
+             sequence="0"
+             web_icon="images/contract.png"
+             action="action_contract_dashboard"
+             web_icon_hover="images/contract-hover.png" />
+    
+    <menuitem id="menu_contract_analysis_root"
+             name="Analysys"
+             parent="menu_contract_manage_root" 
+             groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager"
+             sequence="80"/>
+             
+        <menuitem id="menu_contract_analysis_dashboard_default"
+                 name="Dashboard (default)"
+                 parent="menu_contract_analysis_root" 
+                 action="action_contract_dashboard"
+                 sequence="10"/>
+        <menuitem id="menu_contract_analysis_employee"
+                 name="Timesheet (tot hour x employee)"
+                 parent="menu_contract_analysis_root" 
+                 action="action_hr_timesheet_less_today2"
+                 sequence="20"/>
+            <menuitem id="menu_contract_analysis_employee_date"
+                     name="Timesheet (tot hour x date)"
+                     parent="menu_contract_analysis_employee" 
+                     action="action_hr_timesheet_date_today"
+                     sequence="10"/>
+        <menuitem id="menu_contract_analysis_department"
+                 name="Employee (per dept.)"
+                 parent="menu_contract_analysis_root" 
+                 action="action_hr_timesheet_department"
+                 sequence="30"/>
+
+
+    </data>
+</openerp>

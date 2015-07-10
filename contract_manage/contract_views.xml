@@ -1,0 +1,1148 @@
+<?xml version="1.0" ?>
+<openerp>
+<data>
+    <!-- INHERIT VIEWS -->  
+        <!-- res.city -->
+        <record id="view_res_city_costs_tree" model="ir.ui.view">
+            <field name="name">Cost for city (Km)</field>
+            <field name="model">res.city</field>
+            <field name="inherit_id" ref="l10n_it_base.view_res_city_tree"/>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+               <field name="province_id" position="after">
+                  <field name="trip_km" />
+                  <field name="tour_km" />
+               </field>
+           </field>
+        </record>
+        <record id="view_res_city_costs_form" model="ir.ui.view">
+            <field name="name">Cost for city (Km)</field>
+            <field name="model">res.city</field>
+            <field name="inherit_id" ref="l10n_it_base.view_res_city_form"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+               <field name="cadaster_code" position="after">
+                  <separator string="Manage control:" colspan="4"/>
+                  <field name="trip_km" />
+                  <field name="tour_km" />
+               </field>
+           </field>
+        </record>
+
+      <!-- res.users -->
+        <record id='view_res_users_add_fields_search' model='ir.ui.view'>
+            <field name='name'>User extra lecture</field>
+            <field name='model'>res.users</field>
+            <field name="inherit_id" ref="base.view_users_search"/>
+            <field name='type'>search</field>
+            <field name='arch' type='xml'>
+                <field name="login" position="after">
+                     <field name="context_department_id" />
+                </field>
+            </field>
+        </record>    
+          
+        <record id="view_users_tree_add_dept" model="ir.ui.view">
+            <field name="name">Add dept for user</field>
+            <field name="model">res.users</field>
+            <field name="inherit_id" ref="base.view_users_tree"/>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+               <field name="login" position="after">
+                  <field name="context_department_id" />
+               </field>
+           </field>
+        </record>
+
+      <!-- product.product -->
+        <record id="view_product_product_extra_fields" model="ir.ui.view">
+            <field name="name">Product extra field</field>
+            <field name="model">product.product</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+               <field name="purchase_ok" position="after">
+                  <field name="is_hour_cost" />
+               </field>               
+               <field name="ean13" position="after">
+                  <field name="department_id" />
+               </field>              
+           </field>
+        </record>	      
+       <!-- hr.department -->
+        <record id="view_hr_department_tree_extra_fields" model="ir.ui.view">
+            <field name="name">Department extra field</field>
+            <field name="model">hr.department</field>
+            <field name="inherit_id" ref="hr.view_department_tree"/>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+               <xpath expr="/tree" position="attributes">
+                  <attribute name="colors">grey:inactive==True;</attribute>
+               </xpath>
+               <field name="company_id" position="before">
+                  <field name="inactive" invisible="1" />
+               </field>               
+            </field>
+        </record>	
+        <record id="view_hr_department_form_extra_fields" model="ir.ui.view">
+            <field name="name">Department extra field</field>
+            <field name="model">hr.department</field>
+            <field name="inherit_id" ref="hr.view_department_form"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+               <field name="company_id" position="after">
+                  <field name="inactive" />
+                  <field name="for_extra_department" />
+               </field>               
+            </field>
+        </record>	
+
+       <!-- hr.analytic.timesheet -->
+        <record id="view_hr_timesheet_line_extra_fields_tree" model="ir.ui.view">
+            <field name="name">Extra quantity field</field>
+            <field name="model">hr.analytic.timesheet</field>
+            <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_tree"/>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+               <xpath expr="/tree" position="attributes">
+                  <attribute name="colors">red:error_etl;</attribute>
+               </xpath>            
+               <field name="account_id" position="after">
+                  <field name="error_etl" invisible="1" />
+                  <field name="city_id" />
+                  <field name="location_site" />
+                  <field name="operation" string="Oper."/>
+                  <field name="amount_operation" string="Q. op."/>
+               </field>               
+            </field>
+        </record>	
+
+         <!-- account.analytic.line -->
+         <record id="view_account_analytic_line_filter_search_inherit" model="ir.ui.view">
+            <field name="name">Extra search filter line</field>
+            <field name="model">account.analytic.line</field>
+            <field name="inherit_id" ref="account.view_account_analytic_line_filter"/>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <field name="account_id" position="after">
+                    <field name="journal_id"/>
+                </field>
+            </field>
+         </record>
+
+         <record id="view_account_analytic_line_form_view_child" model="ir.ui.view">
+            <field name="name">Analytic equipment linked intervent</field>
+            <field name="model">account.analytic.line</field>
+            <field name="type">form</field>
+            <field name="priority" eval="20" />
+            <field name="arch" type="xml">
+                 <form string="Equipment cost linked to intervent">
+                   <field name="extra_analytic_line_timesheet_id" invisible="1" />
+                    <group colspan="4" col="6">
+                        <field name="journal_id" /><!--onchange-->
+                        <field name="date"/>
+                        <field name="product_id" colspan="4"  domain="[('is_hour_cost','=',False)]"/>
+                        
+                        <field name="unit_amount" colspan="2"/>
+                        <field name="product_uom_id" colspan="2" nolabel="1"/>
+                        <field name="amount" colspan="4"/>
+                        
+                        <field name="name" invisible="1" />
+                        <field name="account_id" invisible="1" />
+                        <field name="ref" invisible="1" />
+                        <field name="company_id" invisible="1" /> 
+                        
+                    </group>
+                    <field name="general_account_id"/> <!--invisible-->
+                  <!-- ORIGINALE:
+                  <field name="extra_ids" nolabel="1" colspan="4">
+                    <tree string="Extra costi" editable="bottom">                        
+                        <field name="type" on_change="on_change_type_get_uom(type_id)" />
+                        <field name="product_id" domain="[('type','=',type),('is_hour_cost','=',False)]" on_change="on_change_product_get_uom(product_id)"/>
+                        <field name="quantity"/>
+                        <field name="uom_id" readonly="1"/>
+                    </tree>
+                    <form string="Extra product">
+                        <field name="type" on_change="on_change_type_get_uom(type_id)"/>
+                        <field name="product_id" domain="[('type','=',type),('is_hour_cost','=',False)]" on_change="on_change_product_get_uom(product_id)"/>
+                        <field name="quantity"/>
+                        <field name="uom_id" readonly="1"/>
+                    </form>
+                </field>
+                  -->  
+                    
+                    
+                   <!--<group colspan="2" col="4">
+                        <separator string="Amount" colspan="4"/>-->
+                        <!--<field name="amount_currency" colspan="2"/>
+                        <field name="currency_id" colspan="2" nolabel="1"/>-->
+                    <!--</group>
+                    <group colspan="2" col="4">
+                        <separator string="Product Information" colspan="4"/>-->
+                        <!--<field name="to_invoice"/><field name="invoice_id"/>
+                    </group>-->
+                    <!--<group colspan="2" col="2">
+                        <separator string="General Accounting" colspan="2"/>-->
+                       
+                        <!--<field name="move_id" readonly="1"/>-->
+                    <!--</group>-->
+                </form>
+            </field>
+         </record>
+
+         <!-- account.analytic.account -->
+         <record id="view_account_analytic_account_contract_search_inherit" model="ir.ui.view">
+            <field name="name">Partner field</field>
+            <field name="model">account.analytic.account</field>
+            <field name="inherit_id" ref="account.view_account_analytic_account_search"/>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                <field name="user_id" position="after">
+                    <field name="department_id" widget="selection"/>
+                    <field name="state"/>
+                    <field name="has_subcontract"/>
+                    <field name="not_working"/>         
+                </field>
+            </field>
+         </record>
+        
+         <record id="view_account_analytic_account_contract_tree" model="ir.ui.view">
+            <field name="name">Partner field</field>
+            <field name="model">account.analytic.account</field>
+            <field name="inherit_id" ref="account.view_account_analytic_account_tree"/>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+               <field name="debit" position="attributes">
+                   <attribute name="string">Ricavi</attribute>
+               </field>               
+               <field name="credit" position="attributes">
+                   <attribute name="string">Costi</attribute>
+               </field>               
+
+               <field name="partner_id" position="attributes">
+                   <attribute name="invisible">0</attribute>
+               </field>               
+               <field name="quantity_max" position="attributes">
+                   <attribute name="invisible">1</attribute>
+               </field>               
+               <field name="quantity" position="attributes">
+                   <attribute name="invisible">1</attribute>
+               </field>               
+               <field name="partner_id" position="before">
+                  <field name="default_operation" string="operation" />
+                  <!--<field name="actual_amount_operation" string="actual op." />-->
+                  <field name="total_amount_operation" string="tot. op."/>
+                  <field name="actual_perc_amount_operation" string="status" widget="progressbar"/>
+                  <field name="department_id" />
+               </field>               
+               <field name="partner_id" position="after">
+                   <field name="state" />
+               </field>
+            </field>
+        </record>
+            
+        <record id="view_account_analytic_account_contract_form" model="ir.ui.view">
+            <field name="name">Sub account page</field>
+            <field name="model">account.analytic.account</field>
+            <field name="inherit_id" ref="account.view_account_analytic_account_form"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+               <field name="type" position="after">
+                  <group colspan="4" col="8">
+                    <field name="is_contract" />                     
+                    <field name="has_subcontract" />                     
+                    <field name="not_working"/>         
+                    <field name="is_recover" />
+                  </group>
+               </field>
+               
+               <xpath expr="/form/notebook/page[@string='Account Data']" position="after">
+                   <page string="Sub account" attrs="{'invisible':[('has_subcontract','=',False)]}">                        <!--attrs="{'invisible':[('parent_id','!=',False)]}"-->
+                       <field name="child_ids" nolabel="1" context="{'default_parent_id':active_id,'default_partner_id':partner_id,}">
+                            <tree toolbar="1" colors="red:(date&lt;current_date);black:(date&gt;=current_date);black:(date==False)" string="Analytic Accounts child">
+                                <field name="code"/>
+                                <field name="complete_name"/>
+                                <field name="department_id"/>
+                                <field name="hours_quantity"/>
+                                <field name="hours_qtt_non_invoiced"/>
+                                <field name="remaining_hours"/>
+                                <field name="quantity_max"/>
+                                <field name="last_invoice_date"/>
+                                <field name="ca_to_invoice"/>
+                                <field name="date"/>
+                                <field name="credit"/>
+                                <field name="debit"/>
+                                <field name="total_cost"/>
+                                <field name="user_id" invisible="1" />
+                                <field name="parent_id" invisible="1" />
+                                <field name="partner_id" invisible="1" />
+                            </tree>
+                       </field>
+                   </page>
+                   <page string="Manage control" >
+                      <separator string="General info" colspan="4" />                      
+                         <field name="total_amount" />                     
+                         <field name="department_id" /> <!--attrs="{'invisible':[('parent_id','!=',False)]}"/>-->
+                      <separator string="Specific data for contract" colspan="4" />
+                         <group colspan="4" col="6">
+                           <field name="default_operation" />
+                           <field name="total_amount_operation" />
+                           <field name="price_operation" />
+                         </group>
+                      <separator string="Extra rate" colspan="4" />
+                           <field name="commercial_rate" />
+                           <field name="general_rate" />
+                      <separator string="Location city for daily cost" colspan="4" />                           
+                       <field name="location_filtered" />
+                       <group colspan="4" attrs="{'invisible': [('location_filtered','=',False)]}">
+                          <separator name="City filtered" colspan="4" />
+                          <!--<field name="filtered_city_ids" nolabel="1" colspan="4" />-->
+                          <field name="filter_city_ids" nolabel="1" colspan="4">
+                             <tree sting="Filter city" editable="bottom">
+                                <field name="name" on_change="on_change_city_compute_std_cost(name,)" /><!--city_id-->
+                                <field name="trip_km" />
+                                <field name="tour_km" />
+                             </tree>
+                          </field>
+                       </group>                      
+                   </page>
+               </xpath>
+            </field>
+        </record>
+
+        <record id="view_account_analytic_account_contract_form_lite" model="ir.ui.view">
+            <field name="name">Contract lite form</field>
+            <field name="model">account.analytic.account</field>
+            <field name="type">form</field>
+            <field name="priority" eval="20" />
+            <field name="arch" type="xml">
+               <form string="Analytic account">
+                     <separator string="Contract data:" colspan="4" />
+                     <group colspan="4" col="6">
+                        <field name="name" select="1" />
+                        <field name="code" select="1" />
+                        <field name="company_id" widget="selection"/>
+                        <newline />
+                        <label string="Tip: use code + partner + department, ex.: 2012001 Mr BLack Read" colspan="2"/>
+                        <label string="4 number for year + 3 number for count, ex.: 2012001" colspan="2"/>
+                        <label string="" colspan="2"/>
+                     </group>
+                     <separator string="Extra informations:" colspan="4" />
+                     <field name="partner_id" select="1"/>
+                     <field name="currency_id" select="1"/>
+                     <field name="date_start"/>
+                     <field name="date" select="2"/>
+                     <field name="default_operation"/>
+                     <field name="total_amount_operation"/>
+               
+                </form>
+           </field>
+       </record>
+
+        <record id="view_account_analytic_account_contract_calendar" model="ir.ui.view">
+            <field name="name">Contract calendar</field>
+            <field name="model">account.analytic.account</field>
+            <field name="type">calendar</field>
+            <field name="arch" type="xml">
+               <calendar string="Deadline calendar" date_start="date" color="department_id">
+                     <field name="name" />
+                     <field name="partner_id" />
+                     <field name="code" />
+                </calendar>
+           </field>
+       </record>
+
+        <!--Low priority-->
+        <record id="view_account_analytic_account_contract_graph_total" model="ir.ui.view">
+            <field name="name">Contract lite graph</field>
+            <field name="model">account.analytic.account</field>
+            <field name="type">graph</field>
+            <field name="priority" eval="20" />
+            <field name="arch" type="xml">
+               <graph string="Contracts total" type="bar">
+                     <field name="department_id" />
+                     <field name="total_amount"/>
+                </graph>
+           </field>
+       </record>
+
+        <!-- hr.analytic.timesheet.stat -->    
+        <record id="view_hr_timesheet_intervent_stat_tree" model="ir.ui.view">
+            <field name="name">Intervent check</field>
+            <field name="model">hr.analytic.timesheet.stat</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+               <tree string="Intervent report">
+                    <field name="date" />
+                    <field name="user_id" />
+                    <field name="unit_amount" />
+                    <field name="total" />
+                </tree>
+            </field>
+        </record>    
+        <record id="view_hr_timesheet_intervent_stat_form" model="ir.ui.view">
+            <field name="name">Intervent check</field>
+            <field name="model">hr.analytic.timesheet.stat</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+               <form string="Intervent report">
+                    <field name="date" readonly="1" />
+                    <field name="user_id" readonly="1" />
+                    <field name="unit_amount" readonly="1" />
+                    <field name="total" readonly="1"/>
+                </form>
+            </field>
+        </record>    
+       
+        <record id="action_hr_timesheet_intervent_stat" model="ir.actions.act_window">
+            <field name="name">Intervent check</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.analytic.timesheet.stat</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('unit_amount','&gt;=',12),]</field>
+            <field name="view_id" ref="view_hr_timesheet_intervent_stat_tree"/>
+        </record>
+        
+        <act_window            
+            id="act_hr_timesheet_intervent_stat_2_intervent"
+            name="Open intervents"
+            res_model="hr.analytic.timesheet"
+            src_model="hr.analytic.timesheet.stat"
+            domain="[('user_id','=',user_id),('date','=',date)]"
+            />
+
+        <!-- hr.analytic.timesheet -->    
+        <record id="view_hr_analytic_timesheet_graph" model="ir.ui.view">
+            <field name="name">Timesheet graph</field>
+            <field name="model">hr.analytic.timesheet</field>
+            <field name="type">graph</field>
+            <field name="arch" type="xml">
+               <graph string="Employee" type="bar">
+                     <field name="user_id" />
+                     <field name="unit_amount" operator="+"/>
+                </graph>
+           </field>
+       </record>
+        <record id="view_hr_analytic_timesheet_graph_date" model="ir.ui.view">
+            <field name="name">Contract lite graph (date)</field>
+            <field name="model">hr.analytic.timesheet</field>
+            <field name="type">graph</field>
+            <field name="priority" eval="20" />
+            <field name="arch" type="xml">
+               <graph string="Contracts total (date)" type="bar">
+                     <field name="date" />
+                     <field name="unit_amount" operator="+"/>
+                </graph>
+           </field>
+       </record>
+        <record id="view_hr_analytic_timesheet_dept_graph" model="ir.ui.view">
+            <field name="name">Contract lite graph (dept.)</field>
+            <field name="model">hr.analytic.timesheet</field>
+            <field name="type">graph</field>
+            <field name="priority" eval="20" />
+            <field name="arch" type="xml">
+               <graph string="Contracts total (department)" type="bar">
+                     <field name="department_id" />
+                     <field name="unit_amount" operator="+"/>
+                </graph>
+           </field>
+       </record>
+
+
+        <record id="view_hr_employee_search_add" model="ir.ui.view">
+            <field name="name">Employee contract search</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_filter"/>
+            <field name="type">search</field>
+            <field name="arch" type="xml">
+                 <filter name="active" position="after">
+                     <filter icon="terp-check" domain="[('product_id','=',False)]" name="employee_no_product" string="No product" />                       
+                 </filter>
+            </field>
+        </record>
+
+        <record id="view_hr_employee_tree_add" model="ir.ui.view">
+            <field name="name">Employee contract</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_tree"/>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+                 <field name="department_id" position="after">
+                     <field name="product_id" />
+                 </field>
+            </field>
+        </record>
+
+        <record id="view_hr_timesheet_intervent_form" model="ir.ui.view">
+            <field name="name">Analist account page</field>
+            <field name="model">hr.analytic.timesheet</field>
+            <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_form"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+               <xpath expr="/form/notebook" position="after">
+               <!--<field name="journal_id" position="after">
+                      <group colspan="2" col="2">-->
+                            <separator string="Intervent data" colspan="4"/>
+                            <!--<field name="user_id"/>-->
+                            <field name="operation" />
+                            <field name="amount_operation" />
+                            <separator string="Note" colspan="4"/>
+                            <field name="intervent_annotation" nolabel="1" colspan="4"/>
+                      <!--</group>-->
+               </xpath>
+               <field name="date" position="after">
+                   <field name="city_id" />
+                   <field name="location_site" />                   
+               </field>               
+               <xpath expr="/form/notebook/page[@string='Information']" position="after">
+                   <page string="Extra products" attrs="{'invisible':[('account_id','=',False)]}">
+                       <field name="extra_analytic_line_ids" nolabel="1" context="{'default_date':date,'default_account_id':account_id,'form_view_ref':'contract_manage.view_account_analytic_line_form_view_child'}"> <!--'default_name':name default_journal_id-->
+                            <tree string="Analytic Entries" >
+                                <field name="date"/>
+                                <field name="ref" /> <!--invisible="not context.get('to_invoice', False)"-->
+                                <field name="name"/>
+                                <field name="journal_id" /> <!--invisible="not context.get('to_invoice', False)"-->
+                                <field name="amount" sum="Total" /> <!--invisible="not context.get('to_invoice', False)"-->
+                                <field name="product_id" on_change="on_change_unit_amount(product_id, unit_amount, company_id, product_uom_id, journal_id)" /> <!--invisible="not context.get('to_invoice', False)"-->
+                                <field name="unit_amount" on_change="on_change_unit_amount(product_id, unit_amount, company_id, product_uom_id)" sum="Total Quantity" /> <!--invisible="not context.get('to_invoice', False)"-->
+                                <field name="product_uom_id" on_change="on_change_unit_amount(product_id, unit_amount, company_id, product_uom_id)" /> <!--invisible="not context.get('to_invoice', False)"-->
+                                <field domain="[('type','=','normal')]" name="account_id"/>
+                                <field name="to_invoice"/>
+                                <field name="general_account_id" /> <!--invisible="not context.get('to_invoice', False)"-->
+                                <field name="user_id" invisible="1"/>
+                            </tree>
+                            
+                       </field>
+                   </page>
+               </xpath>
+            </field>
+        </record>
+
+  <!-- NEW VIEWS: -->
+   <!-- account.analytic.superintervent -->
+    <record id="view_account_analytic_superintervent_search" model="ir.ui.view">
+        <field name="name">Super intervent search</field>
+        <field name="model">account.analytic.superintervent</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search string="Super intervent">
+               <filter icon="terp-emblem-important" string="Not grouped" domain="[('group_id','=',False)]"/>
+               <filter icon="terp-stock_effects-object-colorize" string="All department" domain="[('extra_department','=',True)]"/>
+               <separator orientation="vertical"/>
+               <field name="date"/>
+               <field name="name"/>
+               <field name="user_id"/>
+               <field name="department_id" widget="selection"/>
+               <field name="group_id"/>
+            </search>
+        </field>    
+    </record>
+    <record id="view_account_analytic_superintervent_tree" model="ir.ui.view">
+        <field name="name">Super intervent</field>
+        <field name="model">account.analytic.superintervent</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Super intervent (green=not grouped, black=extra dep., grey=with dep.)" colors="black:extra_department==True;grey:extra_department==False;green:group_id!=False;">
+               <field name="date"/>
+               <field name="name"/>
+               <field name="user_id"/>
+               <field name="extra_department"/>
+               <field name="department_id"/>
+               <field name="quantity" sum="Total"/>
+               <field name="group_id"/>
+            </tree>
+        </field>    
+    </record>
+    <record id="view_account_analytic_superintervent_form" model="ir.ui.view">
+        <field name="name">Super intervent</field>
+        <field name="model">account.analytic.superintervent</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Super intervent">
+               <group colspan="4" col="6">
+                  <field name="date"/>
+                  <field name="user_id"/>
+                  <field name="name" default_focus="1"/>
+               </group>
+               <field name="quantity"/>
+               <field name="group_id" readonly="1" />
+               <field name="extra_department" on_change="on_change_extra_department(extra_department)"/>
+               <field name="department_id" attrs="{'invisible': [('extra_department','=',True)], 'required': [('extra_department','=',False)]}"/>
+               <newline/>
+               <separator string="Note" colspan="4"/>
+               <field name="intervent_annotation" colspan="4" nolabel="1"/>
+            </form>
+        </field>    
+    </record>
+        <record id="view_account_analytic_superintervent_calendar" model="ir.ui.view">
+            <field name="name">Super intervent calendar</field>
+            <field name="model">account.analytic.superintervent</field>
+            <field name="type">calendar</field>
+            <field name="arch" type="xml">
+               <calendar string="Super intervent" date_start="date" color="department_id"> <!--TODO create a field to generate "No department" -->
+                     <field name="user_id" />
+                     <field name="name" />
+                     <field name="quantity" />
+                </calendar>
+           </field>
+    </record>
+    <record id="view_account_analytic_superintervent_graph" model="ir.ui.view">
+        <field name="name">Super intervent graph</field>
+        <field name="model">account.analytic.superintervent</field>
+        <field name="type">graph</field>
+        <field name="arch" type="xml">
+           <graph string="Super intervent" type="bar">
+                 <field name="date" />
+                 <field name="quantity" operator="+"/>
+            </graph>
+       </field>
+   </record>
+
+   <record id="action_account_analytic_superintervent" model="ir.actions.act_window">
+        <field name="name">Super intervent</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.analytic.superintervent</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form,calendar,graph</field>
+        <field name="context">{'search_default_user_id':uid,'default_user_id':uid,}</field>
+        <field name="view_id" ref="view_account_analytic_superintervent_tree"/>
+        <field name="search_view_id" ref="view_account_analytic_superintervent_search"/>
+    </record>
+
+   <!-- account.analytic.superintervent.group -->
+    <record id="view_account_analytic_superintervent_group_search" model="ir.ui.view">
+        <field name="name">Super intervent group search</field>
+        <field name="model">account.analytic.superintervent.group</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search string="Super intervent group">
+               <field name="date"/>
+               <field name="name"/>
+               <field name="user_id"/>
+               <field name="department_id"/>
+            </search>
+        </field>    
+    </record>
+
+    <record id="view_account_analytic_superintervent_group_tree" model="ir.ui.view">
+        <field name="name">Super intervent group</field>
+        <field name="model">account.analytic.superintervent.group</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Super intervent group">
+               <field name="date"/>
+               <field name="name"/>
+               <field name="user_id"/>
+               <field name="employee_id"/>
+               <field name="department_id"/>
+               <field name="quantity"/>
+            </tree>
+        </field>    
+    </record>
+
+    <record id="view_account_analytic_superintervent_group_form" model="ir.ui.view">
+        <field name="name">Super intervent group</field>
+        <field name="model">account.analytic.superintervent.group</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Super intervent group">
+               <field name="name" />
+               <field name="date" />
+               <field name="user_id" readonly="1" />
+               <field name="employee_id" readonly="1" />
+               <field name="department_id" readonly="1" />
+               <field name="quantity" readonly="1" />
+               <notebook colspan="4" >
+                  <page string="Intervent list grouped">
+                      <separator string="List of super intervent grouped here"/>
+                      <field name="superintervent_ids" colspan="4" nolabel="1" readonly="1">
+                      </field>
+                  </page>
+                  <page string="Timesheet entry">
+                      <separator string="List of analitic line (timesheet entry)"/>
+                      <field name="timesheet_ids" colspan="4" nolabel="1" readonly="1">
+                      </field>
+                  </page>
+               </notebook>
+            </form>
+        </field>    
+    </record>
+
+   <record id="action_account_analytic_superintervent_group" model="ir.actions.act_window">
+        <field name="name">Super intervent grouped</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.analytic.superintervent.group</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <!--<field name="domain">[('user_id','=',uid)]</field>-->
+        <field name="context">{'default_search_user_id':uid,'default_user_id':uid,}</field>
+        <field name="view_id" ref="view_account_analytic_superintervent_group_tree"/>
+        <field name="search_view_id" ref="view_account_analytic_superintervent_group_search"/>
+    </record>
+
+
+   <!-- account.analytic.intervent.activity -->
+    <record id="view_account_analytic_intervent_activity_search" model="ir.ui.view">
+        <field name="name">Intervent activity search</field>
+        <field name="model">account.analytic.intervent.activity</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search string="Intervent activity">
+               <field name="name"/>
+               <field name="department_id"/>
+            </search>
+        </field>    
+    </record>
+
+    <record id="view_account_analytic_intervent_activity_tree" model="ir.ui.view">
+        <field name="name">Intervent activity</field>
+        <field name="model">account.analytic.intervent.activity</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Intervent activity">
+               <field name="name"/>
+               <field name="department_id"/>
+            </tree>
+        </field>    
+    </record>
+
+    <record id="view_account_analytic_intervent_activity_form" model="ir.ui.view">
+        <field name="name">Intervent activity</field>
+        <field name="model">account.analytic.intervent.activity</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Intervent activity">
+               <field name="name" />
+               <field name="department_id" />
+            </form>
+        </field>    
+    </record>
+
+   <record id="action_view_account_analytic_intervent_activity" model="ir.actions.act_window">
+        <field name="name">Intervent activity</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.analytic.intervent.activity</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_account_analytic_intervent_activity_tree"/>
+        <field name="search_view_id" ref="view_account_analytic_intervent_activity_search"/>
+    </record>
+
+   <!-- account.analytic.intervent.type -->
+    <record id="view_account_analytic_intervent_type_tree" model="ir.ui.view">
+        <field name="name">Type of Journal (for intervent)</field>
+        <field name="model">account.analytic.intervent.type</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+            <tree string="Type of Journal (for Intervent)" editable="bottom">
+               <field name="name"/>
+               <field name="journal_id"/>
+            </tree>
+        </field>    
+    </record>
+
+    <record model="ir.actions.act_window" id="action_journal_type">
+        <field name="name">Journal type (for intervent)</field>
+        <field name="res_model">account.analytic.intervent.type</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_account_analytic_intervent_type_tree"/>
+    </record>
+
+    <!-- hr.analytic.timesheet (TODO duplicato da semplificare e automatizzare alcuni inserimenti)-->
+    <record id="view_hr_timesheet_intervent_simplified_form" model="ir.ui.view">
+        <field name="name">Analist account page</field>
+        <field name="model">hr.analytic.timesheet</field>
+        <field name="type">form</field>
+        <field name="priority" eval="20" />
+        <field name="arch" type="xml">
+        <form string="Timesheet Lines simplyfied">
+            <group colspan="4" col="6">
+                <field name="name"/>
+                <field name="user_id" on_change="on_change_user_id(user_id)" required="1" select="1"/>
+                <field name="date" select="1" on_change="on_change_date(date)"/>
+            </group>
+            <notebook colspan="4">
+                <page string="Information">
+                    <group colspan="2" col="2">
+                        <separator string="Product" colspan="2"/>
+                        <field name="product_id" on_change="on_change_unit_amount(product_id, unit_amount, False, product_uom_id,journal_id)" required="1" domain="[('type','=','service')]"/>
+                        <field name="product_uom_id" on_change="on_change_unit_amount(product_id, unit_amount, False, product_uom_id,journal_id)"/>
+                        <field name="unit_amount" on_change="on_change_unit_amount(product_id, unit_amount, False, product_uom_id,journal_id)"/>
+                    </group>
+                    <group colspan="2" col="2">
+                        <separator string="Accounting" colspan="2"/>
+                        <field domain="[('type','=','normal'),('state', '&lt;&gt;', 'close')]" name="account_id" on_change="on_change_account_id(account_id)" select="1"/>
+                        <field name="amount"/>
+                        <field name="general_account_id"/>
+                        <field name="journal_id"/>
+                    </group>
+                    <group colspan="2" col="2">
+                        <separator string="Invoicing" colspan="2"/><field name="to_invoice"/><field name="invoice_id"/>
+                    </group>
+                </page>
+                <page string="Extra products" attrs="{'invisible':[('account_id','=',False)]}">
+                   <field name="extra_analytic_line_ids" nolabel="1" context="{'default_account_id':account_id,}"> <!--'default_name':name default_journal_id-->
+                   </field>
+                </page>
+            </notebook>            
+           </form>
+        </field>
+    </record>    
+
+    <record id="view_hr_timesheet_line_search_extra_fields" model="ir.ui.view">
+        <field name="name">Timesheet search</field>
+        <field name="model">hr.analytic.timesheet</field>
+        <field name="inherit_id" ref="hr_timesheet.hr_timesheet_line_search"/>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+           <filter name="today" position="before">
+              <filter name="today-6" icon="terp-go-today" domain="[('date', '=',  (datetime.datetime.today() + datetime.timedelta(days=-6)).strftime('%%Y-%%m-%%d'))]" string="Today-6"/>              
+              <filter name="today-5" icon="terp-go-today" domain="[('date', '=',  (datetime.datetime.today() + datetime.timedelta(days=-5)).strftime('%%Y-%%m-%%d'))]" string="Today-5"/>              
+              <filter name="today-4" icon="terp-go-today" domain="[('date', '=',  (datetime.datetime.today() + datetime.timedelta(days=-4)).strftime('%%Y-%%m-%%d'))]" string="Today-4"/>              
+              <filter name="today-3" icon="terp-go-today" domain="[('date', '=',  (datetime.datetime.today() + datetime.timedelta(days=-3)).strftime('%%Y-%%m-%%d'))]" string="Today-3"/>              
+              <filter name="today-2" icon="terp-go-today" domain="[('date', '=',  (datetime.datetime.today() + datetime.timedelta(days=-2)).strftime('%%Y-%%m-%%d'))]" string="Today-2"/>              
+              <filter name="today-1" icon="terp-go-today" domain="[('date', '=',  (datetime.datetime.today() + datetime.timedelta(days=-1)).strftime('%%Y-%%m-%%d'))]" string="Today-1"/>              
+           </filter>
+           <field name="user_id" position="before">
+           <field name="department_id"  widget="selection" />
+           <field name="city_id" />
+           <field name="location_site" />
+         </field>               
+       </field>
+    </record>	
+
+    <record id="view_hr_timesheet_intervent_tree_not_editable" model="ir.ui.view">
+        <field name="name">Intervent tree</field>
+        <field name="model">hr.analytic.timesheet</field>
+        <field name="type">tree</field>
+        <field name="priority" eval="20" />
+        <field name="arch" type="xml">
+           <tree string="Intervent report">
+                <field name="date" />
+                <field name="user_id" />
+                <field name="journal_id" />
+                <field name="name" />
+                <field name="account_id" />
+                <field name="department_id"  widget="selection" />
+                <field name="city_id" />
+                <field name="location_site" />
+                <field name="operation" string="Oper."/>
+                <field name="amount_operation" string="Q. op."/>
+                <field name="amount_operation_etl" string="Q. op. ETL"/>
+                <field name="product_id" invisible="1"/>
+                <field name="unit_amount" sum="Total time"/>
+                <field name="product_uom_id"  invisible="1"/>
+                <field name="amount" sum="Total cost" invisible="1"/>
+                <field name="to_invoice"/>
+                <field name="general_account_id" invisible="1"/>
+            </tree>
+        </field>
+    </record>    
+
+    
+    <!-- ACTION (altri moduli) -->       
+        <record id="action_account_analytic_contract_list" model="ir.actions.act_window">
+            <field name="name">Contract list</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.analytic.account</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,graph,form,calendar</field>
+            <field name="domain">[('parent_id','=',False)]</field>
+            <field name="view_id" ref="account.view_account_analytic_account_tree"/>
+            <field name="search_view_id" ref="account.view_account_analytic_account_search"/>
+        </record>
+                
+        <!---<record id="action_account_analytic_contract_list_lite" model="ir.actions.act_window">
+            <field name="name">Contract list (lite)</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.analytic.account</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,graph,form</field>
+            <field name="domain">[('parent_id','=',False)]</field>
+            <field name="view_id" ref="account.view_account_analytic_account_tree"/>            
+            <field name="search_view_id" ref="account.view_account_analytic_account_search"/>
+            <field name="context">{'form_view_ref':'contract_manage.view_account_analytic_account_contract_form_lite','search_default_department_id':department_id}</field>
+        </record>-->
+        <record id="action_account_analytic_contract_list_lite" model="ir.actions.act_window">
+            <field name="name">New contract (minimal)</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.analytic.account</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="contract_manage.view_account_analytic_account_contract_form_lite"/>            
+        </record>
+
+        <record id="action_hr_timesheet_line_evry1_all_form" model="ir.actions.act_window">
+            <field name="name">Working Hours</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">hr.analytic.timesheet</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form,graph</field>
+            <field name="view_id" ref="view_hr_timesheet_intervent_tree_not_editable"/>
+            <field name="context">{"search_default_user_id":uid, "search_default_today":1}</field>
+            <field name="search_view_id" ref="hr_timesheet.hr_timesheet_line_search"/>
+            <field name="help">Through Working Hours you can register your working hours by project every day.</field>
+        </record>
+
+    <!-- hr.analytic.timesheet  SHORT VIEW FOR EMPLOYEE -->    
+    <record id="view_hr_timesheet_intervent_search_short" model="ir.ui.view">
+        <field name="name">Timesheet search</field>
+        <field name="model">hr.analytic.timesheet</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search string="Timesheet">
+                <group col="8" colspan="4">
+                    <filter name="today" icon="terp-go-today" domain="[('date', '=', time.strftime('%%Y-%%m-%%d'))]" string="Today"/>
+                    <separator orientation="vertical"/>
+                    <field name="department_id" widget="selection"/>
+                    <field name="city_id"/>
+                    <field name="location_site"/>
+                    <field name="user_id"/>
+                    <field name="account_id"/>
+                    <field name="date"/>
+                </group>
+                <newline/>
+            
+                <group expand="0" string="Group By...">
+                        <filter string="Users" icon="terp-personal" domain="[]" context="{'group_by':'user_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Anlytic account" icon="terp-folder-green" domain="[]" context="{'group_by':'account_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Date" icon="terp-go-month" domain="[]" context="{'group_by':'date'}"/>
+                </group>
+            </search>
+       </field>
+   </record>    
+                
+    <record id="view_hr_timesheet_intervent_tree_short" model="ir.ui.view">
+        <field name="name">Intervent tree short view</field>
+        <field name="model">hr.analytic.timesheet</field>
+        <field name="type">tree</field>
+        <field name="priority" eval="30" />
+        <field name="arch" type="xml">
+           <tree editable="bottom" string="Timesheet Lines" colors="red:error_etl">
+                <field name="date" on_change="on_change_date(date)"/>
+                <field name="user_id" on_change="on_change_user_id(user_id)" invisible="1" />
+                <field name="journal_id" invisible="1" />
+                <field name="name"  readonly="1" />
+                <field domain="[('type','=','normal'),('state', '&lt;&gt;', 'close')]" name="account_id" on_change="on_change_account_id(account_id)" readonly="1" />
+                <field name="city_id" />
+                <field name="location_site" />
+                <field name="operation" string="Oper." />
+                <field name="amount_operation" string="Q. op." />
+                <field name="amount_operation_etl" string="Q. op. ETL"/>
+                <field name="error_etl" invisible="1"/>
+                <field name="product_id" on_change="on_change_unit_amount(product_id, unit_amount, False, product_uom_id,journal_id)" required="1" domain="[('type','=','service')]" invisible="1" />
+                <field name="unit_amount" on_change="on_change_unit_amount(product_id, unit_amount, False, product_uom_id,journal_id)" sum="Total time"/>
+                <field name="product_uom_id" on_change="on_change_unit_amount(product_id, unit_amount, False, product_uom_id,journal_id)" invisible="1"/>
+                <field name="amount" sum="Total cost" invisible="1" />
+                <field name="to_invoice" invisible="1" />
+                <field name="general_account_id" invisible="1"/>
+            </tree>
+       </field>
+   </record>    
+
+    <record id="action_hr_timesheet_intervent_short" model="ir.actions.act_window">
+        <field name="name">Intervent list (employee)</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hr.analytic.timesheet</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_hr_timesheet_intervent_tree_short"/>
+        <field name="search_view_id" ref="view_hr_timesheet_intervent_search_short"/>
+        <field name="context">{"search_default_user_id": uid}</field>
+        <field name="domain">[('user_id','=',uid)]</field>
+        <field name="help">User list of intervent</field>
+    </record>
+
+    <!-- MENUITEM -->
+   <menuitem id="menu_contract_manage_root"
+             name="Contract Manage"
+             icon="terp-stock" 
+             sequence="0"
+             web_icon="images/contract.png"
+             web_icon_hover="images/contract-hover.png" />
+
+        <menuitem id="menu_rubrica_root"
+             name="Rubrica"
+             sequence="0"                 
+             parent="menu_contract_manage_root" 
+             groups="analytic.group_analytic_accounting" />
+
+            <menuitem id="menu_rubrica_clienti"
+                 name="Partner"
+                 action="base.action_partner_form"
+                 sequence="0"                 
+                 parent="menu_rubrica_root" />
+
+        <menuitem id="menu_hr_root"
+             name="Human Resource"
+             sequence="0"       
+             groups="base.group_hr_manager"           
+             parent="menu_contract_manage_root" />
+
+            <menuitem id="menu_hr_employee"
+                 name="Employee"
+                 action="hr.open_view_employee_list_my"
+                 sequence="0"                 
+                 parent="menu_hr_root" />
+                 
+                <record id="open_view_employee_list_full" model="ir.actions.act_window">
+                    <field name="name">Employees</field>
+                    <field name="res_model">hr.employee</field>
+                    <field name="view_type">form</field>
+                    <field name="view_mode">tree,form</field>
+                    <field name="domain">[('active','=',False)]</field>
+                    <field name="view_id" ref="hr.view_employee_tree"/>
+                    <field name="search_view_id" ref="hr.view_employee_filter"/>
+                </record>
+                <menuitem id="menu_hr_employee_unactive"
+                     name="Employee unactive"
+                     action="open_view_employee_list_full"
+                     sequence="0"                 
+                     parent="menu_hr_employee" />
+
+        <menuitem id="menu_account_analytic_contract"
+             name="Contracts"
+             parent="menu_contract_manage_root"
+             groups="analytic.group_analytic_accounting" />
+
+            <menuitem id="account_analytic_account_contract"
+                 name="Contract list"
+                 action="action_account_analytic_contract_list" 
+                 sequence="10"                 
+                 parent="menu_account_analytic_contract"
+                 groups="analytic.group_analytic_accounting"/>
+
+            <menuitem id="account_analytic_account_contract_lite"
+                 name="Contract list (lite)"
+                 action="action_account_analytic_contract_list_lite" 
+                 sequence="20"                 
+                 parent="menu_account_analytic_contract"
+                 groups="contract_manage.group_contract_super_manager"/>
+                 
+            <menuitem id="account_analytic_account"
+                 name="Contracts and sub entry"
+                 action="account.action_account_analytic_account_form" 
+                 sequence="30"
+                 parent="menu_account_analytic_contract"
+                 groups="analytic.group_analytic_accounting"/>
+
+            <menuitem id="account_analytic_account_chart"
+                 name="Chart of Analytic Accounts"
+                 action="account.action_account_analytic_chart" 
+                 sequence="40"
+                 parent="menu_account_analytic_contract"
+                 groups="analytic.group_analytic_accounting"/>
+
+            <menuitem id="account_analytic_account_lines"
+                 name="Registrazioni giornale analitico"
+                 action="account.action_account_analytic_journal_open_form"
+                 sequence="50"
+                 parent="menu_account_analytic_contract"
+                 groups="analytic.group_analytic_accounting"/>
+
+        <menuitem id="menu_hr_intervent"
+             name="Intervents"
+             parent="menu_contract_manage_root" />
+
+            <menuitem id="menu_action_hr_timesheet_intervent_short" 
+                 name="Intervent list (for employee)"
+                 action="action_hr_timesheet_intervent_short"
+                 sequence="25" 
+                 parent="menu_hr_intervent" />
+
+            <menuitem id="menu_hr_timesheet_line_evry1_all_formmenu_hr_working_hours" 
+                 name="Intervent list"
+                 action="action_hr_timesheet_line_evry1_all_form"
+                 sequence="20" 
+                 groups="analytic.group_analytic_accounting"
+                 parent="menu_hr_intervent" />
+<!--contract_manage.group_contract_all_macro_group_manager,contract_manage.group_contract_department_manager,contract_manage.group_contract_super_manager,contract_manage.group_contract_administrator_manager-->
+            <menuitem id="menu_action_account_analytic_superintervent_root" 
+                 name="Super intervent"
+                 sequence="10" 
+                 groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager"
+                 parent="menu_hr_intervent" />
+                 
+                <menuitem id="menu_action_account_analytic_superintervent" 
+                     name="Super intervent"
+                     action="action_account_analytic_superintervent"
+                     sequence="10" 
+                     groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager"
+                     parent="menu_action_account_analytic_superintervent_root" />
+                     
+                <menuitem id="menu_action_account_analytic_superintervent_group" 
+                     name="Super intervent grouped"
+                     action="action_account_analytic_superintervent_group"
+                     sequence="20" 
+                     groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager"
+                     parent="menu_action_account_analytic_superintervent_root" />
+
+        <menuitem id="menu_configuration_root"
+             name="Configuration"
+             sequence="99" 
+             parent="menu_contract_manage_root" 
+             groups="analytic.group_analytic_accounting" />
+             
+            <menuitem id="menu_configuration_product"                 
+                 name="Product"
+                 action="product.product_normal_action"
+                 sequence="10"
+                 parent="menu_configuration_root" />
+
+            <menuitem id="menu_configuration_department"                 
+                 name="Department"
+                 action="hr.open_module_tree_department" 
+                 sequence="20"
+                 parent="menu_configuration_root" />
+
+            <menuitem id="menu_configuration_journal_type"                 
+                 name="Journal type (for intervent)"
+                 action="action_journal_type" 
+                 sequence="30"
+                 parent="menu_configuration_root" />
+
+            <menuitem id="menu_view_account_analytic_intervent_activity"                 
+                 name="Intervent activity"
+                 action="action_view_account_analytic_intervent_activity" 
+                 sequence="40"
+                 parent="menu_configuration_root" />
+
+            <!--copy for city-->
+            <menuitem id="menu_action_province"                 
+                 name="City"
+                 action="l10n_it_base.action_city" 
+                 sequence="60"
+                 parent="menu_configuration_root" />
+
+                 
+    <!-- DISABLE ALL MACRO AREA FOR ALL USER:-->                 
+       <record id="base.menu_base_partner" model="ir.ui.menu">
+           <field name="groups_id" eval="[(6,0,[ref('contract_manage.group_contract_all_macro_group_manager')])]"/>
+       </record>    
+       <record id="base.menu_main_pm" model="ir.ui.menu">
+           <field name="groups_id" eval="[(6,0,[ref('contract_manage.group_contract_all_macro_group_manager')])]"/>
+       </record>           
+       <record id="account.menu_finance" model="ir.ui.menu">
+           <field name="groups_id" eval="[(6,0,[ref('contract_manage.group_contract_all_macro_group_manager')])]"/>
+       </record>           
+       <record id="base.menu_main_pm" model="ir.ui.menu">
+           <field name="groups_id" eval="[(6,0,[ref('contract_manage.group_contract_all_macro_group_manager')])]"/>
+       </record>           
+       <record id="hr.menu_hr_root" model="ir.ui.menu">
+           <field name="groups_id" eval="[(6,0,[ref('contract_manage.group_contract_all_macro_group_manager')])]"/>
+       </record>           
+       <record id="knowledge.menu_document" model="ir.ui.menu">
+           <field name="groups_id" eval="[(6,0,[ref('contract_manage.group_contract_all_macro_group_manager')])]"/>
+       </record>           
+       <record id="base.menu_administration" model="ir.ui.menu">
+           <field name="groups_id" eval="[(6,0,[ref('contract_manage.group_contract_all_macro_group_manager')])]"/>
+       </record>           
+       
+
+</data>
+</openerp>
+

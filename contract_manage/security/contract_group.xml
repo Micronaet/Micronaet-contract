@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+   <data>
+        <!-- Contract Manager Group (see all macro area, instead only Contract one) -->
+        <!-- Macro group for visualization: -->
+        <record id="group_contract_all_macro_group_manager" model="res.groups">
+            <field name="name">Contract / Macro group</field>
+        </record>
+        
+        <!-- Roles -->
+        <record id="group_contract_department_manager" model="res.groups">
+            <field name="name">Contract / Department manager</field>
+        </record>
+        <record id="group_contract_super_manager" model="res.groups">
+            <field name="name">Contract / Super admin manager</field>
+        </record>
+        <record id="group_contract_administrator_manager" model="res.groups">
+            <field name="name">Contract / Administrator manager</field>
+        </record>
+   </data>
+</openerp>

@@ -1,0 +1,227 @@
+# Translation of OpenERP Server.
+# This file contains the translation of the following modules:
+# 	* contract_manage_employee
+# <> <>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenERP Server 6.0.4\n"
+"Report-Msgid-Bugs-To: support@openerp.com\n"
+"POT-Creation-Date: 2013-02-18 10:39+0000\n"
+"PO-Revision-Date: 2013-02-18 11:40+0100\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+
+#. module: contract_manage_employee
+#: field:contract.employee.festivity,month:0
+msgid "Static month"
+msgstr "Mese statico"
+
+#. module: contract_manage_employee
+#: model:ir.model,name:contract_manage_employee.model_contract_employee_festivity
+msgid "Contract festivity"
+msgstr "Festività contratto"
+
+#. module: contract_manage_employee
+#: model:ir.model,name:contract_manage_employee.model_contract_employee_timesheet_tipology
+msgid "Timesheet tipology"
+msgstr "Tipologia di foglio presenze"
+
+#. module: contract_manage_employee
+#: field:contract.employee.timesheet.tipology.line,week_day:0
+msgid "Week day"
+msgstr "Giorno settimana"
+
+#. module: contract_manage_employee
+#: help:contract.employee.festivity,periodic:0
+msgid ""
+"Festivity is only for a from-to period (ex.: Patronal festivity but for a "
+"period because of changing city)"
+msgstr ""
+"Festitivà solo per un determinato periodo [da-a] (es.: Festa patronale "
+"vincolata ad un periodo per cambio sede legale successiva)"
+
+#. module: contract_manage_employee
+#: help:contract.employee.festivity,static:0
+msgid ""
+"It means that every year this festivity is the same day (ex. Christmas = 25 "
+"of dec.), if not it's dynamic (ex. Easter monday)"
+msgstr ""
+"Significa che ogni anno questa festa è lo stesso giorno (es. Nalale = 25 "
+"dic.), altimenti è considerata dinamica (es. Lunedì dell'angelo)"
+
+#. module: contract_manage_employee
+#: selection:contract.employee.timesheet.tipology.line,week_day:0
+msgid "Thursday"
+msgstr "Giovedì"
+
+#. module: contract_manage_employee
+#: view:contract.employee.festivity:0
+msgid "Dynamic date"
+msgstr "Data dinamica"
+
+#. module: contract_manage_employee
+#: selection:contract.employee.timesheet.tipology.line,week_day:0
+msgid "Sunday"
+msgstr "Domenica"
+
+#. module: contract_manage_employee
+#: field:contract.employee.festivity,periodic:0
+msgid "Periodic festivity"
+msgstr "Festività periodica"
+
+#. module: contract_manage_employee
+#: view:contract.employee.timesheet.tipology:0
+msgid "Details"
+msgstr "Dettagli"
+
+#. module: contract_manage_employee
+#: model:ir.model,name:contract_manage_employee.model_hr_employee
+msgid "Employee"
+msgstr "Dipendente"
+
+#. module: contract_manage_employee
+#: field:contract.employee.festivity,periodic_to:0
+msgid "To year"
+msgstr "All'anno"
+
+#. module: contract_manage_employee
+#: view:contract.employee.festivity:0
+#: model:ir.ui.menu,name:contract_manage_employee.menu_configuration_festivity
+msgid "Festivity"
+msgstr "Festività"
+
+#. module: contract_manage_employee
+#: field:contract.employee.festivity,name:0
+#: field:contract.employee.timesheet.tipology,name:0
+msgid "Description"
+msgstr "Descrizione"
+
+#. module: contract_manage_employee
+#: selection:contract.employee.timesheet.tipology.line,week_day:0
+msgid "Monday"
+msgstr "Lunedì"
+
+#. module: contract_manage_employee
+#: model:ir.ui.menu,name:contract_manage_employee.menu_configuration_contract_tipology_contract
+msgid "Contracts"
+msgstr "Contratti"
+
+#. module: contract_manage_employee
+#: selection:contract.employee.timesheet.tipology.line,week_day:0
+msgid "Friday"
+msgstr "Venerdì"
+
+#. module: contract_manage_employee
+#: help:hr.employee,contract_tipology_id:0
+msgid ""
+"Working time for this employee, tipically a contract tipology, like: full "
+"time, part time etc. (for manage hour and presence)"
+msgstr ""
+"Orario lavorativo per dipendente, tipicamente per tipologia di contratto, "
+"come: part time, full time, ecc. (per gestire le ore di presenza)"
+
+#. module: contract_manage_employee
+#: field:contract.employee.festivity,dynamic_date:0
+msgid "Dynamic Date"
+msgstr "Data dinamica"
+
+#. module: contract_manage_employee
+#: field:contract.employee.festivity,periodic_from:0
+msgid "From year"
+msgstr "Dall'anno"
+
+#. module: contract_manage_employee
+#: field:hr.employee,contract_tipology_id:0
+msgid "Work time"
+msgstr "Orario lavorativo"
+
+#. module: contract_manage_employee
+#: model:ir.actions.act_window,name:contract_manage_employee.action_view_contract_employee_festivity_dynamic
+msgid "Festivity (dynamic)"
+msgstr "Festività (dinamica)"
+
+#. module: contract_manage_employee
+#: view:contract.employee.timesheet.tipology:0
+#: field:contract.employee.timesheet.tipology.line,contract_tipology_id:0
+#: model:ir.actions.act_window,name:contract_manage_employee.action_view_contract_employee_timesheet_tipology
+#: model:ir.ui.menu,name:contract_manage_employee.menu_configuration_contract_tipology
+msgid "Contract tipology"
+msgstr "Tipologia di contratto"
+
+#. module: contract_manage_employee
+#: field:contract.employee.timesheet.tipology,line_ids:0
+msgid "Lines"
+msgstr "Linee"
+
+#. module: contract_manage_employee
+#: model:ir.actions.act_window,name:contract_manage_employee.action_view_contract_employee_festivity
+msgid "Festivity (static)"
+msgstr "Festitivà (statica)"
+
+#. module: contract_manage_employee
+#: constraint:hr.employee:0
+msgid ""
+"Error ! You cannot select a department for which the employee is the manager."
+msgstr ""
+"Errore ! Non è possibile selezionare un reparto del quale l'impiegato è "
+"manager."
+
+#. module: contract_manage_employee
+#: selection:contract.employee.timesheet.tipology.line,week_day:0
+msgid "Wednesday"
+msgstr "Mercoledì"
+
+#. module: contract_manage_employee
+#: field:contract.employee.festivity,static:0
+msgid "Static festivity"
+msgstr "Festività statica"
+
+#. module: contract_manage_employee
+#: view:contract.employee.festivity:0
+msgid "Static date"
+msgstr "Data statica"
+
+#. module: contract_manage_employee
+#: field:contract.employee.festivity,day:0
+msgid "Static day"
+msgstr "Giorno statico"
+
+#. module: contract_manage_employee
+#: model:ir.ui.menu,name:contract_manage_employee.menu_configuration_contract_festivity_dynamic
+msgid "Dynamic"
+msgstr "Dinamico"
+
+#. module: contract_manage_employee
+#: field:contract.employee.timesheet.tipology.line,name:0
+msgid "Tot. hours"
+msgstr "Tot. ore"
+
+#. module: contract_manage_employee
+#: constraint:hr.employee:0
+msgid "Error ! You cannot create recursive Hierarchy of Employees."
+msgstr "Errore ! Non è possibile creare gerarchie ricorsive di impiegati."
+
+#. module: contract_manage_employee
+#: model:ir.ui.menu,name:contract_manage_employee.menu_configuration_contract_festivity_static
+msgid "Static"
+msgstr "Statico"
+
+#. module: contract_manage_employee
+#: selection:contract.employee.timesheet.tipology.line,week_day:0
+msgid "Tuesday"
+msgstr "Martedì"
+
+#. module: contract_manage_employee
+#: selection:contract.employee.timesheet.tipology.line,week_day:0
+msgid "Saturday"
+msgstr "Sabato"
+
+#. module: contract_manage_employee
+#: model:ir.model,name:contract_manage_employee.model_contract_employee_timesheet_tipology_line
+msgid "Timesheet tipology line"
+msgstr "linea tipo foglio ora"

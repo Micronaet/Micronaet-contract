@@ -1,0 +1,127 @@
+<?xml version="1.0" ?>
+<openerp>
+<data>
+    <!--VIEWS: -->
+    <record id="account_analytic__tree_tiny" model="ir.ui.view">
+        <field name="name">Contracts</field>
+        <field name="model">account.analytic.account</field>
+        <field name="type">tree</field>
+        <field name="priority" eval="20"/>
+        <field name="arch" type="xml">
+            <tree string="Contract list">
+                <field name="name" />
+                <field name="code" />
+                <field name="partner_id" />
+            </tree>
+        </field>
+    </record>
+        
+    <record id="account_analytic_intervent_wizard" model="ir.ui.view">
+        <field name="name">Insert intervent</field>
+        <field name="model">account.analytic.intervent.wizard</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+            <form string="Insert intervent">
+                <separator string="Operations" colspan="4" />
+                <group colspan="4">
+                    <button string="Cancel" special="cancel" icon="gtk-cancel"/>
+                    <button string="Create" name="create_intervent_function" type="object" icon="gtk-ok"/>
+                </group>
+                <field name="like_last" on_change="on_change_like_last(like_last)" />
+                <field name="range_vacancy" on_change="onchange_range_vacancy(range_vacancy,department_id)"/>
+                <newline />
+                <separator string="Generalità" colspan="4" />
+                <group colspan="4" col="9">
+                    <field name="user_id" on_change="on_change_user_name(user_id,department_id,like_last)" /> <!--invisible="context.get('user_readonly',True)"/>-->
+                    <field name="department_id" domain="[('inactive','=',False)]" on_change="on_change_department(department_id,like_last)" widget="selection" />
+                    <field name="date" on_change="on_change_date_get_weekday(date)" />
+                    <field name="week_day" readonly="1" nolabel="1"  attrs="{'invisible':[('range_vacancy','=',True)]}"/>
+                    <field name="quantity" string="Quantity (hours)" on_change="on_change_hours(quantity,operation,amount_operation)" attrs="{'invisible':[('range_vacancy','=',True)],'required':[('range_vacancy','=',False)],}"/>
+                    <field name="to_date" attrs="{'invisible':[('range_vacancy','=',False)],'required':[('range_vacancy','=',True)],}" />
+                </group>                    
+                <field name="account_analytic_id" colspan="4" domain="[('department_id','=',department_id),('state','=','open')]" context="{'tree_view_ref':'contract_manage.account_analytic__tree_tiny'}"  on_change="on_change_contract(account_analytic_id)"/>
+
+                <separator string="Location and trip" colspan="4" />
+                <group colspan="4" col="8">
+                   <field name="trip_type" />
+                   <field name="product_id" attrs="{'required':[('trip_type','!=',False)]}" />
+                   <field name="city_id" attrs="{'required':[('trip_type','!=',False)]}"  />
+                   <field name="location_site" />
+               </group>
+               
+               <separator string="Manage control" colspan="4" />
+               <group colspan="4" col="6">
+                   <field name="operation" />
+                   <field name="amount_operation" />
+                   <field name="activity_id" />
+               </group>   
+               <field name="mail_raccomanded" attrs="{'invisible':[('operation','!=','mailing')]}"/>               
+               
+               <separator string="Note" colspan="4" />
+                   <field name="intervent_annotation" colspan="4" nolabel="1" />
+               <separator string="Extra products" colspan="4"/>
+               <field name="extra_ids" nolabel="1" colspan="4">
+                    <tree string="Extra costi" editable="bottom">                        
+                        <field name="type" on_change="on_change_type_get_uom(type_id)" />
+                        <field name="product_id" domain="[('type','=',type),('is_hour_cost','=',False)]" on_change="on_change_product_get_uom(product_id)"/>
+                        <field name="quantity"/>
+                        <field name="uom_id" readonly="1"/>
+                    </tree>
+                    <form string="Extra product">
+                        <field name="type" on_change="on_change_type_get_uom(type_id)"/>
+                        <field name="product_id" domain="[('type','=',type),('is_hour_cost','=',False)]" on_change="on_change_product_get_uom(product_id)"/>
+                        <field name="quantity"/>
+                        <field name="uom_id" readonly="1"/>
+                    </form>
+                </field>
+            </form>
+        </field>
+    </record>
+
+    <!--ACTION: -->
+      <record id="account_analytic_intervent_wizard_action" model="ir.actions.act_window">
+        <field name="name">Insert intervent</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.analytic.intervent.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_user_id':uid,'user_readonly':True,}</field>
+      </record>
+      <record id="account_analytic_intervent_wizard_admin_action" model="ir.actions.act_window">
+        <field name="name">Insert intervent</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.analytic.intervent.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_user_id':uid,'user_readonly':False,}</field>
+      </record>
+      <!--<record id="account_analytic_intervent_wizard_last_admin_action" model="ir.actions.act_window">
+        <field name="name">Insert intervent (like last)</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.analytic.intervent.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+        <field name="context">{'default_user_id':uid,'user_readonly':False,'default_like_last':True}</field>
+      </record>-->
+    <!-- MENUITEM -->
+            <menuitem id="menu_hr_new_intervent"                 
+                 name="New intervents"
+                 action="account_analytic_intervent_wizard_action" 
+                 sequence="20"
+                 parent="menu_hr_intervent" />
+            <!--<menuitem id="menu_hr_new_intervent_admin"
+                 name="New intervents (admin)"
+                 action="account_analytic_intervent_wizard_admin_action" 
+                 sequence="30"
+                 parent="menu_hr_intervent" />-->
+            <!--<menuitem id="menu_hr_new_intervent_last"
+                 name="New intervents (like last)"
+                 action="account_analytic_intervent_wizard_last_admin_action" 
+                 sequence="0"
+                 parent="menu_hr_intervent" />-->
+</data>
+</openerp>
+

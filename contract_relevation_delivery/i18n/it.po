@@ -1,0 +1,206 @@
+# Translation of OpenERP Server.
+# This file contains the translation of the following modules:
+# 	* contract_relevation_delivery
+# <> <>, 2013.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenERP Server 6.0.4\n"
+"Report-Msgid-Bugs-To: support@openerp.com\n"
+"POT-Creation-Date: 2013-03-05 08:45+0000\n"
+"PO-Revision-Date: 2013-03-05 09:46+0100\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: \n"
+"Plural-Forms: \n"
+"X-Generator: Gtranslator 2.91.5\n"
+
+#. module: contract_relevation_delivery
+#: model:ir.model,name:contract_relevation_delivery.model_etl_relevation_header_wizard
+msgid "Relevation wizard"
+msgstr "Wizard controllo get. interventi"
+
+#. module: contract_relevation_delivery
+#: field:etl.relevation.header,import_error:0
+msgid "Import error"
+msgstr "Errore importazione"
+
+#. module: contract_relevation_delivery
+#: view:etl.relevation.header:0
+msgid "Elements imported"
+msgstr "Elementi importati"
+
+#. module: contract_relevation_delivery
+#: view:etl.relevation.header:0
+#: model:ir.actions.act_window,name:contract_relevation_delivery.action_view_etl_relevation_header
+msgid "Importation header"
+msgstr "Archivi importazioni"
+
+#. module: contract_relevation_delivery
+#: model:ir.model,name:contract_relevation_delivery.model_res_users
+msgid "res.users"
+msgstr "res.users"
+
+#. module: contract_relevation_delivery
+#: view:etl.relevation.header.wizard:0
+msgid "Print"
+msgstr "Stampa"
+
+#. module: contract_relevation_delivery
+#: constraint:res.users:0
+msgid "The chosen company is not in the allowed companies for this user"
+msgstr "L'azienda scelta non è fra le aziende abilitate per questo utente"
+
+#. module: contract_relevation_delivery
+#: field:etl.relevation.line,location:0
+msgid "Location"
+msgstr "Localita'"
+
+#. module: contract_relevation_delivery
+#: field:res.users,relevation_code:0
+msgid "User code"
+msgstr "Codice utente"
+
+#. module: contract_relevation_delivery
+#: field:etl.relevation.header.wizard,department_id:0
+msgid "Department"
+msgstr "Dipartimento"
+
+#. module: contract_relevation_delivery
+#: model:ir.model,name:contract_relevation_delivery.model_hr_analytic_timesheet
+msgid "Timesheet Line"
+msgstr "Riga Foglio Orario"
+
+#. module: contract_relevation_delivery
+#: field:etl.relevation.header.wizard,start_date:0
+msgid "Start date"
+msgstr "Data inizio"
+
+#. module: contract_relevation_delivery
+#: view:etl.relevation.header:0
+msgid "Elements"
+msgstr "Elementi"
+
+#. module: contract_relevation_delivery
+#: view:etl.relevation.header:0
+msgid "Search importation header"
+msgstr "Ricerca importazione"
+
+#. module: contract_relevation_delivery
+#: field:etl.relevation.line,timesheet_id:0
+msgid "Timesheet"
+msgstr "Foglio presenza"
+
+#. module: contract_relevation_delivery
+#: field:etl.relevation.header.wizard,all:0
+msgid "All department"
+msgstr "Tutti i dipartimenti"
+
+#. module: contract_relevation_delivery
+#: field:etl.relevation.line,error:0
+msgid "Error"
+msgstr "Errore"
+
+#. module: contract_relevation_delivery
+#: model:ir.actions.act_window,name:contract_relevation_delivery.etl_relevation_header_wizard_action
+#: model:ir.ui.menu,name:contract_relevation_delivery.etl_relevation_header_wizard_menuitem
+msgid "Intervent wizard"
+msgstr "Wizard controllo get. interventi"
+
+#. module: contract_relevation_delivery
+#: field:etl.relevation.line,name:0
+msgid "Lector code"
+msgstr "Codice lettore"
+
+#. module: contract_relevation_delivery
+#: field:etl.relevation.line,user_id:0
+msgid "User"
+msgstr "Utente"
+
+#. module: contract_relevation_delivery
+#: model:ir.model,name:contract_relevation_delivery.model_etl_intervent_header_wizard
+msgid "Intervent relevation wizard"
+msgstr "Wizard controllo gest. interventi"
+
+#. module: contract_relevation_delivery
+#: field:etl.relevation.header.wizard,end_date:0
+msgid "End Date"
+msgstr "Data fine"
+
+#. module: contract_relevation_delivery
+#: model:ir.model,name:contract_relevation_delivery.model_etl_relevation_header
+msgid "ETL relevation header"
+msgstr "ETL rilevazione intestazione"
+
+#. module: contract_relevation_delivery
+#: field:etl.relevation.header,name:0
+msgid "File name"
+msgstr "Nome file"
+
+#. module: contract_relevation_delivery
+#: field:etl.relevation.header,relevation_line_ids:0
+msgid "Lines"
+msgstr "Linee"
+
+#. module: contract_relevation_delivery
+#: help:res.users,relevation_code:0
+msgid "For lector used to delivery mail"
+msgstr "Per il lettore utilizzato per la consegna della posta"
+
+#. module: contract_relevation_delivery
+#: view:etl.relevation.header.wizard:0
+msgid "Intervent report"
+msgstr "Report intervento (contr. gest.)"
+
+#. module: contract_relevation_delivery
+#: model:ir.ui.menu,name:contract_relevation_delivery.menu_importation_root
+msgid "Importation"
+msgstr "Importazione"
+
+#. module: contract_relevation_delivery
+#: field:etl.relevation.line,line_import_error:0
+msgid "Line import error"
+msgstr "Errore importazione linea"
+
+#. module: contract_relevation_delivery
+#: model:ir.actions.report.xml,name:contract_relevation_delivery.aeroo_hr_analytic_timesheet
+#: model:ir.actions.report.xml,name:contract_relevation_delivery.aeroo_res_users_relevation
+msgid "Relevation per user"
+msgstr "Rilevazioni per utente"
+
+#. module: contract_relevation_delivery
+#: sql_constraint:res.users:0
+msgid "You can not have two users with the same login !"
+msgstr "Non è possibile avere due utenti con lo stesso login!"
+
+#. module: contract_relevation_delivery
+#: model:ir.ui.menu,name:contract_relevation_delivery.menu_importation_relevation
+msgid "Relevation"
+msgstr "Rilevazione"
+
+#. module: contract_relevation_delivery
+#: field:etl.relevation.line,relevation_header_id:0
+msgid "Header"
+msgstr "Intestazione"
+
+#. module: contract_relevation_delivery
+#: view:etl.relevation.header.wizard:0
+msgid "Cancel"
+msgstr "Annulla"
+
+#. module: contract_relevation_delivery
+#: model:ir.model,name:contract_relevation_delivery.model_etl_relevation_line
+msgid "ETL relevation line"
+msgstr "ETL linea rilevazione"
+
+#. module: contract_relevation_delivery
+#: field:etl.relevation.line,total:0
+msgid "Total"
+msgstr "Totale"
+
+#. module: contract_relevation_delivery
+#: field:etl.relevation.header,date:0 field:etl.relevation.line,date:0
+msgid "Ref. Date"
+msgstr "Rif. Date"

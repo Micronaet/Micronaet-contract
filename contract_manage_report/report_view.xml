@@ -1,0 +1,12 @@
+<?xml version="1.0" ?>
+<openerp>
+<data>
+    <!-- MENUITEM -->
+    <menuitem id="menu_reports_root"
+         name="Report"
+         sequence="90"
+         parent="contract_manage.menu_contract_manage_root"
+         groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager" />
+</data>
+</openerp>
+
