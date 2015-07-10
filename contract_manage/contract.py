@@ -47,10 +47,10 @@ class account_analytic_expense(osv.osv):
     _description = 'Analytic expense'
 
     _columns = {
-        'name': fields.char('Protocol #', size=64, required=True, 
+        'name': fields.char('Protocol #', size=64, required=True,
             help='ID in accounting for link the record of OpenERP'),
         'amount': fields.float('Amount', required=True, 
-            help='Amount for total of accounting record line')
+            help='Amount for total of accounting record line', digit(16, 2))
         'note': fields.text('Note')
             
         # Header description:    
@@ -62,6 +62,7 @@ class account_analytic_expense(osv.osv):
         'date': fields.date('Ref. date', required=True),
         'date_to': fields.date('To date'),
         'date_from': fields.date('From date'),
+        'year': fields.char('Year', size=4),
 
         # Split possibilities:    
         'split_type': fields.selection([
@@ -73,10 +74,11 @@ class account_analytic_expense(osv.osv):
         'department_id': fields.many2one(
             'hr.department', 'Department', 
             help="Department if directly associated"),
-        'contract_ids': fields.many2one(
-            'account.analytic.account', 'expense_account_analitic_rel', 
-            'expense_id', 'contract_id', 'Contract', 
-            help="Contract if directly associated"),
+        #'contract_ids': fields.many2one(
+        #    'account.analytic.account', 'expense_account_analitic_rel', 
+        #    'expense_id', 'contract_id', 'Contract', 
+        #    help="Contract if directly associated"),
+        # TODO Not indicate contract, same as analytic lines!!
         }
 account_analytic_expense()
 
@@ -299,7 +301,8 @@ class account_analytic_line_extra_fields(osv.osv):
          #'location_site': fields.char('Location', size=50, required=False, readonly=False, help="Location of intervent"),
          
          # Expense:
-         'expense_id': fields.many2one('account.analytic.expense', 'Expense', ondelete='cascade'),
+         'expense_id': fields.many2one('account.analytic.expense', 'Expense', 
+             ondelete='cascade'),
     }    
 
     _defaults = {
