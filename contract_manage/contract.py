@@ -31,7 +31,11 @@ from osv import osv, fields
 import time 
 from tools.translate import _
 
-operation_type=[('lecture','Lecture'),('hour','Intervent Hours'),('mailing','Mailing'),('material','Material in EUR'),]
+operation_type=[
+    ('lecture','Lecture'),
+    ('hour','Intervent Hours'),
+    ('mailing','Mailing'),
+    ('material','Material in EUR'),]
 
 class account_analytic_intervent_activity(osv.osv):
     ''' Activity for intervent (generic catalogation)
@@ -211,27 +215,27 @@ class account_analytic_account_extra_fields(osv.osv):
     _columns = {
          'total_amount': fields.float('Total amount', digits=(16, 2)),
          'department_id': fields.many2one('hr.department', 'Dipartimento', required=False),
-         'is_contract':fields.boolean('Is contract', required=False, help="Check if this account is a master contract (or subvoice)"),
-         'is_recover':fields.boolean('Is recover', required=False, help="Check this if the contract is a recovery for extra hour worked (used in report timesheet for calculate recover hour for next month)"),
-         'has_subcontract':fields.boolean('Has subcontract', required=False, help="Check if this account is a master contract (or subvoice)"),
+         'is_contract': fields.boolean('Is contract', required=False, help="Check if this account is a master contract (or subvoice)"),
+         'is_recover': fields.boolean('Is recover', required=False, help="Check this if the contract is a recovery for extra hour worked (used in report timesheet for calculate recover hour for next month)"),
+         'has_subcontract': fields.boolean('Has subcontract', required=False, help="Check if this account is a master contract (or subvoice)"),
          
-         'default_operation':fields.selection(operation_type,'Default operation', select=True, readonly=False), 
+         'default_operation': fields.selection(operation_type,'Default operation', select=True, readonly=False), 
          'total_amount_operation': fields.float('Total amount operation', digits=(16, 2)),
          'price_operation': fields.float('Price per operation', digits=(16, 2)),
          'actual_amount_operation': fields.function(_function_total_amount_operation, method=True, type='float', string='Actual total operation ', store=False, multi=True),
          'actual_perc_amount_operation': fields.function(_function_total_amount_operation, method=True, type='float', string='Actual total operation ', store=False, multi=True),  # TODO solution to store false?
          
-         'location_filtered':fields.boolean('City filtered', required=False, help="If true this account has a shot list of cities"),
+         'location_filtered': fields.boolean('City filtered', required=False, help="If true this account has a shot list of cities"),
          
          # TODO TO REMOVE!
-         'filtered_city_ids':fields.many2many('res.city', 'account_city_rel', 'account_id', 'city_id', 'City', help="When city filtered is enabled this field contains list of cities available"),
+         'filtered_city_ids': fields.many2many('res.city', 'account_city_rel', 'account_id', 'city_id', 'City', help="When city filtered is enabled this field contains list of cities available"),
           
-         'filter_city_ids':fields.one2many('res.city.relation', 'contract_id', 'City element', help="When city filtered is enabled this field contains list of cities available"), 
+         'filter_city_ids': fields.one2many('res.city.relation', 'contract_id', 'City element', help="When city filtered is enabled this field contains list of cities available"), 
          
          #'timesheet_user_ids': fields.many2many('res.users', 'account_users_rel', 'account_id', 'user_id', 'Allowed users'), #TODO testing....
          'commercial_rate': fields.float('% Commercial rate', digits=(16, 2), help="% of invoice value for commercial value"),
          'general_rate': fields.float('% General rate', digits=(16, 2), help="% of invoice value for general value"),
-         'not_working':fields.boolean('Not working', required=False, help="All intervent to this contract are not working elements (like festivity, permission etc.)"),
+         'not_working': fields.boolean('Not working', required=False, help="All intervent to this contract are not working elements (like festivity, permission etc.)"),
     } 
     _defaults = {
         'is_contract': lambda *a: True,
@@ -244,10 +248,10 @@ class account_analytic_line_extra_fields(osv.osv):
     _inherit ='account.analytic.line'
 
     _columns = {
-         'extra_analytic_line_timesheet_id':fields.many2one('hr.analytic.timesheet', 'Timesheet generator', required=False, ondelete='cascade'),
+         'extra_analytic_line_timesheet_id': fields.many2one('hr.analytic.timesheet', 'Timesheet generator', required=False, ondelete='cascade'),
          'import_type': fields.char('Import type', size=1, required=False, readonly=False, help="For import invoice from account program, I for invoice, L for line"),
-         'activity_id':fields.many2one('account.analytic.intervent.activity', 'Activity', required=False),          
-         'mail_raccomanded':fields.boolean('Is raccomanded', required=False, help="Mail is a raccomanded"),
+         'activity_id': fields.many2one('account.analytic.intervent.activity', 'Activity', required=False),          
+         'mail_raccomanded': fields.boolean('Is raccomanded', required=False, help="Mail is a raccomanded"),
          #'location_site': fields.char('Location', size=50, required=False, readonly=False, help="Location of intervent"),
     }    
     _defaults = {
@@ -260,13 +264,13 @@ class hr_analytic_timesheet_extra_fields(osv.osv):
     _inherit ='hr.analytic.timesheet'
 
     _columns = {
-       'extra_analytic_line_ids':fields.one2many('account.analytic.line', 'extra_analytic_line_timesheet_id', 'Extra analitic entry', required=False),
-       'city_id':fields.many2one('res.city', 'Località', required=False),
+       'extra_analytic_line_ids': fields.one2many('account.analytic.line', 'extra_analytic_line_timesheet_id', 'Extra analitic entry', required=False),
+       'city_id': fields.many2one('res.city', 'Località', required=False),
        'location_site': fields.char('Location', size=50, required=False, readonly=False, help="Location of intervent"),
-       'operation':fields.selection(operation_type,'operation', select=True, readonly=False), 
+       'operation': fields.selection(operation_type,'operation', select=True, readonly=False), 
        'amount_operation': fields.float('amount operation', digits=(16, 2)),
        'amount_operation_etl': fields.float('amount operation ETL', digits=(16, 2)),
-       'error_etl':fields.boolean('Error ETL', required=False),
+       'error_etl': fields.boolean('Error ETL', required=False),
        'intervent_annotation': fields.text('Note'),       
        'department_id': fields.related('account_id','department_id', type='many2one', relation='hr.department', string='Department'),
     }
