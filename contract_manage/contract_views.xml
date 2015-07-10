@@ -80,6 +80,7 @@
                   <attribute name="colors">grey:inactive==True;</attribute>
                </xpath>
                <field name="company_id" position="before">
+                  <field name="code"/>
                   <field name="inactive" invisible="1" />
                </field>               
             </field>
@@ -91,6 +92,7 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                <field name="company_id" position="after">
+                  <field name="code"/>
                   <field name="inactive" />
                   <field name="for_extra_department" />
                </field>               
