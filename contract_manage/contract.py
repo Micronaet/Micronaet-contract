@@ -486,7 +486,7 @@ class account_analytic_expense(osv.osv):
 
     _columns = {
         'analytic_line_ids': fields.one2many(
-            'account.analytic.account', 'expense_id', 'Analytic line', 
+            'account.analytic.line', 'expense_id', 'Analytic line', 
             help="Analytic line child of this expense"),
         }
 account_analytic_expense()
