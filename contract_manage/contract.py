@@ -50,8 +50,8 @@ class account_analytic_expense(osv.osv):
         'name': fields.char('Protocol #', size=64, required=True,
             help='ID in accounting for link the record of OpenERP'),
         'amount': fields.float('Amount', required=True, 
-            help='Amount for total of accounting record line', digit(16, 2))
-        'note': fields.text('Note')
+            help='Amount for total of accounting record line', digit(16, 2)),
+        'note': fields.text('Note'),
             
         # Header description:    
         'causal': fields.char('Causal', size=2, required=True),
@@ -70,7 +70,7 @@ class account_analytic_expense(osv.osv):
             ('department', 'Department'), 
             ('contract', 'Contract'), 
             #('contracts', 'Contracts'), 
-            ], 'Split type'),        
+            ], 'Split type'),
         'department_id': fields.many2one(
             'hr.department', 'Department', 
             help="Department if directly associated"),
@@ -461,8 +461,10 @@ class hr_analytic_timesheet_extra_fields(osv.osv):
     _inherit ='hr.analytic.timesheet'
 
     _columns = {
-        'superintervent_group_id':fields.many2one('account.analytic.superintervent.group', 'Super intervents', required=False, ondelete="cascade", 
-                                                  help="Super intervent group that generate this analytic line, deleting a group delete all analytic line created"),
+        'superintervent_group_id':fields.many2one(
+            'account.analytic.superintervent.group', 'Super intervents', 
+            ondelete="cascade", 
+            help="Super intervent group that generate this analytic line, deleting a group delete all analytic line created"),
     }    
 hr_analytic_timesheet_extra_fields()
 
