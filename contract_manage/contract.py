@@ -37,6 +37,30 @@ operation_type=[
     ('mailing','Mailing'),
     ('material','Material in EUR'),]
 
+class account_analytic_expense(osv.osv):
+    ''' List of account expenses (imported)
+        All this record will be distributed on account.analytic.account 
+        present in the period selected
+    '''
+    
+    _name='account.analytic.expense'
+    _description = 'Analytic expense'
+
+    _columns = {
+        'name': fields.char('Progressive', size=64, required=True, 
+            help="ID in accounting for link the record of OpenERP"),
+        'department_id': fields.many2one(
+            'hr.department', 'Department', 
+            help="Department if directly associated"),
+        'contract_id': fields.many2one(
+            'account.analytic.account', 'Contract', 
+            help="Contract if directly associated"),
+        'note': fields.text('Note')
+        'date_to': date('To date', required=True),
+        'date_from': date('From date', required=True),                 
+        }
+account_analytic_expense()
+
 class account_analytic_intervent_activity(osv.osv):
     ''' Activity for intervent (generic catalogation)
     '''
