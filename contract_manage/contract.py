@@ -31,11 +31,12 @@ from osv import osv, fields
 import time 
 from tools.translate import _
 
-operation_type=[
-    ('lecture','Lecture'),
-    ('hour','Intervent Hours'),
-    ('mailing','Mailing'),
-    ('material','Material in EUR'),]
+operation_type = [
+    ('lecture', 'Lecture'),
+    ('hour', 'Intervent Hours'),
+    ('mailing', 'Mailing'),
+    ('material', 'Material in EUR'), 
+    ]
 
 class account_analytic_expense(osv.osv):
     ''' List of account expenses (imported)
@@ -45,6 +46,15 @@ class account_analytic_expense(osv.osv):
     
     _name = 'account.analytic.expense'
     _description = 'Analytic expense'
+    
+    # Scheduler event:
+    def schedule_csv_accounting_movement_import(self, cr, uid, input_file, 
+            separator, header, verbose=100):  
+        ''' Import movement sync with record in OpenERP
+        '''    
+        
+        return True
+        
     _columns = {
         'name': fields.char('Protocol #', size=64, required=True,
             help='ID in accounting for link the record of OpenERP'),
