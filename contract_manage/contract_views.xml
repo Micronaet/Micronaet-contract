@@ -966,15 +966,11 @@
         <field name="model">account.analytic.expense</field>
         <field name="type">search</field>
         <field name="arch" type="xml">
-            <search string="Expcence">
-                <group col="8" colspan="4">
-                    <!--<filter name="today" icon="terp-go-today" domain="[('date', '=', time.strftime('%%Y-%%m-%%d'))]" string="Today"/>-->
-                    <separator orientation="vertical"/>
-                    <field name="department_id" widget="selection"/>
-                    <field name="name" />
-                    <filter string="Date" icon="terp-go-month" domain="[]" context="{'group_by':'date'}"/>-->
-                </group>
-                <newline/>
+            <search string="Expcense">
+                <separator orientation="vertical"/>
+                <field name="department_id" widget="selection"/>
+                <field name="name" />
+                <filter string="Date" icon="terp-go-month" domain="[]" context="{'group_by':'date'}"/>
             
                 <group expand="0" string="Group By...">
                     <filter string="Department" icon="terp-personal" domain="[]" context="{'group_by':'department_id'}"/>
