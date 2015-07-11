@@ -21,40 +21,43 @@
 ###############################################################################
 
 {
-    'name' : 'Contract Manage',
-    'version' : '0.0.1',
-    'category' : 'Generic Modules/Customization',
-    'description' : """Manage contract using analitic account withour parent_id
-                       Use TS to create values in analitic line with extra 
-                       analytic lines added inserting hours
-                    """,
-    'author' : 'Micronaet s.r.l.',
-    'website' : 'http://www.micronaet.it',
-    'depends' : ['base',
-                 'hr',
-                 'analytic',
-                 'hr_timesheet',
-                 'hr_timesheet_invoice',                 
-                 'account',
-                 'account_analytic_analysis',
-                 'product',
-                 'knowledge',
-                 'l10n_it_base',
-                 'report_aeroo',
-                 'report_aeroo_ooo',
-                 'scheduler.xml',
-                ],
-    'init_xml' : [], 
-    'update_xml' : [
-                   'security/contract_group.xml',
-                   'security/ir.model.access.csv',
-                   'contract_views.xml',
-                   'wizard/intervent_views.xml',
-                   'wizard/group_superintervent_view.xml',
-                   'contract_dashboard.xml',
-                   'report/report_employee.xml',
-                   ],
-    'demo_xml' : [],
-    'active' : False, 
-    'installable' : True, 
-}
+    'name': 'Contract Manage',
+    'version': '0.0.1',
+    'category': 'Generic Modules/Customization',
+    'description': """
+        Manage contract using analitic account withour parent_id
+        Use TS to create values in analitic line with extra 
+        analytic lines added inserting hours
+        """,
+    'author': 'Micronaet s.r.l.',
+    'website': 'http://www.micronaet.it',
+    'depends': [
+        'base',
+        'hr',
+        'analytic',
+        'hr_timesheet',
+        'hr_timesheet_invoice',                 
+        'account',
+        'account_analytic_analysis',
+        'product',
+        'knowledge',
+        'l10n_it_base',
+        'report_aeroo',
+        'report_aeroo_ooo',
+        'csv_base',
+        ],
+    'init_xml': [], 
+    'update_xml': [
+        'security/contract_group.xml',
+        'security/ir.model.access.csv',
+        'contract_views.xml',
+        'scheduler.xml',
+        'wizard/intervent_views.xml',
+        'wizard/group_superintervent_view.xml',
+        'contract_dashboard.xml',
+        'report/report_employee.xml',
+        ],
+    'demo_xml': [],
+    'active': False, 
+    'installable': True, 
+    }
