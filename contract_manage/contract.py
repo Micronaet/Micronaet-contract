@@ -70,9 +70,10 @@ class account_analytic_expense(osv.osv):
         counter = -header
 
         partner_pool = self.pool.get('res.partner')
-        #csv_pool = self.pool.get('csv.base')
+        csv_pool = self.pool.get('csv.base')
         
         # Load from CSV file:
+        record = {}
         tot_col = 0
         for line in lines:
             try:
@@ -89,19 +90,20 @@ class account_analytic_expense(osv.osv):
                         'Riga: %s Empty line of col different [%s!=%s]' % (
                             counter, tot_col, len(line)))
                     continue
-                            
+                
                 # Load fields from CSV file:
                 causal = csv_pool.decode_string(line[0])
                 series = csv_pool.decode_string(line[1])
                 number = csv_pool.decode_string(line[2])
                 account_code = csv_pool.decode_string(line[3])
+                # account description
                 contract_code = csv_pool.decode_string(line[4])
                 period = csv_pool.decode_string(line[5])
-                date = False or csv_pool.decode_string(line[]) # TODO
-                year = False or csv_pool.decode_string(line[]) # TODO
-                amount = csv_pool.decode_float(line[6])
-                department = csv_pool.decode_string(line[7])
-                movement_id = csv_pool.decode_string(line[8])
+                date = csv_pool.decode_string(line[6]) # TODO
+                year = False or csv_pool.decode_string(line[6]) # TODO
+                amount = csv_pool.decode_float(line[7])
+                department = csv_pool.decode_string(line[8])
+                movement_id = csv_pool.decode_string(line[9])
                 
                 # Get extra fields:
                 if period:
@@ -123,10 +125,11 @@ class account_analytic_expense(osv.osv):
                 split_type = 'contract' # TODO
                         
                 # Sync or create elements:        
+                name = '%s-%s' % (movement_id, date[:4])
                 data = {
-                    'name': movement_id,
+                    'name': name,
                     'amount': amount,
-                    'note': False
+                    'note': False,
                     'causal': causal,
                     'series': series,
                     'number': number,
@@ -137,7 +140,11 @@ class account_analytic_expense(osv.osv):
                     'split_type': split_type, 
                     'department_id': department_id,
                     }
-                    
+                self.search(cr, uid, [
+                    ('name', '=', name),
+                    (),
+                    ], context=context)
+                
             except:
                 _logger.error('Error import deadline')
                 continue
@@ -145,11 +152,12 @@ class account_analytic_expense(osv.osv):
 
     _columns = {
         'name': fields.char('Protocol #', size=64, required=True,
-            help='ID in accounting for link the record of OpenERP'),
+            help='ID in accounting for link the record of OpenERP'), 
         'amount': fields.float('Amount', digits=(16, 2), required=True),
         'note': fields.text('Note'),
 
         # Header description:
+        # TODO change casual in selection?
         'causal': fields.char('Causal', size=2, required=True),
         'series': fields.char('Series', size=2, required=True),
         'number': fields.char('Document', size=12, required=True),
