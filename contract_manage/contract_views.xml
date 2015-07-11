@@ -959,6 +959,69 @@
         <field name="help">User list of intervent</field>
     </record>
 
+
+    <!-- account.analytic.expense-->    
+    <record id="view_account_analytic_expense_search" model="ir.ui.view">
+        <field name="name">Expense search</field>
+        <field name="model">account.analytic.expense</field>
+        <field name="type">search</field>
+        <field name="arch" type="xml">
+            <search string="Expcence">
+                <group col="8" colspan="4">
+                    <!--<filter name="today" icon="terp-go-today" domain="[('date', '=', time.strftime('%%Y-%%m-%%d'))]" string="Today"/>-->
+                    <separator orientation="vertical"/>
+                    <field name="department_id" widget="selection"/>
+                    <field name="name" />
+                    <filter string="Date" icon="terp-go-month" domain="[]" context="{'group_by':'date'}"/>-->
+                </group>
+                <newline/>
+            
+                <group expand="0" string="Group By...">
+                    <filter string="Department" icon="terp-personal" domain="[]" context="{'group_by':'department_id'}"/>
+                    <separator orientation="vertical"/>
+                    <!--<filter string="Department" icon="terp-personal" domain="[]" context="{'group_by':'department_id'}"/>-->
+                </group>
+            </search>
+       </field>
+   </record>    
+                
+    <record id="view_account_analytic_expense_tree" model="ir.ui.view">
+        <field name="name">Expense list</field>
+        <field name="model">account.analytic.expense</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+           <tree string="Expense">
+                <field name="name"/>
+                <field name="date"/>
+            </tree>
+       </field>
+   </record>    
+
+    <record id="view_account_analytic_expense_form" model="ir.ui.view">
+        <field name="name">Expense form</field>
+        <field name="model">account.analytic.expense</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+           <form string="Expense">
+                <field name="name"/>
+                <field name="date"/>
+            </form>
+       </field>
+   </record>    
+
+    <record id="action_account_analytic_expense" model="ir.actions.act_window">
+        <field name="name">Expense list</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.analytic.expense</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field> <!--TODO calendar ?? -->
+        <field name="view_id" ref="view_account_analytic_expense_tree"/>
+        <field name="search_view_id" ref="view_account_analytic_expense_search"/>
+        <field name="context">{}</field>
+        <field name="domain">[]</field>
+        <field name="help">Expense list </field>
+    </record>
+
     <!-- MENUITEM -->
    <menuitem id="menu_contract_manage_root"
              name="Contract Manage"
@@ -1082,6 +1145,17 @@
                      sequence="20" 
                      groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager"
                      parent="menu_action_account_analytic_superintervent_root" />
+
+        <menuitem id="menu_analytic_expense"
+             name="Expense"
+             sequence="26" 
+             parent="menu_contract_manage_root" />
+
+            <menuitem id="menu_action_account_analytic_expense" 
+                 name="Expense list"
+                 action="action_account_analytic_expense"
+                 sequence="10"
+                 parent="menu_analytic_expense" />
 
         <menuitem id="menu_configuration_root"
              name="Configuration"
