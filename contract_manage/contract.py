@@ -24,6 +24,7 @@ import os
 import sys
 import logging
 import openerp
+import csv
 import openerp.netsvc as netsvc
 import openerp.addons.decimal_precision as dp
 from openerp.osv import fields, osv, expression, orm
@@ -58,11 +59,88 @@ class account_analytic_expense(osv.osv):
     _description = 'Analytic expense'
 
     # Scheduler event:
-    def schedule_csv_accounting_movement_import(self, cr, uid, input_file,
-            separator, header, verbose=100):
+    def schedule_csv_accounting_movement_import(self, cr, uid, csv_file,
+            delimiter, header, verbose=100):
         ''' Import movement sync with record in OpenERP
         '''
+        
+        _logger.info('Start import accounting movement, filee: %s' % csv_file)
+        lines = csv.reader(open(os.path.expanduser(
+                csv_file), 'rb'), delimiter=delimiter)
+        counter = -header
 
+        partner_pool = self.pool.get('res.partner')
+        #csv_pool = self.pool.get('csv.base')
+        
+        # Load from CSV file:
+        tot_col = 0
+        for line in lines:
+            try:
+                # Starting test for row check:
+                counter += 1
+                if counter <= 0:
+                    continue # jump header line
+                if tot_col == 0: # the first time (for tot col)
+                   tot_col = len(line)
+                   _logger.info('Total column %s' % tot_col)
+                   
+                if not(len(line) and (tot_col == len(line))):
+                    _logger.warning(
+                        'Riga: %s Empty line of col different [%s!=%s]' % (
+                            counter, tot_col, len(line)))
+                    continue
+                            
+                # Load fields from CSV file:
+                causal = csv_pool.decode_string(line[0])
+                series = csv_pool.decode_string(line[1])
+                number = csv_pool.decode_string(line[2])
+                account_code = csv_pool.decode_string(line[3])
+                contract_code = csv_pool.decode_string(line[4])
+                period = csv_pool.decode_string(line[5])
+                date = False or csv_pool.decode_string(line[]) # TODO
+                year = False or csv_pool.decode_string(line[]) # TODO
+                amount = csv_pool.decode_float(line[6])
+                department = csv_pool.decode_string(line[7])
+                movement_id = csv_pool.decode_string(line[8])
+                
+                # Get extra fields:
+                if period:
+                    date_from = "%s-%s-%s" % (
+                        '2015', # TODO calculate correct
+                        period[:2],
+                        period[2:4],
+                        )
+                    date_to = "%s-%s-%s" % (
+                        '2015', # TODO calculate correct
+                        period[4:6],
+                        period[6:8],
+                        )
+                else:
+                    date_from = False
+                    date_to = False
+                        
+                department_id = False # TODO
+                split_type = 'contract' # TODO
+                        
+                # Sync or create elements:        
+                data = {
+                    'name': movement_id,
+                    'amount': amount,
+                    'note': False
+                    'causal': causal,
+                    'series': series,
+                    'number': number,
+                    'date': date,
+                    'date_to': date_to,
+                    'date_from': date_from,
+                    'year': year,
+                    'split_type': split_type, 
+                    'department_id': department_id,
+                    }
+                    
+            except:
+                _logger.error('Error import deadline')
+                continue
         return True
 
     _columns = {
@@ -104,7 +182,7 @@ class account_analytic_intervent_activity(osv.osv):
     ''' Activity for intervent (generic catalogation)
     '''
 
-    _name='account.analytic.intervent.activity'
+    _name = 'account.analytic.intervent.activity'
     _description = 'Intervent activity'
 
     _columns = {
