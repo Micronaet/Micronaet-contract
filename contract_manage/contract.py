@@ -43,7 +43,7 @@ class account_analytic_expense(osv.osv):
         present in the period selected
     '''
     
-    _name='account.analytic.expense'
+    _name = 'account.analytic.expense'
     _description = 'Analytic expense'
     _columns = {
         'name': fields.char('Protocol #', size=64, required=True,
