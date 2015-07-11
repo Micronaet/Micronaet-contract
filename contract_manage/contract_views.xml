@@ -970,12 +970,11 @@
                 <separator orientation="vertical"/>
                 <field name="department_id" widget="selection"/>
                 <field name="name" />
-                <filter string="Date" icon="terp-go-month" domain="[]" context="{'group_by':'date'}"/>
-            
+                <newline />
                 <group expand="0" string="Group By...">
                     <filter string="Department" icon="terp-personal" domain="[]" context="{'group_by':'department_id'}"/>
                     <separator orientation="vertical"/>
-                    <!--<filter string="Department" icon="terp-personal" domain="[]" context="{'group_by':'department_id'}"/>-->
+                    <filter string="Date" icon="terp-go-month" domain="[]" context="{'group_by':'date'}"/>                
                 </group>
             </search>
        </field>
