@@ -168,10 +168,13 @@ class account_analytic_expense(osv.osv):
                 code_id = code_pool.get_create_code(
                     cr, uid, account_code, account_name, context=context)
 
-                if contract_code:
+                if contract_code: # Directly to contract
                     split_type = 'contract'
-                elif department_code:
-                        
+                elif department_code in department_code_all:
+                    split_type = 'all'
+                else: # no contract
+                    split_type = 'department'
+                    
 
                 # ------------------------
                 # Sync or create elements:        
