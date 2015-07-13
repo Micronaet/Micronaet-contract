@@ -89,6 +89,7 @@ class account_analytic_expense(osv.osv):
         counter = -header
 
         partner_pool = self.pool.get('res.partner')
+        dept_pool = self.pool.get('hr.department')
         code_pool = self.pool.get('account.analytic.expense.account')
         csv_pool = self.pool.get('csv.base')
         
@@ -127,7 +128,7 @@ class account_analytic_expense(osv.osv):
                 period = csv_pool.decode_string(line[6])
                 date = csv_pool.decode_date(line[7])
                 amount = csv_pool.decode_float(line[8])
-                department = csv_pool.decode_string(line[9])
+                department_code = csv_pool.decode_string(line[9])
                 movement_id = csv_pool.decode_string(line[10])
                 year = csv_pool.decode_string(line[11])
                 
@@ -149,11 +150,13 @@ class account_analytic_expense(osv.osv):
                     date_from = False
                     date_to = False
                         
-                department_id = False # TODO
-                split_type = 'contract' # TODO
-                
+                department_id = dept_pool = get_department(
+                    cr, uid, department_code, context=context)
+                    
                 code_id = code_pool.get_create_code(
                     cr, uid, account_code, account_name, context=context)
+
+                split_type = 'contract' # TODO
 
                 # ------------------------
                 # Sync or create elements:        
@@ -174,10 +177,14 @@ class account_analytic_expense(osv.osv):
                     'split_type': split_type, 
                     'department_id': department_id,
                     }
-                self.search(cr, uid, [
+                account_ids = self.search(cr, uid, [
                     ('name', '=', name),
-                    (),
+                    (), # TODO
                     ], context=context)
+                if account_ids:
+                    # Update:
+                else:
+                    # Create    
                 
             except:
                 _logger.error('Error import deadline')
@@ -258,6 +265,14 @@ class hr_department_extra(osv.osv):
 
     _inherit = 'hr.department'
 
+    def get_department(self, cr, uid, code, context=None):
+        ''' Get department ID from code 
+        '''
+        item_ids = self.search(cr, uid, [('code', '=', code)], context=context)
+        if code_ids:
+            return code_ids[0]
+        return False
+        
     _columns = {
         'inactive': fields.boolean('Inactive'),
         'for_extra_department': fields.boolean('For extra cost',
