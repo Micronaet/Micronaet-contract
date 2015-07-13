@@ -96,6 +96,7 @@ class account_analytic_expense(osv.osv):
         # -------------------
         # Load from CSV file:
         # -------------------
+        import pdb; pdb.set_trace()
         record = {}
         tot_col = 0
         for line in lines:
@@ -179,7 +180,7 @@ class account_analytic_expense(osv.osv):
                     }
                 account_ids = self.search(cr, uid, [
                     ('name', '=', name),
-                    (), # TODO
+                    #(), # TODO
                     ], context=context)
                 if account_ids:
                     # Update:
