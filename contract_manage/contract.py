@@ -24,6 +24,7 @@ import os
 import sys
 import logging
 import netsvc
+import csv
 import decimal_precision as dp
 from osv import fields, osv, expression, orm
 from datetime import datetime, timedelta
@@ -97,7 +98,7 @@ class account_analytic_expense(osv.osv):
     # Scheduler event:
     def schedule_csv_accounting_movement_import(self, cr, uid, csv_file,
             delimiter, header, verbose=100, department_code_all=None, 
-            general_code = '410100'):
+            general_code = '410100', context=None):
         ''' Import movement sync with record in OpenERP
             csv_file: full path of file to import  (use ~ for home)
             delimiter: for csv separation
@@ -417,9 +418,10 @@ class hr_department_extra(osv.osv):
     def get_department(self, cr, uid, code, context=None):
         ''' Get department ID from code 
         '''
-        item_ids = self.search(cr, uid, [('code', '=', code)], context=context)
-        if code_ids:
-            return code_ids[0]
+        department_ids = self.search(cr, uid, [
+            ('code', '=', code)], context=context)
+        if department_ids:
+            return department_ids[0]
         return False
         
     _columns = {
