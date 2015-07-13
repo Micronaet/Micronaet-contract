@@ -92,12 +92,13 @@ class account_analytic_expense(osv.osv):
             department_code_all = []
 
         _logger.info('Start import accounting movement, filee: %s' % csv_file)
+        counter = -header
         lines = csv.reader(open(os.path.expanduser(
                 csv_file), 'rb'), delimiter=delimiter)
-        counter = -header
-
+        
         partner_pool = self.pool.get('res.partner')
         contract_pool = self.pool.get('account.analytic.account')
+        line_pool = self.pool.get('account.analytic.line')
         dept_pool = self.pool.get('hr.department')
         code_pool = self.pool.get('account.analytic.expense.account')
         csv_pool = self.pool.get('csv.base')
@@ -107,6 +108,7 @@ class account_analytic_expense(osv.osv):
         # -------------------
         record = {} # dict for collect contract list 
         tot_col = 0
+        import pdb; pdb.set_trace()
         for line in lines:
             try:
                 # ----------------------------
@@ -195,7 +197,7 @@ class account_analytic_expense(osv.osv):
                     split_type = 'department'
                     
                 if prot_id not in record:
-                    record[prot_id] = [] # contract list                    
+                    record[prot_id] = {}                  
 
                 # ------------------------
                 # Sync or create elements:        
@@ -229,12 +231,81 @@ class account_analytic_expense(osv.osv):
                 else:
                     item_id = self.create(
                         cr, uid, account_ids, data, context=context)
-                if contract_code:        
-                    record[prot_id].append(contract_id)
+                if contract_code:
+                    record[prot_id][contract_id] = amount
                 
             except:
                 _logger.error('Error import deadline')
                 continue
+                
+        # --------------------------------------        
+        # Read all lines and sync contract state
+        # --------------------------------------        
+        import pdb; pdb.set_trace()
+        unlink_line_ids = []
+        record_ids = self.search(cr, uid, [], context=context)
+        for item in self.browse(cr, uid, record_ids, context=context):
+            if item.name not in record:
+                # delete line (not present) #TODO check years multi importation
+                self.unlink(cr, uid, item.id, context=context)
+                continue
+                
+            if record.split_type == 'all': 
+                # Compute all active contract and split amount
+                contract_dict = {}
+            elif record.split_type == 'department': 
+                # Compute dept. active contract and split amount
+                contract_dict = {}            
+            elif record.split_type == 'contract': 
+                # use dict record
+                contract_dict = record[item.name]
+            #for line in item.analytic_line_ids:
+            current_contract = {}
+            for item in item.analytic_line_ids:
+                currenct_contract[item.contract_id.id] = item.id
+                
+            for contract_id, amount in record[item.name].iteritems():
+                if contract_id in current_ids: # contract present
+                    delete(current_contract[contract_id])
+                    line_pool.write(cr, uid, current_contract[contract_id], {
+                        'amount': amount,
+                        }, context=context)
+                else: # not present create
+                    line_pool.create(cr, uid, {
+                        # TODO create analytic line:
+                        'amount': amount,
+                        'user_id': uid,
+                        'name': 'Accounting movement prot.: %s' % item.name,
+                        'unit_amount': 1.0,
+                        'date': item.date, # TODO change with one period date (in range)                       
+                        #company_id,
+                        account_id: contract_id,
+                        #code,
+                        general_account_id, #TODO merci c/acq
+                        #currency_id,
+                        #move_id,
+                        #product_id,
+                        #product_uom_id,
+                        journal_id,
+                        #amount_currency,
+                        #ref,
+                        #to_invoice,
+                        #invoice_id,
+                        #extra_analytic_line_timesheet_id,
+                        import_type,
+                        activity_id ,
+                        #mail_raccomanded,
+                        location,
+                        expense_id item.id,                        
+                        }, context=context)
+                            
+                    
+            # unlink record (once at the end of all loops)
+            unlink_line_ids.extend([
+                current_contract[k] for k in current_contract]) 
+            
+            
+        line_pool.unlink(cr, uid, unlink_line_ids, context=context)
         return True
 
     _columns = {
@@ -563,6 +634,8 @@ class account_analytic_line_extra_fields(osv.osv):
         # Expense:
         'expense_id': fields.many2one('account.analytic.expense', 'Expense',
             ondelete='cascade'),
+        'contract_id': fields.many2one('account.analytic.account', 
+            'Exp. account', ondelete='cascade'),
         }
 
     _defaults = {
