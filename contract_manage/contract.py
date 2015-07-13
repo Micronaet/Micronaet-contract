@@ -60,6 +60,30 @@ class account_account(osv.osv):
         
 account_account()        
 
+class account_analytic_journal(osv.osv):
+    ''' Extend obj with utility functions 
+    '''
+
+    _inherit = 'account.analytic.journal'
+    
+    def get_journal_purchase(self, cr, uid, context=None):
+        ''' Search or create journal for purchase accounting
+        '''
+        code_ids = self.search(cr, uid, [
+            ('code', '=', 'PUR')], context=context)
+        if code_ids:
+            return code_ids[0]
+        company_id = self.pool.get('res.users').browse(
+            cr, uid, uid, context=context).company_id.id
+        return self.create(cr, uid, {
+            'code': 'PUR',
+            'name': _('Purchase'),
+            'type': 'purchase',
+            'company_id': company_id, 
+            'active': True,
+            }, context=context)                
+account_analytic_journal()            
+
 class account_analytic_expense_account(osv.osv):
     ''' List of account expenses (imported)
         All this record will be distributed on account.analytic.account
@@ -110,7 +134,7 @@ class account_analytic_expense(osv.osv):
         _logger.info('Start import accounting movement, filee: %s' % csv_file)
 
         # ------------------
-        # Startup parameters
+        # Startup parameters        
         # ------------------
         partner_pool = self.pool.get('res.partner')
         account_pool = self.pool.get('account.account')
@@ -119,6 +143,7 @@ class account_analytic_expense(osv.osv):
         dept_pool = self.pool.get('hr.department')
         code_pool = self.pool.get('account.analytic.expense.account')
         csv_pool = self.pool.get('csv.base')
+        journal_pool = self.pool.get('account.analytic.journal')
 
         if department_code_all is None:
             department_code_all = [] 
@@ -129,6 +154,12 @@ class account_analytic_expense(osv.osv):
             cr, uid, general_code, context=context)
         if not general_id:
             _logger.error('Cannot create analytic line, no ledge!')
+            return False
+
+        journal_id = journal_pool.get_journal_purchase(
+            cr, uid, context=context)
+        if not journal_id:
+            _logger.error('Cannot get purchase journal!')
             return False
 
         counter = -header
@@ -275,8 +306,6 @@ class account_analytic_expense(osv.osv):
         # --------------------------------------        
         # Read all lines and sync contract state
         # --------------------------------------        
-        import pdb; pdb.set_trace()
-
         unlink_line_ids = []
         record_ids = self.search(cr, uid, [], context=context)
         for item in self.browse(cr, uid, record_ids, context=context):
@@ -287,21 +316,23 @@ class account_analytic_expense(osv.osv):
                 
             if item.split_type == 'all': 
                 # Compute all active contract and split amount
+                # TODO
                 contract_dict = {}
             elif item.split_type == 'department': 
                 # Compute dept. active contract and split amount
+                # TODO
                 contract_dict = {}            
             elif item.split_type == 'contract': 
                 # use dict record
                 contract_dict = record[item.name]
-            #for line in item.analytic_line_ids:
+
+            # Load contract-line for current write operation
             current_contract = {}
             for item in item.analytic_line_ids:
                 currenct_contract[item.contract_id.id] = item.id
                 
-                
             for contract_id, amount in record[item.name].iteritems():
-                if contract_id in current_ids: # contract present
+                if contract_id in current_contract: # contract present
                     delete(current_contract[contract_id])
                     line_pool.write(cr, uid, current_contract[contract_id], {
                         'amount': amount,
@@ -309,30 +340,30 @@ class account_analytic_expense(osv.osv):
                 else: # not present create
                     line_pool.create(cr, uid, {
                         # TODO create analytic line:
-                        'amount': amount,
+                        'amount': -amount,
                         'user_id': uid,
-                        'name': _('Accounting movement prot.: %s') % item.name,
+                        'name': _('Accounting prot.: %s') % item.name,
                         'unit_amount': 1.0,
                         'date': item.date, # TODO change with one period date (in range)                       
-                        account_id: contract_id,
-                        general_account_id: general_id,
-                        #journal_id, # TODO 
-                        #company_id,
-                        #code,
-                        #currency_id,
-                        #move_id,
-                        #product_id,
-                        #product_uom_id,
-                        #amount_currency,
-                        #ref,
-                        #to_invoice,
-                        #invoice_id,
-                        #extra_analytic_line_timesheet_id,
-                        ##import_type,
-                        ##activity_id ,
-                        #mail_raccomanded,
-                        ##location,
-                        expense_id: item.id,
+                        'account_id': contract_id,
+                        'general_account_id': general_id,
+                        'journal_id': journal_id, 
+                        #'company_id',
+                        #'code',
+                        #'currency_id',
+                        #'move_id',
+                        #'product_id',
+                        #'product_uom_id',
+                        #'amount_currency',
+                        #'ref',
+                        #'to_invoice',
+                        #'invoice_id',
+                        #'extra_analytic_line_timesheet_id',
+                        ##'import_type',
+                        ##'activity_id' ,
+                        #'mail_raccomanded',
+                        ##'location',
+                        'expense_id': item.id,
                         }, context=context)
                             
                     

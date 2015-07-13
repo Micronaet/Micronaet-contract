@@ -1020,16 +1020,31 @@
            <form string="Expense">
                 <field name="name"/>
                 <field name="date"/>
-                <field name="amount"/>
-                <field name="note"/>
+                
                 <field name="causal"/>
                 <field name="series"/>
+                
                 <field name="number"/>
+                <field name="year"/>
+                
                 <field name="date_to"/>
                 <field name="date_from"/>
-                <field name="year"/>
+                
+                <field name="amount"/>
                 <field name="split_type"/>
+                
                 <field name="department_id" widget="selection"/>
+                <field name="note"/>
+                
+                <field name="analytic_line_ids" nolabel="1" colspan="4" readonly="1">
+                    <tree string="Analytic line">
+                        <field name="name" />
+                        <field name="amount" />
+                        <field name="date" />
+                        <field name="journal_id" />
+                        <field name="general_account_id" />
+                    </tree>
+                </field>
             </form>
        </field>
    </record>    
