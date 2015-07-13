@@ -87,7 +87,7 @@ class account_analytic_expense(osv.osv):
             verbose: every X record print a log message (else nothing)
             department_code_all: list of department code that split on all dep.
         '''
-        if department_code_all is None:
+        '''if department_code_all is None:
             department_code_all = []
 
         _logger.info('Start import accounting movement, filee: %s' % csv_file)
@@ -104,7 +104,6 @@ class account_analytic_expense(osv.osv):
         # -------------------
         # Load from CSV file:
         # -------------------
-        import pdb; pdb.set_trace()
         record = {} # dict for collect contract list 
         tot_col = 0
         for line in lines:
@@ -234,7 +233,7 @@ class account_analytic_expense(osv.osv):
                 
             except:
                 _logger.error('Error import deadline')
-                continue
+                continue'''
         return True
 
     _columns = {
