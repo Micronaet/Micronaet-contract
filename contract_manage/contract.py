@@ -223,8 +223,7 @@ class account_analytic_expense(osv.osv):
                     ('department_id', '=', department_id),
                     ], context=context)
                 if account_ids: # TODO
-                    assert len(account_ids) == 1, 'Account key broken'
-                        '(protocol-ledge-department)!'
+                    assert len(account_ids) == 1, 'Key broken prot-ledge-dept!'
                     self.write(cr, uid, account_ids, data, context=context)
                     item_id = account_ids[0]
                 else:
