@@ -182,10 +182,12 @@ class account_analytic_expense(osv.osv):
                     ('name', '=', name),
                     #(), # TODO
                     ], context=context)
-                if account_ids:
+                if account_ids: # TODO
                     # Update:
+                    pass
                 else:
                     # Create    
+                    pass
                 
             except:
                 _logger.error('Error import deadline')
