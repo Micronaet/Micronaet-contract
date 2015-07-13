@@ -67,6 +67,7 @@ class account_analytic_expense_account(osv.osv):
         'name': fields.char('Account', size=60, required=True), 
         'code': fields.char('Code', size=10, required=True),
         }
+account_analytic_expense_account()
 
 class account_analytic_expense(osv.osv):
     ''' List of account expenses (imported)
@@ -87,7 +88,7 @@ class account_analytic_expense(osv.osv):
             verbose: every X record print a log message (else nothing)
             department_code_all: list of department code that split on all dep.
         '''
-        '''if department_code_all is None:
+        if department_code_all is None:
             department_code_all = []
 
         _logger.info('Start import accounting movement, filee: %s' % csv_file)
@@ -233,7 +234,7 @@ class account_analytic_expense(osv.osv):
                 
             except:
                 _logger.error('Error import deadline')
-                continue'''
+                continue
         return True
 
     _columns = {
