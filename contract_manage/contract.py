@@ -107,7 +107,6 @@ class account_analytic_expense(osv.osv):
             department_code_all: list of department code that split on all dep.
             general_code = account for analytic line
         '''
-        import pdb; pdb.set_trace()
         _logger.info('Start import accounting movement, filee: %s' % csv_file)
 
         # ------------------
@@ -122,7 +121,9 @@ class account_analytic_expense(osv.osv):
         csv_pool = self.pool.get('csv.base')
 
         if department_code_all is None:
-            department_code_all = []
+            department_code_all = [] 
+            # list of department that split in all contracts
+            
 
         general_id = account_pool.get_account_id(
             cr, uid, general_code, context=context)
@@ -171,11 +172,11 @@ class account_analytic_expense(osv.osv):
                 contract_code = csv_pool.decode_string(line[5])
                 
                 period = csv_pool.decode_string(line[6])
-                date = csv_pool.decode_date(line[7])
+                date = csv_pool.decode_date(line[7], with_slash=False)
                 
                 amount = csv_pool.decode_float(line[8])
                 department_code = csv_pool.decode_string(line[9])
-                prot_id = csv_pool.decode_string(line[10])
+                name = csv_pool.decode_string(line[10]) # prot_id
                 year = csv_pool.decode_string(line[11])
                 
                 # -----------------
@@ -198,7 +199,9 @@ class account_analytic_expense(osv.osv):
                         
                 department_id = dept_pool.get_department(
                     cr, uid, department_code, context=context)
-                if not department_id:
+                
+                if not department_id and department_code not in \
+                        department_code_all:
                     _logger.error(
                         '%s. Department code not found: %s' % (
                             counter, department_code))
@@ -216,8 +219,8 @@ class account_analytic_expense(osv.osv):
                     cr, uid, contract_code, context=context)
                 if not contract_id:
                     _logger.error(
-                        '%s. Contract code not found: %s' % (
-                            counter, contract_code))
+                        '%s. Contract code not found [%s-%s-%s]: %s' % (
+                            counter, causal, series, number, contract_code))
                     continue    
 
                 if contract_code: # Directly to contract
@@ -227,13 +230,13 @@ class account_analytic_expense(osv.osv):
                 else: # no contract
                     split_type = 'department'
                     
-                if prot_id not in record:
-                    record[prot_id] = {}                  
+                if name not in record:
+                    record[name] = {}                  
 
                 # ------------------------
                 # Sync or create elements:        
                 # ------------------------
-                name = '%s-%s' % (prot_id, date[:4])
+                #name = '%s-%s' % (prot_id, date[:4])
                 data = {
                     'name': name,
                     'amount': amount,
@@ -249,7 +252,6 @@ class account_analytic_expense(osv.osv):
                     'split_type': split_type, 
                     'department_id': department_id,
                     }
-                    
                 account_ids = self.search(cr, uid, [
                     ('name', '=', name),
                     ('code_id', '=', code_id),
@@ -261,9 +263,10 @@ class account_analytic_expense(osv.osv):
                     item_id = account_ids[0]
                 else:
                     item_id = self.create(
-                        cr, uid, account_ids, data, context=context)
+                        cr, uid, data, context=context)
+
                 if contract_code:
-                    record[prot_id][contract_id] = amount
+                    record[name][contract_id] = amount
                 
             except:
                 _logger.error('Error import deadline')
@@ -282,13 +285,13 @@ class account_analytic_expense(osv.osv):
                 self.unlink(cr, uid, item.id, context=context)
                 continue
                 
-            if record.split_type == 'all': 
+            if item.split_type == 'all': 
                 # Compute all active contract and split amount
                 contract_dict = {}
-            elif record.split_type == 'department': 
+            elif item.split_type == 'department': 
                 # Compute dept. active contract and split amount
                 contract_dict = {}            
-            elif record.split_type == 'contract': 
+            elif item.split_type == 'contract': 
                 # use dict record
                 contract_dict = record[item.name]
             #for line in item.analytic_line_ids:
