@@ -208,6 +208,8 @@ class account_analytic_expense(osv.osv):
                 
                 amount = csv_pool.decode_float(line[8])
                 department_code = csv_pool.decode_string(line[9])
+                if department_code == '1':
+                    import pdb; pdb.set_trace()
                 name = csv_pool.decode_string(line[10]) # prot_id
                 year = csv_pool.decode_string(line[11])
                 
@@ -254,7 +256,6 @@ class account_analytic_expense(osv.osv):
                         '%s. Contract code not found [%s-%s-%s]: %s' % (
                             counter, causal, series, number, contract_code))
                     continue    
-
                     
                 if name not in record_contract:
                     record_contract[name] = {}                  
@@ -277,16 +278,16 @@ class account_analytic_expense(osv.osv):
                     'department_id': department_id,
                     }
 
+                if department_code in department_code_all: # first!
+                    data.update({
+                        'split_type': 'all',
+                        'amount': amount,
+                        })
                 if contract_code: # Directly to contract
                     data.update({
                         'split_type': 'contract',
                         'amount': 0.0,
                         })                    
-                elif department_code in department_code_all:
-                    data.update({
-                        'split_type': 'all',
-                        'amount': amount,
-                        })
                 else: # no contract
                     data.update({
                         'split_type': 'department',
@@ -414,11 +415,6 @@ class account_analytic_expense(osv.osv):
         'code_id': fields.many2one(
             'account.analytic.expense.account', 'Account code',
             help="Accounting code from external program"),
-        #'contract_ids': fields.many2one(
-        #    'account.analytic.account', 'expense_account_analitic_rel',
-        #    'expense_id', 'contract_id', 'Contract',
-        #    help="Contract if directly associated"),
-        # TODO Not indicate contract, same as analytic lines!!
         }
 account_analytic_expense()
 

@@ -1010,31 +1010,31 @@
                 <field name="department_id"/>
             </tree>
        </field>
-   </record>    
+   </record>
 
-    <record id="view_account_analytic_expense_form" model="ir.ui.view">
-        <field name="name">Expense form</field>
-        <field name="model">account.analytic.expense</field>
-        <field name="type">form</field>
-        <field name="arch" type="xml">
+   <record id="view_account_analytic_expense_form" model="ir.ui.view">
+       <field name="name">Expense form</field>
+       <field name="model">account.analytic.expense</field>
+       <field name="type">form</field>
+       <field name="arch" type="xml">
            <form string="Expense">
-                <field name="name"/>
-                <field name="date"/>
+                <field name="name" readonly="1"/>
+                <field name="date" readonly="1"/>
                 
-                <field name="causal"/>
-                <field name="series"/>
+                <field name="causal" readonly="1"/>
+                <field name="series" readonly="1"/>
                 
-                <field name="number"/>
-                <field name="year"/>
+                <field name="number" readonly="1"/>
+                <field name="year" readonly="1"/>
                 
-                <field name="date_to"/>
-                <field name="date_from"/>
+                <field name="date_to" readonly="1"/>
+                <field name="date_from" readonly="1"/>
                 
-                <field name="amount"/>
-                <field name="split_type"/>
+                <field name="amount" readonly="1"/>
+                <field name="split_type" readonly="1"/>
                 
-                <field name="department_id" widget="selection"/>
-                <field name="note"/>
+                <field name="department_id" widget="selection" readonly="1"/>
+                <!--<field name="note"/>-->
                 
                 <field name="analytic_line_ids" nolabel="1" colspan="4" readonly="1">
                     <tree string="Analytic line">
@@ -1042,12 +1042,12 @@
                         <field name="date" />
                         <field name="journal_id" />
                         <field name="general_account_id" />
-                        <field name="amount" total="total"/>
+                        <field name="amount" sum="total"/>
                     </tree>
                 </field>
             </form>
        </field>
-   </record>    
+    </record>    
 
     <record id="action_account_analytic_expense" model="ir.actions.act_window">
         <field name="name">Expense list</field>
