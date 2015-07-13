@@ -43,6 +43,22 @@ operation_type = [
     ('material', 'Material in EUR'),
     ]
 
+class account_account(osv.osv):
+    ''' Extra function
+    '''
+
+    _inherit = 'account.account'
+    
+    def get_account_id(self, cr, uid, code, context=None):
+        ''' Search code in database and return ID
+        '''
+        code_ids = self.search(cr, uid, [('code', '=', code)], context=context)
+        if code_ids:
+            return code_ids[0]
+        return False
+        
+account_account()        
+
 class account_analytic_expense_account(osv.osv):
     ''' List of account expenses (imported)
         All this record will be distributed on account.analytic.account
@@ -80,28 +96,43 @@ class account_analytic_expense(osv.osv):
 
     # Scheduler event:
     def schedule_csv_accounting_movement_import(self, cr, uid, csv_file,
-            delimiter, header, verbose=100, department_code_all=None):
+            delimiter, header, verbose=100, department_code_all=None, 
+            general_code = '410100'):
         ''' Import movement sync with record in OpenERP
             csv_file: full path of file to import  (use ~ for home)
             delimiter: for csv separation
             header: number of line for header (jumped)
             verbose: every X record print a log message (else nothing)
             department_code_all: list of department code that split on all dep.
+            general_code = account for analytic line
         '''
-        if department_code_all is None:
-            department_code_all = []
 
         _logger.info('Start import accounting movement, filee: %s' % csv_file)
-        counter = -header
-        lines = csv.reader(open(os.path.expanduser(
-                csv_file), 'rb'), delimiter=delimiter)
-        
+
+        # ------------------
+        # Startup parameters
+        # ------------------
         partner_pool = self.pool.get('res.partner')
+        account_pool = self.pool.get('account.account')
         contract_pool = self.pool.get('account.analytic.account')
         line_pool = self.pool.get('account.analytic.line')
         dept_pool = self.pool.get('hr.department')
         code_pool = self.pool.get('account.analytic.expense.account')
         csv_pool = self.pool.get('csv.base')
+
+        if department_code_all is None:
+            department_code_all = []
+
+        general_id = accunt_pool.get_account_id(
+            cr, uid, general_code, context=context)
+        if not general_id:
+            _logger.error('Cannot create analytic line, no ledge!')
+            return False
+
+        counter = -header
+        lines = csv.reader(open(os.path.expanduser(
+                csv_file), 'rb'), delimiter=delimiter)
+        
         
         # -------------------
         # Load from CSV file:
@@ -242,6 +273,7 @@ class account_analytic_expense(osv.osv):
         # Read all lines and sync contract state
         # --------------------------------------        
         import pdb; pdb.set_trace()
+
         unlink_line_ids = []
         record_ids = self.search(cr, uid, [], context=context)
         for item in self.browse(cr, uid, record_ids, context=context):
@@ -275,7 +307,7 @@ class account_analytic_expense(osv.osv):
                         # TODO create analytic line:
                         'amount': amount,
                         'user_id': uid,
-                        'name': 'Accounting movement prot.: %s' % item.name,
+                        'name': _('Accounting movement prot.: %s') % item.name,
                         'unit_amount': 1.0,
                         'date': item.date, # TODO change with one period date (in range)                       
                         #company_id,
