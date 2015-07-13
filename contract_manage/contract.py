@@ -43,6 +43,31 @@ operation_type = [
     ('material', 'Material in EUR'),
     ]
 
+class account_analytic_expense_account(osv.osv):
+    ''' List of account expenses (imported)
+        All this record will be distributed on account.analytic.account
+        present in the period selected
+    '''
+
+    _name = 'account.analytic.expense.account'
+    _description = 'Analytic expense account'
+    
+    def get_create_code(self, cr, uid, code, name, context=None):
+        ''' Search code in database, if not present create and return ID
+        '''
+        code_ids = self.search(cr, uid, [('code', '=', code)], context=context)
+        if code_ids:
+            return code_ids[0]
+        return self.create(cr, uid, {
+            'code': code,
+            'name': name,
+            }, context=context)    
+
+    _columns = {
+        'name': fields.char('Account', size=60, required=True), 
+        'code': fields.char('Code', size=10, required=True),
+        }
+
 class account_analytic_expense(osv.osv):
     ''' List of account expenses (imported)
         All this record will be distributed on account.analytic.account
@@ -64,14 +89,19 @@ class account_analytic_expense(osv.osv):
         counter = -header
 
         partner_pool = self.pool.get('res.partner')
+        code_pool = self.pool.get('account.analytic.expense.account')
         csv_pool = self.pool.get('csv.base')
         
+        # -------------------
         # Load from CSV file:
+        # -------------------
         record = {}
         tot_col = 0
         for line in lines:
             try:
+                # ----------------------------
                 # Starting test for row check:
+                # ----------------------------
                 counter += 1
                 if counter <= 0:
                     continue # jump header line
@@ -85,21 +115,25 @@ class account_analytic_expense(osv.osv):
                             counter, tot_col, len(line)))
                     continue
                 
+                # --------------------------
                 # Load fields from CSV file:
+                # --------------------------
                 causal = csv_pool.decode_string(line[0])
                 series = csv_pool.decode_string(line[1])
                 number = csv_pool.decode_string(line[2])
                 account_code = csv_pool.decode_string(line[3])
-                # account description
-                contract_code = csv_pool.decode_string(line[4])
-                period = csv_pool.decode_string(line[5])
-                date = csv_pool.decode_string(line[6]) # TODO
-                year = False or csv_pool.decode_string(line[6]) # TODO
-                amount = csv_pool.decode_float(line[7])
-                department = csv_pool.decode_string(line[8])
-                movement_id = csv_pool.decode_string(line[9])
+                account_name = csv_pool.decode_string(line[4])
+                contract_code = csv_pool.decode_string(line[5])
+                period = csv_pool.decode_string(line[6])
+                date = csv_pool.decode_date(line[7])
+                amount = csv_pool.decode_float(line[8])
+                department = csv_pool.decode_string(line[9])
+                movement_id = csv_pool.decode_string(line[10])
+                year = csv_pool.decode_string(line[11])
                 
+                # -----------------
                 # Get extra fields:
+                # -----------------
                 if period:
                     date_from = "%s-%s-%s" % (
                         '2015', # TODO calculate correct
@@ -117,8 +151,13 @@ class account_analytic_expense(osv.osv):
                         
                 department_id = False # TODO
                 split_type = 'contract' # TODO
-                        
+                
+                code_id = code_pool.get_create_code(
+                    cr, uid, account_code, account_name, context=context)
+
+                # ------------------------
                 # Sync or create elements:        
+                # ------------------------
                 name = '%s-%s' % (movement_id, date[:4])
                 data = {
                     'name': name,
@@ -127,6 +166,7 @@ class account_analytic_expense(osv.osv):
                     'causal': causal,
                     'series': series,
                     'number': number,
+                    'code_id': code_id, 
                     'date': date,
                     'date_to': date_to,
                     'date_from': date_from,
@@ -172,6 +212,10 @@ class account_analytic_expense(osv.osv):
         'department_id': fields.many2one(
             'hr.department', 'Department',
             help="Department if directly associated"),
+        
+        'code_id': fields.many2one(
+            'account.analytic.expense.account', 'Account code',
+            help="Accounting code from external program"),
         #'contract_ids': fields.many2one(
         #    'account.analytic.account', 'expense_account_analitic_rel',
         #    'expense_id', 'contract_id', 'Contract',
