@@ -208,8 +208,6 @@ class account_analytic_expense(osv.osv):
                 
                 amount = csv_pool.decode_float(line[8])
                 department_code = csv_pool.decode_string(line[9])
-                if department_code == '1':
-                    import pdb; pdb.set_trace()
                 name = csv_pool.decode_string(line[10]) # prot_id
                 year = csv_pool.decode_string(line[11])
                 
@@ -282,8 +280,9 @@ class account_analytic_expense(osv.osv):
                     data.update({
                         'split_type': 'all',
                         'amount': amount,
+                        'department_id': False,
                         })
-                if contract_code: # Directly to contract
+                elif contract_code: # Directly to contract
                     data.update({
                         'split_type': 'contract',
                         'amount': 0.0,
