@@ -332,7 +332,7 @@ class account_analytic_expense(osv.osv):
             # Load contract-line for current write operation
             current_contract = {}
             for item in item.analytic_line_ids:
-                currenct_contract[item.contract_id.id] = item.id
+                current_contract[item.contract_id.id] = item.id
                 
             for contract_id, amount in record[item.name].iteritems():
                 if contract_id in current_contract: # contract present
