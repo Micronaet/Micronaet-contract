@@ -96,6 +96,7 @@ class account_analytic_expense(osv.osv):
         counter = -header
 
         partner_pool = self.pool.get('res.partner')
+        contract_pool = self.pool.get('account.analytic.account')
         dept_pool = self.pool.get('hr.department')
         code_pool = self.pool.get('account.analytic.expense.account')
         csv_pool = self.pool.get('csv.base')
@@ -104,7 +105,7 @@ class account_analytic_expense(osv.osv):
         # Load from CSV file:
         # -------------------
         import pdb; pdb.set_trace()
-        record = {}
+        record = {} # dict for collect contract list 
         tot_col = 0
         for line in lines:
             try:
@@ -168,6 +169,9 @@ class account_analytic_expense(osv.osv):
                 code_id = code_pool.get_create_code(
                     cr, uid, account_code, account_name, context=context)
 
+                contract_id = contract_pool.get_code(
+                    cr, uid, contract_code, context=context)
+
                 if contract_code: # Directly to contract
                     split_type = 'contract'
                 elif department_code in department_code_all:
@@ -175,6 +179,8 @@ class account_analytic_expense(osv.osv):
                 else: # no contract
                     split_type = 'department'
                     
+                if movement_id not in record:
+                    record[movement_id] = [] # contract list
 
                 # ------------------------
                 # Sync or create elements:        
@@ -202,11 +208,15 @@ class account_analytic_expense(osv.osv):
                     ('department_id', '=', department_id),
                     ], context=context)
                 if account_ids: # TODO
-                    # Update:
-                    pass
+                    assert len(account_ids) == 1, 
+                        'Account key broken (protocol-ledge-department)!'
+                    self.write(cr, uid, account_ids, data, context=context)
+                    item_id = account_ids[0]
                 else:
-                    # Create    
-                    pass
+                    item_id = self.create(
+                        cr, uid, account_ids, data, context=context)
+                if contract_code:        
+                    record[movement_id].append(
                 
             except:
                 _logger.error('Error import deadline')
@@ -367,6 +377,15 @@ class account_analytic_account_extra_fields(osv.osv):
     _inherit = "account.analytic.account"
 
     # Utility function (temp function):
+    def get_code(self, cr, uid, contract_code, context=None):
+        ''' Search code and return ID
+        '''
+        account_ids = self.search(cr, uid, [
+            ('code', '=', contract_code)], context=context)
+        if account_ids:
+            return account_ids[0]
+        return False
+            
     def copy_filtered_city_ids(self, cr, uid, context=None):
         ''' Temp function for migrate city from m2m to o2m fields
         '''
