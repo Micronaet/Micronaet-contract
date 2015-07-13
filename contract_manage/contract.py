@@ -255,12 +255,6 @@ class account_analytic_expense(osv.osv):
                             counter, causal, series, number, contract_code))
                     continue    
 
-                if contract_code: # Directly to contract
-                    split_type = 'contract'
-                elif department_code in department_code_all:
-                    split_type = 'all'
-                else: # no contract
-                    split_type = 'department'
                     
                 if name not in record_contract:
                     record_contract[name] = {}                  
@@ -270,7 +264,7 @@ class account_analytic_expense(osv.osv):
                 # ------------------------
                 data = {
                     'name': name,
-                    'amount': amount,
+                    #'amount': amount,
                     'note': False,
                     'causal': causal,
                     'series': series,
@@ -280,9 +274,25 @@ class account_analytic_expense(osv.osv):
                     'date_to': date_to,
                     'date_from': date_from,
                     'year': year,
-                    'split_type': split_type, 
                     'department_id': department_id,
                     }
+
+                if contract_code: # Directly to contract
+                    data.update({
+                        'split_type': 'contract',
+                        'amount': 0.0,
+                        })                    
+                elif department_code in department_code_all:
+                    data.update({
+                        'split_type': 'all',
+                        'amount': amount,
+                        })
+                else: # no contract
+                    data.update({
+                        'split_type': 'department',
+                        'amount': amount,
+                        })
+
                 account_ids = self.search(cr, uid, [
                     ('name', '=', name),
                     ('code_id', '=', code_id),
@@ -307,7 +317,6 @@ class account_analytic_expense(osv.osv):
         # --------------------------------------        
         # Read all lines and sync contract state
         # --------------------------------------        
-        import pdb; pdb.set_trace()
         unlink_line_ids = []
         record_ids = self.search(cr, uid, [], context=context)
         for item in self.browse(cr, uid, record_ids, context=context):
@@ -376,7 +385,7 @@ class account_analytic_expense(osv.osv):
     _columns = {
         'name': fields.char('Protocol #', size=64, required=True,
             help='ID in accounting for link the record of OpenERP'), 
-        'amount': fields.float('Amount', digits=(16, 2), required=True),
+        'amount': fields.float('Amount', digits=(16, 2)),
         'note': fields.text('Note'),
 
         # Header description:
