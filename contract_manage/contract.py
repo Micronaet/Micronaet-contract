@@ -142,7 +142,7 @@ class account_analytic_expense(osv.osv):
                 
                 amount = csv_pool.decode_float(line[8])
                 department_code = csv_pool.decode_string(line[9])
-                movement_id = csv_pool.decode_string(line[10])
+                prot_id = csv_pool.decode_string(line[10])
                 year = csv_pool.decode_string(line[11])
                 
                 # -----------------
@@ -165,12 +165,27 @@ class account_analytic_expense(osv.osv):
                         
                 department_id = dept_pool.get_department(
                     cr, uid, department_code, context=context)
+                if not department_id:
+                    _logger.error(
+                        '%s. Department code not found: %s' % (
+                            counter, department_code))
+                    continue    
                     
                 code_id = code_pool.get_create_code(
                     cr, uid, account_code, account_name, context=context)
+                if not code_id:
+                    _logger.error(
+                        '%s. General ledge code not found: %s' % (
+                            counter, account_code))
+                    continue    
 
                 contract_id = contract_pool.get_code(
                     cr, uid, contract_code, context=context)
+                if not contract_id:
+                    _logger.error(
+                        '%s. Contract code not found: %s' % (
+                            counter, contract_code))
+                    continue    
 
                 if contract_code: # Directly to contract
                     split_type = 'contract'
@@ -179,13 +194,13 @@ class account_analytic_expense(osv.osv):
                 else: # no contract
                     split_type = 'department'
                     
-                if movement_id not in record:
-                    record[movement_id] = [] # contract list
+                if prot_id not in record:
+                    record[prot_id] = [] # contract list                    
 
                 # ------------------------
                 # Sync or create elements:        
                 # ------------------------
-                name = '%s-%s' % (movement_id, date[:4])
+                name = '%s-%s' % (prot_id, date[:4])
                 data = {
                     'name': name,
                     'amount': amount,
@@ -216,7 +231,7 @@ class account_analytic_expense(osv.osv):
                     item_id = self.create(
                         cr, uid, account_ids, data, context=context)
                 if contract_code:        
-                    record[movement_id].append(
+                    record[prot_id].append(contract_id)
                 
             except:
                 _logger.error('Error import deadline')
