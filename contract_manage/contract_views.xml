@@ -988,7 +988,7 @@
                 </group>
             </search>
        </field>
-   </record>    
+   </record>
                 
     <record id="view_account_analytic_expense_tree" model="ir.ui.view">
         <field name="name">Expense list</field>

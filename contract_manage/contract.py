@@ -79,10 +79,17 @@ class account_analytic_expense(osv.osv):
 
     # Scheduler event:
     def schedule_csv_accounting_movement_import(self, cr, uid, csv_file,
-            delimiter, header, verbose=100):
+            delimiter, header, verbose=100, department_code_all=None):
         ''' Import movement sync with record in OpenERP
+            csv_file: full path of file to import  (use ~ for home)
+            delimiter: for csv separation
+            header: number of line for header (jumped)
+            verbose: every X record print a log message (else nothing)
+            department_code_all: list of department code that split on all dep.
         '''
-        
+        if department_code_all is None:
+            department_code_all = []
+
         _logger.info('Start import accounting movement, filee: %s' % csv_file)
         lines = csv.reader(open(os.path.expanduser(
                 csv_file), 'rb'), delimiter=delimiter)
@@ -123,11 +130,15 @@ class account_analytic_expense(osv.osv):
                 causal = csv_pool.decode_string(line[0])
                 series = csv_pool.decode_string(line[1])
                 number = csv_pool.decode_string(line[2])
+                
                 account_code = csv_pool.decode_string(line[3])
                 account_name = csv_pool.decode_string(line[4])
+                
                 contract_code = csv_pool.decode_string(line[5])
+                
                 period = csv_pool.decode_string(line[6])
                 date = csv_pool.decode_date(line[7])
+                
                 amount = csv_pool.decode_float(line[8])
                 department_code = csv_pool.decode_string(line[9])
                 movement_id = csv_pool.decode_string(line[10])
@@ -151,13 +162,16 @@ class account_analytic_expense(osv.osv):
                     date_from = False
                     date_to = False
                         
-                department_id = dept_pool = get_department(
+                department_id = dept_pool.get_department(
                     cr, uid, department_code, context=context)
                     
                 code_id = code_pool.get_create_code(
                     cr, uid, account_code, account_name, context=context)
 
-                split_type = 'contract' # TODO
+                if contract_code:
+                    split_type = 'contract'
+                elif department_code:
+                        
 
                 # ------------------------
                 # Sync or create elements:        
@@ -178,9 +192,11 @@ class account_analytic_expense(osv.osv):
                     'split_type': split_type, 
                     'department_id': department_id,
                     }
+                    
                 account_ids = self.search(cr, uid, [
                     ('name', '=', name),
-                    #(), # TODO
+                    ('code_id', '=', code_id),
+                    ('department_id', '=', department_id),
                     ], context=context)
                 if account_ids: # TODO
                     # Update:
