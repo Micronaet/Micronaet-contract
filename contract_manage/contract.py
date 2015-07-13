@@ -174,6 +174,7 @@ class account_analytic_expense(osv.osv):
         for line in csv.reader(open(os.path.expanduser(
                 csv_file), 'rb'), delimiter=delimiter):
             try:
+                import pdb; pdb.set_trace()
                 # ----------------------------
                 # Starting test for row check:
                 # ----------------------------
