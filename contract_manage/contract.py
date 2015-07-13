@@ -73,8 +73,11 @@ class account_analytic_journal(osv.osv):
             ('code', '=', 'PUR')], context=context)
         if code_ids:
             return code_ids[0]
+            
+        # Get company from user:    
         company_id = self.pool.get('res.users').browse(
             cr, uid, uid, context=context).company_id.id
+            
         return self.create(cr, uid, {
             'code': 'PUR',
             'name': _('Purchase'),
