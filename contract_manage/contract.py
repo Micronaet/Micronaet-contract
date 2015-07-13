@@ -106,7 +106,7 @@ class account_analytic_expense(osv.osv):
             department_code_all: list of department code that split on all dep.
             general_code = account for analytic line
         '''
-
+        import pdb; pdb.set_trace()
         _logger.info('Start import accounting movement, filee: %s' % csv_file)
 
         # ------------------
@@ -123,7 +123,7 @@ class account_analytic_expense(osv.osv):
         if department_code_all is None:
             department_code_all = []
 
-        general_id = accunt_pool.get_account_id(
+        general_id = account_pool.get_account_id(
             cr, uid, general_code, context=context)
         if not general_id:
             _logger.error('Cannot create analytic line, no ledge!')
@@ -139,7 +139,6 @@ class account_analytic_expense(osv.osv):
         # -------------------
         record = {} # dict for collect contract list 
         tot_col = 0
-        import pdb; pdb.set_trace()
         for line in lines:
             try:
                 # ----------------------------
@@ -296,6 +295,7 @@ class account_analytic_expense(osv.osv):
             for item in item.analytic_line_ids:
                 currenct_contract[item.contract_id.id] = item.id
                 
+                
             for contract_id, amount in record[item.name].iteritems():
                 if contract_id in current_ids: # contract present
                     delete(current_contract[contract_id])
@@ -310,25 +310,25 @@ class account_analytic_expense(osv.osv):
                         'name': _('Accounting movement prot.: %s') % item.name,
                         'unit_amount': 1.0,
                         'date': item.date, # TODO change with one period date (in range)                       
-                        #company_id,
                         account_id: contract_id,
+                        general_account_id: general_id,
+                        #journal_id, # TODO 
+                        #company_id,
                         #code,
-                        general_account_id, #TODO merci c/acq
                         #currency_id,
                         #move_id,
                         #product_id,
                         #product_uom_id,
-                        journal_id,
                         #amount_currency,
                         #ref,
                         #to_invoice,
                         #invoice_id,
                         #extra_analytic_line_timesheet_id,
-                        import_type,
-                        activity_id ,
+                        ##import_type,
+                        ##activity_id ,
                         #mail_raccomanded,
-                        location,
-                        expense_id item.id,                        
+                        ##location,
+                        expense_id: item.id,
                         }, context=context)
                             
                     
