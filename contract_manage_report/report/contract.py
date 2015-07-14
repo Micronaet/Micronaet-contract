@@ -29,28 +29,31 @@
 from report import report_sxw
 from report.report_sxw import rml_parse
 
-totals = {'hour': 0.0,
-          'hour_cost': 0.0,
-          'cost': 0.0,
-          'invoice': 0.0,
-          'operation':0.0,
-         }
+totals = {
+    'hour': 0.0,
+    'hour_cost': 0.0,
+    'cost': 0.0,
+    'invoice': 0.0,
+    'operation':0.0,
+    }
 
-subtotals = {'hour': 0.0,
-             'hour_cost': 0.0,
-             'cost': 0.0,
-             'invoice': 0.0,
-             'operation': 0.0,
-             'balance': 0.0,
-             'general': 0.0,
-            }
+subtotals = {
+    'hour': 0.0,
+    'hour_cost': 0.0,
+    'cost': 0.0,
+    'invoice': 0.0,
+    'operation': 0.0,
+    'balance': 0.0,
+    'general': 0.0,
+    }
 
+# TODO put in class as private object
 variables = {} # per problemi nell'interpretare le funzioni
-t_cost={}
-t_hour={}
-t_hour_cost={}
-t_invoice={}
-t_operation={}
+t_cost = {}
+t_hour = {}
+t_hour_cost = {}
+t_invoice = {}
+t_operation = {}
 
 class Parser(report_sxw.rml_parse):
     
@@ -91,20 +94,20 @@ class Parser(report_sxw.rml_parse):
             'set_variables': self.set_variables,
             'get_variables': self.get_variables,
 
-            'filter_description': self.filter_description, # description of filter from wizard
+            'filter_description': self.filter_description, # filter desc. (wiz)
             
             # Utility: 
             'format_data_italian': self.format_data_italian,
-        })
+            })
 
     # --------------------   
     # Counters operations:    
     # --------------------   
-    def reset_all_counter(self,):
+    def reset_all_counter(self):
         self.counters = {}
         return
     
-    def set_counter(self, name, value = 0.0):
+    def set_counter(self, name, value=0.0):
         ''' Create or set a counter in the counter list of the class
             If value is not setted counter is reset
         '''
@@ -127,27 +130,27 @@ class Parser(report_sxw.rml_parse):
         if not value: 
             return ""
         
-        value=value.strip()
-        if len(value.strip())==10:
-            return "%s/%s/%s"%(value[8:10], value[5:7], value[:4])
+        value = value.strip()
+        if len(value.strip()) == 10:
+            return "%s/%s/%s" % (value[8:10], value[5:7], value[:4])
         return "" 
 
-    def get_intervent_loop(self, account_id, data = None):
+    def get_intervent_loop(self, account_id, data=None):
         ''' Reset totals every start
         '''
-        response = self.get_intervent(account_id, data = data)
+        response = self.get_intervent(account_id, data=data)
         return "" # Only used for total globals variables
         
-    def get_cost_loop(self, account_id, data = None):
+    def get_cost_loop(self, account_id, data=None):
         ''' Reset totals every start
         '''
-        response = self.get_cost(account_id, data = data)
+        response = self.get_cost(account_id, data=data)
         return "" # Only used for total globals variables
         
-    def get_invoice_loop(self, account_id, data = None):
+    def get_invoice_loop(self, account_id, data=None):
         ''' Reset totals every start
         '''
-        response = self.get_invoice(account_id, data = data)
+        response = self.get_invoice(account_id, data=data)
         return "" # Only used for total globals variables
         
     def get_totals_account(self, type_of, account_id):
@@ -160,21 +163,22 @@ class Parser(report_sxw.rml_parse):
         global t_operation
         global subtotals
 
-        if type_of=='invoice':
+        if type_of == 'invoice':
             return t_invoice.get(account_id, 0.0)
-        elif type_of=='cost':
+        elif type_of == 'cost':
             return t_cost.get(account_id, 0.0)
-        elif type_of=='hour':
+        elif type_of == 'hour':
             return t_hour.get(account_id, 0.0)
-        elif type_of=='hour_cost':
+        elif type_of == 'hour_cost':
             return t_hour_cost.get(account_id, 0.0)
-        elif type_of=='operation':    
+        elif type_of == 'operation':    
             return t_operation.get(account_id, 0.0)
-        elif type_of=='balance':
-            res = t_invoice.get(account_id, 0.0) + t_cost.get(account_id, 0.0) + t_hour_cost.get(account_id, 0.0)
+        elif type_of == 'balance':
+            res = t_invoice.get(account_id, 0.0) + \
+                t_cost.get(account_id, 0.0) + \
+                t_hour_cost.get(account_id, 0.0)
             subtotals[type_of] += res
-            return res
-            
+            return res            
         return 0.0
         
     def reset_counters(self):
@@ -195,10 +199,7 @@ class Parser(report_sxw.rml_parse):
 
     def get_totals(self, field, subtotalize=True):
         ''' Get totals for field:
-              hour
-              hour_cost
-              cost
-              invoice
+              hour, hour_cost, cost, invoice
         '''        
         global totals 
         global subtotals 
@@ -226,14 +227,15 @@ class Parser(report_sxw.rml_parse):
         '''
         global subtotals
         
-        subtotals = {'hour': 0.0,
-                     'hour_cost': 0.0,
-                     'cost': 0.0,
-                     'invoice': 0.0,
-                     'operation': 0.0,
-                     'balance': 0.0,
-                     'general': 0.0,
-                    }
+        subtotals = {
+            'hour': 0.0,
+            'hour_cost': 0.0,
+            'cost': 0.0,
+            'invoice': 0.0,
+            'operation': 0.0,
+            'balance': 0.0,
+            'general': 0.0,
+            }
         return 
 
     def get_subtotals(self, field):
@@ -243,7 +245,8 @@ class Parser(report_sxw.rml_parse):
         return subtotals.get(field, 0.0)
 
     def increment_subtotals(self, field, total):
-        ''' Increment subtotals value for field (used for generat that is calculated)
+        ''' Increment subtotals value for field 
+            (used for generate that is calculated)
             Subtotals are usually reset with the function
             It return total value (for print in ODS)
         '''
@@ -251,7 +254,7 @@ class Parser(report_sxw.rml_parse):
         subtotals[field] = subtotals.get(field, 0.0) + (total or 0.0)
         return total # for let print the value
 
-    def filter_description(self, data = None, short = False):
+    def filter_description(self, data=None, short = False):
         ''' Get description textual of filter selecter on wizard
         '''
         if data is None:
@@ -260,34 +263,46 @@ class Parser(report_sxw.rml_parse):
         if short:
             res = ""
             if data.get('start_date', False): 
-                res += "Da %s "%(self.formatLang(data.get('start_date'), date=True))
+                res += "Da %s " % (
+                    self.formatLang(data.get('start_date'), date=True))
             if data.get('end_date', False): 
-                res += "A %s "%(self.formatLang(data.get('end_date'), date=True))
-            return "[ %s ]"%(res)
+                res += "A %s " % (
+                    self.formatLang(data.get('end_date'), date=True))
+            return "[ %s ]" % res
         else:
             res = "Filtro: "
             if data.get('contract_id', False):
-                res += "Solo contratto: %s; "%(data.get('contract_name', "???"))
+                res += "Solo contratto: %s; " % (
+                    data.get('contract_name', "???"))
             elif data.get('department_id', False):
-                res += "Solo dipartimento: %s; "%(data.get('department_name', "???"))
+                res += "Solo dipartimento: %s; " % (
+                    data.get('department_name', "???"))
                 
             if data.get('active_contract',False):
                 res += "Movimentate; "
             if data.get('start_date', False): 
-                res += "Dalla data %s; "%(self.formatLang(data.get('start_date'), date=True))
+                res += "Dalla data %s; " % (
+                    self.formatLang(data.get('start_date'), date=True))
             if data.get('end_date', False): 
-                res += "Alla data %s; "%(self.formatLang(data.get('end_date'), date = True))
+                res += "Alla data %s; " % (
+                    self.formatLang(data.get('end_date'), date = True))
 
             res += "  [ %s - %s - %s - %s - %s ]"%(
-                "interventi visibili" if data.get('intervent', True) else "interventi non visibili", 
-                "costi visibili" if data.get('cost', True) else "costi non visibili",
-                "fatture visibili" if data.get('invoice', True) else "fatture non visibili",
-                "bilancio periodo visibile" if data.get('balance_summary', True) else "bilancio periodo non visibile",
-                "bilancio visibili" if data.get('balance', True) else "bilancio non visibili",
-            )
+                "interventi visibili" if data.get('intervent', True) \
+                    else "interventi non visibili", 
+                "costi visibili" if data.get('cost', True) \
+                    else "costi non visibili",
+                "fatture visibili" if data.get('invoice', True) \
+                    else "fatture non visibili",
+                "bilancio periodo visibile" \
+                    if data.get('balance_summary', True) \
+                    else "bilancio periodo non visibile",
+                "bilancio visibili" if data.get('balance', True) \
+                    else "bilancio non visibili",
+                )
             return res                             
 
-    def test_part(self, block, data = None):
+    def test_part(self, block, data=None):
         ''' Function that test the wizard parameter and then return depend on 
             block name the value for show or not show in report
         '''
@@ -295,18 +310,18 @@ class Parser(report_sxw.rml_parse):
            data = {}
 
         if block=='intervent':
-            return data.get('hour', True)              # default show hour
+            return data.get('hour', True) # default show hour
         elif block=='cost':
-            return data.get('cost', True)              # default show cost
+            return data.get('cost', True) # default show cost
         elif block=='invoice': 
-            return data.get('invoice', True)           # default show invoice
+            return data.get('invoice', True) # default show invoice
         elif block=='balance': 
-            return data.get('balance', True)           # default show balance
+            return data.get('balance', True) # default show balance
         elif block=='date_summary':
-            return data.get('balance_summary', True)   # default show balance summary    
+            return data.get('balance_summary', True) # default show balance summary    
         return True
         
-    def wizard_objects(self, objects, data = None):
+    def wizard_objects(self, objects, data=None):
         ''' Get list of contract (according to filter in wizard)
             Used in list of contract for detailed and summary report
         '''
@@ -317,7 +332,7 @@ class Parser(report_sxw.rml_parse):
 
         # Test if there's contract selected, or department, or all:   
         if data.get('contract_id', 0): # all contract:
-            domain = [('id','=',data.get('contract_id',0))]
+            domain = [('id', '=', data.get('contract_id',0))]
         else:
             # Filter for domain
             if data.get('department_id', 0): # department
@@ -326,49 +341,60 @@ class Parser(report_sxw.rml_parse):
                 domain = []
             # Filter for active
             if data.get('active_contract',False):
-                # TODO DUG!!!! work only if parent has movements!!!!
-                # Find contract list movement ##################################
+                # TODO BUG!!!! work only if parent has movements!!!!
+                # Find contract list movement #################################
                 domain_active = [] #TODO filter department?
-                start_date = data.get('start_date',False)
-                end_date = data.get('end_date',False)
+                start_date = data.get('start_date', False)
+                end_date = data.get('end_date', False)
                 
-                if start_date: domain_active.append(('date', '>=', start_date))
-                if end_date:   domain_active.append(('date', '<=', end_date))
+                if start_date: 
+                    domain_active.append(('date', '>=', start_date))
+                if end_date: 
+                    domain_active.append(('date', '<=', end_date))
 
                 intervent_pool = self.pool.get('hr.analytic.timesheet')
-                item_ids = intervent_pool.search(self.cr, self.uid, domain_active)
-                intervent_contract_ids = set([contract.account_id.id for contract in intervent_pool.browse(self.cr, self.uid, item_ids)])
+                item_ids = intervent_pool.search(
+                    self.cr, self.uid, domain_active)
+                intervent_contract_ids = set([
+                    contract.account_id.id for contract in \
+                        intervent_pool.browse(
+                            self.cr, self.uid, item_ids)])
                 # TODO correct loop for load parent_id here
 
                 invoice_cost_pool = self.pool.get('account.analytic.line')
-                item_ids = invoice_cost_pool.search(self.cr, self.uid, domain_active)
-                invoice_cost_ids = set([contract.account_id.id for contract in invoice_cost_pool.browse(self.cr, self.uid, item_ids)])
-                item_ids=list(invoice_cost_ids | intervent_contract_ids)
+                item_ids = invoice_cost_pool.search(
+                    self.cr, self.uid, domain_active)
+                invoice_cost_ids = set([
+                    contract.account_id.id for contract \
+                        in invoice_cost_pool.browse(self.cr, self.uid, item_ids)])
+                item_ids = list(invoice_cost_ids | intervent_contract_ids)
                 # TODO correct loop for load parent_id here
 
-                domain.append(('id','in',item_ids)) 
+                domain.append(('id', 'in', item_ids)) 
 
-        contract_ids = contract_pool.search(self.cr, self.uid, domain, order="code,name")
+        contract_ids = contract_pool.search(
+            self.cr, self.uid, domain, order="code,name")
         return contract_pool.browse(self.cr, self.uid, contract_ids)
         
-    def get_intervent(self, account_id, data = None):
+    def get_intervent(self, account_id, data=None):
         ''' Filter all account intervent and return browse obj
         '''    
         if data is None: 
-            data={}
+            data = {}
 
-        domain = [('account_id','=',account_id)]
-        start_date = data.get('start_date',False)
-        end_date = data.get('end_date',False)
+        domain = [('account_id', '=', account_id)]
+        start_date = data.get('start_date', False)
+        end_date = data.get('end_date', False)
         
         if start_date:
-            domain.append(('date','>=',start_date))
+            domain.append(('date', '>=', start_date))
         if end_date:
-            domain.append(('date','<=',end_date))
+            domain.append(('date', '<=', end_date))
 
         intervent_pool = self.pool.get('hr.analytic.timesheet')
         intervent_ids = intervent_pool.search(self.cr, self.uid, domain)
-        intervent_proxy = intervent_pool.browse(self.cr, self.uid, intervent_ids)
+        intervent_proxy = intervent_pool.browse(
+            self.cr, self.uid, intervent_ids)
 
         global totals 
 
@@ -376,40 +402,48 @@ class Parser(report_sxw.rml_parse):
         global t_hour_cost
         global t_operation
 
-        totals['hour'] = sum([intervent.unit_amount or 0.0 for intervent in intervent_proxy])
-        totals['hour_cost'] = sum([intervent.amount or 0.0 for intervent in intervent_proxy])
-        totals['operation'] = sum([intervent.amount_operation or 0.0 for intervent in intervent_proxy])
+        totals['hour'] = sum(
+            [intervent.unit_amount or 0.0 for intervent in intervent_proxy])
+        totals['hour_cost'] = sum(
+            [intervent.amount or 0.0 for intervent in intervent_proxy])
+        totals['operation'] = sum(
+            [intervent.amount_operation or 0.0 for intervent \
+                in intervent_proxy])
 
-        t_hour[account_id]=totals['hour']
-        t_hour_cost[account_id]=totals['hour_cost']
-        t_operation[account_id]=totals['operation']
+        t_hour[account_id] = totals['hour']
+        t_hour_cost[account_id] = totals['hour_cost']
+        t_operation[account_id] = totals['operation']
         
         return intervent_proxy
 
-    def get_invoice(self, account_id, data = None):
+    def get_invoice(self, account_id, data=None):
         ''' Filter all account intervent and return browse obj
         '''    
         
         if data is None: 
-            data={}
+            data = {}
 
         start_date = data.get('start_date',False)
         end_date = data.get('end_date',False)
 
         # invoice journal
         journal_pool = self.pool.get('account.analytic.intervent.type')
-        journal_ids = journal_pool.search(self.cr, self.uid, [('name','=','invoice')]) 
+        journal_ids = journal_pool.search(
+            self.cr, self.uid, [('name','=','invoice')]) 
         journal_proxy = journal_pool.browse(self.cr, self.uid, journal_ids)
         if not journal_proxy:
             pass # TODO error no Journal setted up
             return []
-        journal_id=journal_proxy[0].journal_id.id
+        journal_id = journal_proxy[0].journal_id.id
         
-        domain=[('account_id','=',account_id),('journal_id','=',journal_id)]
+        domain = [
+            ('account_id', '=', account_id),
+            ('journal_id', '=', journal_id)
+            ]
         if start_date:
-            domain.append(('date','>=',start_date))
+            domain.append(('date', '>=', start_date))
         if end_date:
-            domain.append(('date','<=',end_date))
+            domain.append(('date', '<=', end_date))
 
         invoice_pool = self.pool.get('account.analytic.line')
         invoice_ids = invoice_pool.search(self.cr, self.uid, domain) 
@@ -418,30 +452,35 @@ class Parser(report_sxw.rml_parse):
         global totals 
         global t_invoice
         
-        totals['invoice']=sum([invoice.amount or 0.0 for invoice in invoice_proxy]) # price
-        t_invoice[account_id]=totals['invoice']
+        totals['invoice'] = sum(
+            [invoice.amount or 0.0 for invoice in invoice_proxy]) # price
+        t_invoice[account_id] = totals['invoice']
         return invoice_proxy
 
-    def get_cost(self, account_id, data = None):
+    def get_cost(self, account_id, data=None):
         ''' Filter all account intervent and return browse obj        
         '''    
         if data is None: 
-            data={}
+            data = {}
 
         start_date = data.get('start_date',False)
         end_date = data.get('end_date',False)
         
         # get 2 journal service and material:
         journal_pool = self.pool.get('account.analytic.intervent.type')
-        journal_ids = journal_pool.search(self.cr, self.uid, [('name','!=','invoice')])  # all but not invoice
+        journal_ids = journal_pool.search(
+            self.cr, self.uid, [('name','!=','invoice')])  # all but not invoice
         journal_proxy = journal_pool.browse(self.cr, self.uid, journal_ids)
         journal_list = [item.journal_id.id for item in journal_proxy]
 
-        domain=[('account_id','=',account_id),('journal_id','in',journal_list)]
+        domain = [
+            ('account_id', '=', account_id),
+            ('journal_id', 'in', journal_list),
+            ]
         if start_date:
-            domain.append(('date','>=',start_date))
+            domain.append(('date', '>=', start_date))
         if end_date:
-            domain.append(('date','<=',end_date))
+            domain.append(('date', '<=', end_date))
 
         cost_pool = self.pool.get('account.analytic.line')
         cost_ids = cost_pool.search(self.cr, self.uid, domain) 
