@@ -92,7 +92,7 @@ class Parser(report_sxw.rml_parse):
             
             'reset_counters': self.reset_counters,
             
-            'reset_subtotals': self.reset_subtotals, # Summary report (every contract parent)
+            'reset_subtotals': self.reset_subtotals, # Summary rept contr. par.
 
             'get_totals_account': self.get_totals_account,
             
@@ -278,13 +278,15 @@ class Parser(report_sxw.rml_parse):
                 res += "Alla data %s; " % (
                     self.formatLang(data.get('end_date'), date = True))
 
-            res += "  [ %s - %s - %s - %s - %s ]"%(
+            res += "  [ %s - %s - %s - %s - %s - %s ]"%(
                 "interventi visibili" if data.get('intervent', True) \
                     else "interventi non visibili", 
                 "costi visibili" if data.get('cost', True) \
                     else "costi non visibili",
-                "fatture visibili" if data.get('invoice', True) \
-                    else "fatture non visibili",
+                "fatture pass. visibili" if data.get('supplier', True) \
+                    else "fatture pass. non visibili",
+                "fattato visibili" if data.get('invoice', True) \
+                    else "fatturato non visibili",
                 "bilancio periodo visibile" \
                     if data.get('balance_summary', True) \
                     else "bilancio periodo non visibile",
@@ -359,7 +361,8 @@ class Parser(report_sxw.rml_parse):
                     self.cr, self.uid, domain_active)
                 invoice_cost_ids = set([
                     contract.account_id.id for contract \
-                        in invoice_cost_pool.browse(self.cr, self.uid, item_ids)])
+                        in invoice_cost_pool.browse(
+                            self.cr, self.uid, item_ids)])
                 item_ids = list(invoice_cost_ids | intervent_contract_ids)
                 # TODO correct loop for load parent_id here
 
@@ -453,7 +456,7 @@ class Parser(report_sxw.rml_parse):
         # get 2 journal service and material:
         journal_pool = self.pool.get('account.analytic.intervent.type')
         journal_ids = journal_pool.search(
-            self.cr, self.uid, [('name','!=','invoice')])  # all but not invoice
+            self.cr, self.uid, [('name','!=','invoice')]) # all but not invoice
         journal_proxy = journal_pool.browse(self.cr, self.uid, journal_ids)
         journal_list = [item.journal_id.id for item in journal_proxy]
 
