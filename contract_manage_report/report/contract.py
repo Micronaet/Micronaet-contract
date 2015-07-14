@@ -486,7 +486,7 @@ class Parser(report_sxw.rml_parse):
         
         journal_pool = self.pool.get('account.analytic.line')
         purchase_id = self.pool.get(
-            'account.analytic.journal').get_journal_purchase(cr, uid)
+            'account.analytic.journal').get_journal_purchase(self.cr, self.uid)
         if not purchase_id:
             _logger.error('Not found purchase journal for passive invoice')
             return [] # TODO raise error
@@ -502,11 +502,11 @@ class Parser(report_sxw.rml_parse):
 
         supplier_pool = self.pool.get('account.analytic.line')
         supplier_ids = supplier_pool.search(self.cr, self.uid, domain) 
-        supplier_proxy = supplier_pool.browse(self.cr, self.uid, cost_ids)
+        supplier_proxy = supplier_pool.browse(self.cr, self.uid, supplier_ids)
         
         self.totals['supplier'] = sum(
             [supplier.amount or 0.0 for supplier in supplier_proxy])
         self.t_supplier[account_id] = self.totals['supplier']
 
-        return cost_proxy 
+        return supplier_proxy 
 
