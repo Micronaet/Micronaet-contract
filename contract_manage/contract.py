@@ -196,6 +196,7 @@ class account_analytic_expense(osv.osv):
                 # Load fields from CSV file:
                 # --------------------------
                 causal = csv_pool.decode_string(line[0])
+
                 series = csv_pool.decode_string(line[1])
                 number = csv_pool.decode_string(line[2])
                 
@@ -252,14 +253,14 @@ class account_analytic_expense(osv.osv):
                             counter, account_code))
                     continue    
                 
-                # Analytic account (contract):
+                # Analytic account (contract False if directly to cdc):
                 account_id = contract_pool.get_code(
                     cr, uid, contract_code, context=context)
-                if not account_id:
-                    _logger.error(
-                        '%s. Contract code not found [%s-%s-%s]: %s' % (
-                            counter, causal, series, number, contract_code))
-                    continue    
+                #if not account_id:
+                #    _logger.error(
+                #        '%s. Contract code not found [%s-%s-%s]: %s' % (
+                #            counter, causal, series, number, contract_code))
+                #    continue    
                     
                 # Dict for manage contract under accounting lines:    
                 if name not in entry_contract:
@@ -281,19 +282,22 @@ class account_analytic_expense(osv.osv):
                     'year': year,
                     }
 
-                if department_code in department_code_all: # first!
+                if department_code in department_code_all:
+                    # All if department in list passed as parameter
                     data.update({
                         'split_type': 'all',
                         'amount': amount,
                         'department_id': False,
                         })
                 elif contract_code: # Directly to contract
+                    # Contract if contract if present
                     data.update({
                         'split_type': 'contract',
                         'amount': 0.0,
                         'department_id': department_id,
                         })                    
                 else: # no contract
+                    # Department in not present contract (only department)
                     data.update({
                         'split_type': 'department',
                         'amount': amount,
@@ -349,6 +353,8 @@ class account_analytic_expense(osv.osv):
                 contract_old[line.account_id.id] = line.id
                 
             for account_id, amount in contract_new.iteritems():
+                if not account_id:
+                    import pdb; pdb.set_trace()
                 if account_id in contract_old: # contract present
                     line_pool.write(cr, uid, contract_old[account_id], {
                         'amount': amount,
