@@ -139,6 +139,7 @@ class account_analytic_expense(osv.osv):
         # ------------------
         # Startup parameters        
         # ------------------
+        # pools used:
         partner_pool = self.pool.get('res.partner')
         account_pool = self.pool.get('account.account')
         contract_pool = self.pool.get('account.analytic.account')
@@ -148,10 +149,10 @@ class account_analytic_expense(osv.osv):
         csv_pool = self.pool.get('csv.base')
         journal_pool = self.pool.get('account.analytic.journal')
 
+        # input parameter:
         if department_code_all is None:
             department_code_all = [] 
             # list of department that split in all contracts
-            
 
         general_id = account_pool.get_account_id(
             cr, uid, general_code, context=context)
@@ -168,7 +169,7 @@ class account_analytic_expense(osv.osv):
         # -------------------
         # Load from CSV file:
         # -------------------        
-        record_contract = {} # Contract for accounting record
+        entry_contract = {} # Contract for accounting record
         tot_col = 0
         counter = -header
         for line in csv.reader(open(os.path.expanduser(
@@ -198,9 +199,11 @@ class account_analytic_expense(osv.osv):
                 series = csv_pool.decode_string(line[1])
                 number = csv_pool.decode_string(line[2])
                 
+                # General ledge:
                 account_code = csv_pool.decode_string(line[3])
                 account_name = csv_pool.decode_string(line[4])
                 
+                # Analytic account:
                 contract_code = csv_pool.decode_string(line[5])
                 
                 period = csv_pool.decode_string(line[6])
@@ -229,6 +232,7 @@ class account_analytic_expense(osv.osv):
                     date_from = False
                     date_to = False
                         
+                # Department:        
                 department_id = dept_pool.get_department(
                     cr, uid, department_code, context=context)
                 
@@ -238,7 +242,8 @@ class account_analytic_expense(osv.osv):
                         '%s. Department code not found: %s' % (
                             counter, department_code))
                     continue    
-                    
+                
+                # General account:    
                 code_id = code_pool.get_create_code(
                     cr, uid, account_code, account_name, context=context)
                 if not code_id:
@@ -246,25 +251,26 @@ class account_analytic_expense(osv.osv):
                         '%s. General ledge code not found: %s' % (
                             counter, account_code))
                     continue    
-
-                contract_id = contract_pool.get_code(
+                
+                # Analytic account (contract):
+                account_id = contract_pool.get_code(
                     cr, uid, contract_code, context=context)
-                if not contract_id:
+                if not account_id:
                     _logger.error(
                         '%s. Contract code not found [%s-%s-%s]: %s' % (
                             counter, causal, series, number, contract_code))
                     continue    
                     
-                if name not in record_contract:
-                    record_contract[name] = {}                  
+                # Dict for manage contract under accounting lines:    
+                if name not in entry_contract:
+                    entry_contract[name] = {}                  
 
                 # ------------------------
                 # Sync or create elements:        
                 # ------------------------
-                data = {
+                data = { # Standard elements:
                     'name': name,
-                    #'amount': amount,
-                    'note': False,
+                    #'note': False,
                     'causal': causal,
                     'series': series,
                     'number': number,
@@ -273,7 +279,6 @@ class account_analytic_expense(osv.osv):
                     'date_to': date_to,
                     'date_from': date_from,
                     'year': year,
-                    'department_id': department_id,
                     }
 
                 if department_code in department_code_all: # first!
@@ -286,64 +291,67 @@ class account_analytic_expense(osv.osv):
                     data.update({
                         'split_type': 'contract',
                         'amount': 0.0,
+                        'department_id': department_id,
                         })                    
                 else: # no contract
                     data.update({
                         'split_type': 'department',
                         'amount': amount,
+                        'department_id': department_id,
                         })
 
-                account_ids = self.search(cr, uid, [
+                account_ids = self.search(cr, uid, [ # Key items:
                     ('name', '=', name),
                     ('code_id', '=', code_id),
                     ('department_id', '=', department_id),
                     ], context=context)
 
-                if account_ids: # TODO
-                    #assert len(account_ids) == 1, 'Key broken prot-ledge-dept!'
-                    self.write(cr, uid, account_ids, data, context=context)
-                    item_id = account_ids[0]
+                if account_ids:
+                    assert len(account_ids) == 1, 'Key broken prot-ledge-dept!'
+                    item_id = account_ids[0]                    
+                    self.write(cr, uid, item_id, data, context=context)
                 else:
                     item_id = self.create(
                         cr, uid, data, context=context)
 
-                if contract_code:
-                    record_contract[name][contract_id] = amount
-                
+                if contract_code: # Save in dict the contract:
+                    entry_contract[name][account_id] = amount                
             except:
                 _logger.error('Error import deadline')
                 continue
                 
-        # --------------------------------------        
+        # --------------------------------------
         # Read all lines and sync contract state
         # --------------------------------------        
-        unlink_line_ids = []
+        unlink_line_ids = [] # element not found during this sync (to delete)
         record_ids = self.search(cr, uid, [], context=context)
-        for item in self.browse(cr, uid, record_ids, context=context):
-            if item.name not in record_contract: # all record + sub-contract
-                self.unlink(cr, uid, item.id, context=context)
+        
+        # Loop on all accounting lines:
+        for entry in self.browse(cr, uid, record_ids, context=context): 
+            if entry.name not in entry_contract: # all record + sub-contract
+                self.unlink(cr, uid, entry.id, context=context)
                 continue
                 
-            if item.split_type == 'all': 
+            if entry.split_type == 'all': 
                 # Compute all active contract and split amount                
-                contract_dict = {} # TODO Load list of active contract
+                contract_new = {} # TODO Load list of active contract
                 
-            elif item.split_type == 'department': 
+            elif entry.split_type == 'department': 
                 # Compute dept. active contract and split amount
-                contract_dict = {} # TODO Load list of active contract (dept.)
+                contract_new = {} # TODO Load list of active contract (dept.)
                 
-            elif item.split_type == 'contract': # use dict record
-                contract_dict = record_contract[item.name]
+            elif entry.split_type == 'contract': # use dict record
+                contract_new = entry_contract[entry.name]
 
             # Load contract-line for current write operation
-            current_contract = {} # yet present on record
-            for item in item.analytic_line_ids:
-                current_contract[item.contract_id.id] = item.id
+            contract_old = {} # yet present on record
+            for line in entry.analytic_line_ids:
+                contract_old[line.account_id.id] = line.id
                 
-            for contract_id, amount in contract_dict.iteritems():
-                if contract_id in current_contract: # contract present
-                    delete(current_contract[contract_id])
-                    line_pool.write(cr, uid, current_contract[contract_id], {
+            for account_id, amount in contract_new.iteritems():
+                if account_id in contract_old: # contract present
+                    delete(contract_old[account_id])
+                    line_pool.write(cr, uid, contract_old[account_id], {
                         'amount': amount,
                         }, context=context)
                 else: # not present create
@@ -351,13 +359,18 @@ class account_analytic_expense(osv.osv):
                         # TODO create analytic line:
                         'amount': -amount,
                         'user_id': uid,
-                        'name': _('Accounting prot.: %s') % item.name,
+                        'name': _('Ref. %s/%s/%s [# %s]') % (
+                            entry.causal,
+                            entry.series,
+                            entry.number,
+                            entry.name,
+                            ),
                         'unit_amount': 1.0,
-                        'date': item.date, # TODO change with one period date (in range)                       
-                        'account_id': contract_id,
+                        'date': entry.date, # TODO change with one period date (in range)                       
+                        'account_id': account_id,
                         'general_account_id': general_id,
                         'journal_id': journal_id, 
-                        'expense_id': item.id,
+                        'expense_id': entry.id,
                         #'company_id',
                         #'code',
                         #'currency_id',
@@ -377,7 +390,7 @@ class account_analytic_expense(osv.osv):
                     
             # unlink record (once at the end of all loops)
             unlink_line_ids.extend([
-                current_contract[k] for k in current_contract]) 
+                contract_old[k] for k in contract_old]) 
             
         line_pool.unlink(cr, uid, unlink_line_ids, context=context)
         return True

@@ -995,7 +995,7 @@
         <field name="model">account.analytic.expense</field>
         <field name="type">tree</field>
         <field name="arch" type="xml">
-           <tree string="Expense">
+           <tree string="Expense" colors="blue:split_type=='department';green:split_type=='all'">
                 <field name="name"/>
                 <field name="date"/>
                 <field name="amount"/>
@@ -1041,6 +1041,7 @@
                         <field name="name" />
                         <field name="date" />
                         <field name="journal_id" />
+                        <field name="account_id" />
                         <field name="general_account_id" />
                         <field name="amount" sum="total"/>
                     </tree>
