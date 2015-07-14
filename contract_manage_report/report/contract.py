@@ -42,6 +42,7 @@ class Parser(report_sxw.rml_parse):
             'cost': 0.0,
             'invoice': 0.0,
             'operation':0.0,
+            'supplier': 0.0,
             }
 
         self.subtotals = {
@@ -52,6 +53,7 @@ class Parser(report_sxw.rml_parse):
             'operation': 0.0,
             'balance': 0.0,
             'general': 0.0,
+            'supplier': 0.0,
             }
 
         # Dict for list record:
@@ -61,6 +63,7 @@ class Parser(report_sxw.rml_parse):
         self.t_hour_cost = {}
         self.t_invoice = {}
         self.t_operation = {}
+        self.t_supplier = {}
 
         # Total for counters:
         self.counters = {}
@@ -74,8 +77,9 @@ class Parser(report_sxw.rml_parse):
         
             # Function called from ODT loop passing contract.id and data {}
             'intervent_proxy': self.get_intervent, # get intervent list
-            'cost_proxy': self.get_cost,           # get costs list
-            'invoice_proxy': self.get_invoice,     # get invoice list
+            'cost_proxy': self.get_cost, # get costs list
+            'invoice_proxy': self.get_invoice, # get invoice list
+            'supplier_proxy': self.get_supplier, # get supplier invoice list
 
             # Function called from ODT that loop using previous funct 
             # (contract.id and data {})
@@ -171,6 +175,8 @@ class Parser(report_sxw.rml_parse):
             return self.t_hour_cost.get(account_id, 0.0)
         elif type_of == 'operation':    
             return self.t_operation.get(account_id, 0.0)
+        elif type_of == 'supplier':
+            return self.t_supplier.get(account_id, 0.0)
         elif type_of == 'balance':
             res = self.t_invoice.get(account_id, 0.0) + \
                 self.t_cost.get(account_id, 0.0) + \
@@ -187,6 +193,7 @@ class Parser(report_sxw.rml_parse):
         self.t_hour_cost = {}
         self.t_invoice = {}
         self.t_operation = {}
+        self.t_supplier = {}
         return 
 
     def get_totals(self, field, subtotalize=True):
@@ -220,6 +227,7 @@ class Parser(report_sxw.rml_parse):
             'operation': 0.0,
             'balance': 0.0,
             'general': 0.0,
+            'supplier': 0.0,
             }
         return 
 
@@ -464,6 +472,41 @@ class Parser(report_sxw.rml_parse):
         
         self.totals['cost']=sum([cost.amount or 0.0 for cost in cost_proxy])
         self.t_cost[account_id]=self.totals['cost']
+
+        return cost_proxy 
+
+    def get_supplier(self, account_id, data=None):
+        ''' Filter all account supplier cost from accounting return browse obj        
+        '''    
+        if data is None: 
+            data = {}
+
+        start_date = data.get('start_date',False)
+        end_date = data.get('end_date',False)
+        
+        journal_pool = self.pool.get('account.analytic.line')
+        purchase_id = self.pool.get(
+            'account.analytic.journal').get_journal_purchase(cr, uid)
+        if not purchase_id:
+            _logger.error('Not found purchase journal for passive invoice')
+            return [] # TODO raise error
+                
+        domain = [
+            ('account_id', '=', account_id),
+            ('journal_id', '=', purchase_id),
+            ]
+        if start_date:
+            domain.append(('date', '>=', start_date))
+        if end_date:
+            domain.append(('date', '<=', end_date))
+
+        supplier_pool = self.pool.get('account.analytic.line')
+        supplier_ids = supplier_pool.search(self.cr, self.uid, domain) 
+        supplier_proxy = supplier_pool.browse(self.cr, self.uid, cost_ids)
+        
+        self.totals['supplier'] = sum(
+            [supplier.amount or 0.0 for supplier in supplier_proxy])
+        self.t_supplier[account_id] = self.totals['supplier']
 
         return cost_proxy 
 
