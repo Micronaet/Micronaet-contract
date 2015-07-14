@@ -75,12 +75,12 @@
                    <newline />
                    
                    <!-- only detailed -->
-                   <group colspan="4" col="6" attrs="{'invisible':[('mode','!=','detailed')]}"> 
-                      <separator string="Filter: Parameter for detailed report" colspan="6"/>
+                   <group colspan="4" col="8" attrs="{'invisible':[('mode','!=','detailed')]}"> 
+                      <separator string="Filter: Parameter for detailed report" colspan="8"/>
                       <field name="hour"/>
                       <field name="cost"/>
                       <field name="invoice"/>
-                      <!--<field name="balance"/>-->
+                      <field name="supplier"/>
                    </group>   
 
                    <!-- only summary --> 

@@ -293,15 +293,17 @@ class Parser(report_sxw.rml_parse):
            data = {}
 
         if block=='intervent':
-            return data.get('hour', True) # default show hour
+            return data.get('hour', True)
         elif block=='cost':
-            return data.get('cost', True) # default show cost
+            return data.get('cost', True)
         elif block=='invoice': 
-            return data.get('invoice', True) # default show invoice
+            return data.get('invoice', True)
         elif block=='balance': 
-            return data.get('balance', True) # default show balance
+            return data.get('balance', True)
         elif block=='date_summary':
-            return data.get('balance_summary', True) # def. show balan. summary    
+            return data.get('balance_summary', True)
+        elif block=='supplier':
+            return data.get('supplier', True) 
         return True
         
     def wizard_objects(self, objects, data=None):

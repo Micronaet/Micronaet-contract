@@ -123,6 +123,7 @@ class contract_department_report_wizard(osv.osv_memory):
             datas['cost'] = wiz_proxy.cost
             datas['invoice'] = wiz_proxy.invoice
             datas['balance'] = wiz_proxy.balance
+            datas['supplier'] = wiz_proxy.supplier
 
             # date:
             datas['start_date'] = wiz_proxy.start_date
@@ -179,12 +180,14 @@ class contract_department_report_wizard(osv.osv_memory):
             ('list','Short list'),
             ('detailed','Detailed'),            
             ('summary','Summary'),            
-        ],'Mode', select=True, readonly=False, required=True),
+        ],'Mode', select=True, required=True),
 
-        'hour':fields.boolean('With hours', required=False),
-        'cost':fields.boolean('With cost', required=False),
-        'invoice':fields.boolean('With invoice', required=False),
-        'balance':fields.boolean('With balance', required=False),
+        # Blocks:
+        'hour':fields.boolean('With hours'),
+        'cost':fields.boolean('With cost'),
+        'invoice':fields.boolean('With invoice'),
+        'balance':fields.boolean('With balance'),
+        'supplier':fields.boolean('With supplier invoice'),
         
         'date_summary':fields.boolean('With date summary', required=False),
         'start_date': fields.date('Start date', help="Start date of period, for evaluate costs, intervent, invoice"),        
@@ -203,6 +206,7 @@ class contract_department_report_wizard(osv.osv_memory):
         'cost': lambda *a: True,
         'invoice': lambda *a: True,
         'balance': lambda *a: True,
+        'supplier': lambda *a: True,
         'date_summary': lambda *a: True,
         }
 contract_department_report_wizard()
