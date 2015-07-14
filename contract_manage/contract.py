@@ -215,9 +215,6 @@ class account_analytic_expense(osv.osv):
                 name = csv_pool.decode_string(line[10]) # prot_id
                 year = csv_pool.decode_string(line[11])
 
-                if name == '18644':
-                    import pdb; pdb.set_trace()
-                                    
                 # -----------------
                 # Get extra fields:
                 # -----------------
@@ -302,7 +299,7 @@ class account_analytic_expense(osv.osv):
                 account_id = contract_pool.get_code(
                     cr, uid, contract_code, context=context)
                 # Check here for split_type test:    
-                if not account_id and data['split_type'] != 'contract':
+                if not account_id and data['split_type'] == 'contract':
                     _logger.error(
                         '%s. Contract code not found [%s-%s-%s]: %s' % (
                             counter, causal, series, number, contract_code))
@@ -357,8 +354,6 @@ class account_analytic_expense(osv.osv):
                 contract_old[line.account_id.id] = line.id
                 
             for account_id, amount in contract_new.iteritems():
-                if not account_id:
-                    import pdb; pdb.set_trace()
                 if account_id in contract_old: # contract present
                     line_pool.write(cr, uid, contract_old[account_id], {
                         'amount': amount,
