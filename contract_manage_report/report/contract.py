@@ -405,14 +405,11 @@ class Parser(report_sxw.rml_parse):
             return []
         journal_id=journal_proxy[0].journal_id.id
         
-        domain = [
-            ('account_id', '=', account_id),
-            ('journal_id', '=', journal_id),
-            ]
+        domain=[('account_id','=',account_id),('journal_id','=',journal_id)]
         if start_date:
-            domain.append(('date', '>=', start_date))
+            domain.append(('date','>=',start_date))
         if end_date:
-            domain.append(('date', '<=', end_date))
+            domain.append(('date','<=',end_date))
 
         invoice_pool = self.pool.get('account.analytic.line')
         invoice_ids = invoice_pool.search(self.cr, self.uid, domain) 
@@ -421,12 +418,11 @@ class Parser(report_sxw.rml_parse):
         global totals 
         global t_invoice
         
-        totals['invoice'] = sum(
-            [invoice.amount or 0.0 for invoice in invoice_proxy]) # price
-        t_invoice[account_id] = totals['invoice']
+        totals['invoice']=sum([invoice.amount or 0.0 for invoice in invoice_proxy]) # price
+        t_invoice[account_id]=totals['invoice']
         return invoice_proxy
 
-    def get_cost(self, account_id, data=None):
+    def get_cost(self, account_id, data = None):
         ''' Filter all account intervent and return browse obj        
         '''    
         if data is None: 
@@ -437,19 +433,15 @@ class Parser(report_sxw.rml_parse):
         
         # get 2 journal service and material:
         journal_pool = self.pool.get('account.analytic.intervent.type')
-        journal_ids = journal_pool.search(self.cr, self.uid, [
-            ('name', '!=', 'invoice')])  # all but not invoice
+        journal_ids = journal_pool.search(self.cr, self.uid, [('name','!=','invoice')])  # all but not invoice
         journal_proxy = journal_pool.browse(self.cr, self.uid, journal_ids)
         journal_list = [item.journal_id.id for item in journal_proxy]
 
-        domain = [
-            ('account_id', '=', account_id),
-            ('journal_id', 'in', journal_list)
-            ]
+        domain=[('account_id','=',account_id),('journal_id','in',journal_list)]
         if start_date:
-            domain.append(('date', '>=', start_date))
+            domain.append(('date','>=',start_date))
         if end_date:
-            domain.append(('date', '<=', end_date))
+            domain.append(('date','<=',end_date))
 
         cost_pool = self.pool.get('account.analytic.line')
         cost_ids = cost_pool.search(self.cr, self.uid, domain) 
@@ -458,8 +450,8 @@ class Parser(report_sxw.rml_parse):
         global totals 
         global t_cost
 
-        totals['cost'] = sum([cost.amount or 0.0 for cost in cost_proxy])
-        t_cost[account_id] = totals['cost']
+        totals['cost']=sum([cost.amount or 0.0 for cost in cost_proxy])
+        t_cost[account_id]=totals['cost']
 
         return cost_proxy 
 

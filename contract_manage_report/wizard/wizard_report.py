@@ -102,7 +102,7 @@ class contract_report_intervent_wizard(osv.osv_memory):
         }
 contract_report_intervent_wizard()
 
-# WIZARD CONTRACT DEPT. REPORT #################################################
+# WIZARD CONTRACT DEPT. REPORT ################################################
 class contract_department_report_wizard(osv.osv_memory):
     ''' Middle window to choose intervent report parameter
     '''
@@ -117,7 +117,7 @@ class contract_department_report_wizard(osv.osv_memory):
         wiz_proxy = self.browse(cr, uid, ids)[0]
 
         datas = {}
-        if wiz_proxy.mode == 'detailed': # Detailed report #####################
+        if wiz_proxy.mode == 'detailed': # Detailed report ####################
             # block:
             datas['hour'] = wiz_proxy.hour
             datas['cost'] = wiz_proxy.cost
@@ -135,11 +135,11 @@ class contract_department_report_wizard(osv.osv_memory):
             # report name
             report='contracts_report'
             
-        elif wiz_proxy.mode == 'list':  # Simple list report ###################
+        elif wiz_proxy.mode == 'list':  # Simple list report ##################
             datas['active'] = wiz_proxy.active
             report = 'dept_contract_list_report'
             
-        else: # Summary report #################################################
+        else: # Summary report ################################################
             #datas['department_id'] = wiz_proxy.department_id.id if wiz_proxy.department_id else False 
             datas['start_date'] = wiz_proxy.start_date
             datas['end_date'] = wiz_proxy.end_date

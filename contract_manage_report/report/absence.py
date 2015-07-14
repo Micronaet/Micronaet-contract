@@ -71,9 +71,9 @@ class Parser(report_sxw.rml_parse):
         if absence_account_id:
             domain.append(('account_id','=',absence_account_id))
         # check period
-        month = data.get('month', False)    
+        month = data.get('month', False)
         year = data.get('year',False)
-        if month and year:
+        if month and year:        
            month = int(month)
            start = "%04d-%02d-01"%(year, month)
            end = "%04d-%02d-01"%(year + 1 if month == 12 else year, month + 1 if month < 12 else 1)
