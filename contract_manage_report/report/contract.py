@@ -29,35 +29,39 @@
 from report import report_sxw
 from report.report_sxw import rml_parse
 
-totals = {
-    'hour': 0.0,
-    'hour_cost': 0.0,
-    'cost': 0.0,
-    'invoice': 0.0,
-    'operation':0.0,
-    }
-
-subtotals = {
-    'hour': 0.0,
-    'hour_cost': 0.0,
-    'cost': 0.0,
-    'invoice': 0.0,
-    'operation': 0.0,
-    'balance': 0.0,
-    'general': 0.0,
-    }
-
-# TODO put in class as private object
-variables = {} # per problemi nell'interpretare le funzioni
-t_cost = {}
-t_hour = {}
-t_hour_cost = {}
-t_invoice = {}
-t_operation = {}
-
 class Parser(report_sxw.rml_parse):
     
     def __init__(self, cr, uid, name, context):
+        # --------------------------------------
+        # Private variables (before global obj):
+        # --------------------------------------
+        # Total counter:
+        self.totals = {
+            'hour': 0.0,
+            'hour_cost': 0.0,
+            'cost': 0.0,
+            'invoice': 0.0,
+            'operation':0.0,
+            }
+
+        self.subtotals = {
+            'hour': 0.0,
+            'hour_cost': 0.0,
+            'cost': 0.0,
+            'invoice': 0.0,
+            'operation': 0.0,
+            'balance': 0.0,
+            'general': 0.0,
+            }
+
+        # Dict for list record:
+        self.variables = {} # for problems in parse functions
+        self.t_cost = {}
+        self.t_hour = {}
+        self.t_hour_cost = {}
+        self.t_invoice = {}
+        self.t_operation = {}
+
         # Total for counters:
         self.counters = {}
         
@@ -73,17 +77,18 @@ class Parser(report_sxw.rml_parse):
             'cost_proxy': self.get_cost,           # get costs list
             'invoice_proxy': self.get_invoice,     # get invoice list
 
-            # Function called from ODT that loop using previous funct (contract.id and data {})
-            'get_intervent_loop': self.get_intervent_loop, # get intervent total (global variable) 
-            'get_cost_loop': self.get_cost_loop,           # get costs total (global variable)
-            'get_invoice_loop': self.get_invoice_loop,     # get invoice total (global variable)
+            # Function called from ODT that loop using previous funct 
+            # (contract.id and data {})
+            'get_intervent_loop': self.get_intervent_loop, # get interv. total
+            'get_cost_loop': self.get_cost_loop,           # get costs total
+            'get_invoice_loop': self.get_invoice_loop,     # get invoice total
 
             'wizard_objects': self.wizard_objects, # master list of obj browse
             'test_part': self.test_part,           # show block test
             
             'reset_counters': self.reset_counters,
             
-            'reset_subtotals': self.reset_subtotals, # Sumary report (every contract parent)
+            'reset_subtotals': self.reset_subtotals, # Summary report (every contract parent)
 
             'get_totals_account': self.get_totals_account,
             
@@ -139,95 +144,75 @@ class Parser(report_sxw.rml_parse):
         ''' Reset totals every start
         '''
         response = self.get_intervent(account_id, data=data)
-        return "" # Only used for total globals variables
+        return ""
         
     def get_cost_loop(self, account_id, data=None):
         ''' Reset totals every start
         '''
         response = self.get_cost(account_id, data=data)
-        return "" # Only used for total globals variables
+        return ""
         
     def get_invoice_loop(self, account_id, data=None):
         ''' Reset totals every start
         '''
         response = self.get_invoice(account_id, data=data)
-        return "" # Only used for total globals variables
+        return ""
         
     def get_totals_account(self, type_of, account_id):
         ''' Reset totals every start
         '''
-        global t_cost
-        global t_hour
-        global t_hour_cost
-        global t_invoice
-        global t_operation
-        global subtotals
-
         if type_of == 'invoice':
-            return t_invoice.get(account_id, 0.0)
+            return self.t_invoice.get(account_id, 0.0)
         elif type_of == 'cost':
-            return t_cost.get(account_id, 0.0)
+            return self.t_cost.get(account_id, 0.0)
         elif type_of == 'hour':
-            return t_hour.get(account_id, 0.0)
+            return self.t_hour.get(account_id, 0.0)
         elif type_of == 'hour_cost':
-            return t_hour_cost.get(account_id, 0.0)
+            return self.t_hour_cost.get(account_id, 0.0)
         elif type_of == 'operation':    
-            return t_operation.get(account_id, 0.0)
+            return self.t_operation.get(account_id, 0.0)
         elif type_of == 'balance':
-            res = t_invoice.get(account_id, 0.0) + \
-                t_cost.get(account_id, 0.0) + \
-                t_hour_cost.get(account_id, 0.0)
-            subtotals[type_of] += res
+            res = self.t_invoice.get(account_id, 0.0) + \
+                self.t_cost.get(account_id, 0.0) + \
+                self.t_hour_cost.get(account_id, 0.0)
+            self.subtotals[type_of] += res
             return res            
         return 0.0
         
     def reset_counters(self):
         ''' Reset totals every start
         '''
-        global subtotal
-        global t_hour
-        global t_hour_cost
-        global t_invoice
-        global t_operation
-
-        t_cost = {}
-        t_hour = {}
-        t_hour_cost = {}
-        t_invoice = {}
-        t_operation = {}
+        self.t_cost = {}
+        self.t_hour = {}
+        self.t_hour_cost = {}
+        self.t_invoice = {}
+        self.t_operation = {}
         return 
 
     def get_totals(self, field, subtotalize=True):
         ''' Get totals for field:
               hour, hour_cost, cost, invoice
         '''        
-        global totals 
-        global subtotals 
-        
-        res = totals.get(field, 0.0)
+        res = self.totals.get(field, 0.0)
         if subtotalize:
-            subtotals[field] += res
+            self.subtotals[field] += res
         return res
 
     def get_variables(self, variable):
         ''' Return variable value
         '''        
-        global variables
-        return variables.get(variable, 0.0)
+        return self.variables.get(variable, 0.0)
 
     def set_variables(self, variable, value=0.0):
         ''' Set variable value and return value for print 
         '''        
-        global variables
-        variables[variable] = value or  0.0
-        return variables[variable]
+        self.variables[variable] = value or  0.0
+        return self.variables[variable]
 
     def reset_subtotals(self):
-        ''' Reset totals every start (for sumary report)
+        ''' Reset totals every start (for summary report)
         '''
-        global subtotals
-        
-        subtotals = {
+        self.subtotals = {
             'hour': 0.0,
             'hour_cost': 0.0,
             'cost': 0.0,
@@ -241,8 +226,7 @@ class Parser(report_sxw.rml_parse):
     def get_subtotals(self, field):
         ''' Get subtotals for field:
         '''
-        global subtotals 
-        return subtotals.get(field, 0.0)
+        return self.subtotals.get(field, 0.0)
 
     def increment_subtotals(self, field, total):
         ''' Increment subtotals value for field 
@@ -250,8 +234,7 @@ class Parser(report_sxw.rml_parse):
             Subtotals are usually reset with the function
             It return total value (for print in ODS)
         '''
-        global subtotals
-        subtotals[field] = subtotals.get(field, 0.0) + (total or 0.0)
+        self.subtotals[field] = self.subtotals.get(field, 0.0) + (total or 0.0)
         return total # for let print the value
 
     def filter_description(self, data=None, short = False):
@@ -318,7 +301,7 @@ class Parser(report_sxw.rml_parse):
         elif block=='balance': 
             return data.get('balance', True) # default show balance
         elif block=='date_summary':
-            return data.get('balance_summary', True) # default show balance summary    
+            return data.get('balance_summary', True) # def. show balan. summary    
         return True
         
     def wizard_objects(self, objects, data=None):
@@ -396,23 +379,17 @@ class Parser(report_sxw.rml_parse):
         intervent_proxy = intervent_pool.browse(
             self.cr, self.uid, intervent_ids)
 
-        global totals 
-
-        global t_hour
-        global t_hour_cost
-        global t_operation
-
-        totals['hour'] = sum(
+        self.totals['hour'] = sum(
             [intervent.unit_amount or 0.0 for intervent in intervent_proxy])
-        totals['hour_cost'] = sum(
+        self.totals['hour_cost'] = sum(
             [intervent.amount or 0.0 for intervent in intervent_proxy])
-        totals['operation'] = sum(
+        self.totals['operation'] = sum(
             [intervent.amount_operation or 0.0 for intervent \
                 in intervent_proxy])
 
-        t_hour[account_id] = totals['hour']
-        t_hour_cost[account_id] = totals['hour_cost']
-        t_operation[account_id] = totals['operation']
+        self.t_hour[account_id] = self.totals['hour']
+        self.t_hour_cost[account_id] = self.totals['hour_cost']
+        self.t_operation[account_id] = self.totals['operation']
         
         return intervent_proxy
 
@@ -449,12 +426,9 @@ class Parser(report_sxw.rml_parse):
         invoice_ids = invoice_pool.search(self.cr, self.uid, domain) 
         invoice_proxy = invoice_pool.browse(self.cr, self.uid, invoice_ids)
 
-        global totals 
-        global t_invoice
-        
-        totals['invoice'] = sum(
+        self.totals['invoice'] = sum(
             [invoice.amount or 0.0 for invoice in invoice_proxy]) # price
-        t_invoice[account_id] = totals['invoice']
+        self.t_invoice[account_id] = self.totals['invoice']
         return invoice_proxy
 
     def get_cost(self, account_id, data=None):
@@ -486,11 +460,8 @@ class Parser(report_sxw.rml_parse):
         cost_ids = cost_pool.search(self.cr, self.uid, domain) 
         cost_proxy = cost_pool.browse(self.cr, self.uid, cost_ids)
         
-        global totals 
-        global t_cost
-
-        totals['cost']=sum([cost.amount or 0.0 for cost in cost_proxy])
-        t_cost[account_id]=totals['cost']
+        self.totals['cost']=sum([cost.amount or 0.0 for cost in cost_proxy])
+        self.t_cost[account_id]=self.totals['cost']
 
         return cost_proxy 
 
