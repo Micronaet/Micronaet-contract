@@ -285,7 +285,7 @@ class Parser(report_sxw.rml_parse):
                     else "costi non visibili",
                 "fatture pass. visibili" if data.get('supplier', True) \
                     else "fatture pass. non visibili",
-                "fattato visibili" if data.get('invoice', True) \
+                "fatturato visibili" if data.get('invoice', True) \
                     else "fatturato non visibili",
                 "bilancio periodo visibile" \
                     if data.get('balance_summary', True) \
