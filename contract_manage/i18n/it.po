@@ -8,13 +8,15 @@ msgstr ""
 "Project-Id-Version: OpenERP Server 6.0.4\n"
 "Report-Msgid-Bugs-To: support@openerp.com\n"
 "POT-Creation-Date: 2013-03-11 17:45+0000\n"
-"PO-Revision-Date: 2013-03-11 18:56+0100\n"
+"PO-Revision-Date: 2015-07-14 17:31+0100\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: \n"
+"Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: \n"
+"Language: it\n"
+"X-Generator: Poedit 1.6.10\n"
 
 #. module: contract_manage
 #: field:account.analytic.superintervent.wizard,name:0
@@ -643,7 +645,7 @@ msgstr ""
 #. module: contract_manage
 #: field:res.city,tour_km:0 field:res.city.relation,tour_km:0
 msgid "Tour km (average)"
-msgstr "Tour km (average)"
+msgstr "Giro km (media)"
 
 #. module: contract_manage
 #: view:hr.employee:0
