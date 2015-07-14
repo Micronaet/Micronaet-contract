@@ -214,7 +214,10 @@ class account_analytic_expense(osv.osv):
                 department_code = csv_pool.decode_string(line[9])
                 name = csv_pool.decode_string(line[10]) # prot_id
                 year = csv_pool.decode_string(line[11])
-                
+
+                if name == '18644':
+                    import pdb; pdb.set_trace()
+                                    
                 # -----------------
                 # Get extra fields:
                 # -----------------
@@ -253,15 +256,6 @@ class account_analytic_expense(osv.osv):
                             counter, account_code))
                     continue    
                 
-                # Analytic account (contract False if directly to cdc):
-                account_id = contract_pool.get_code(
-                    cr, uid, contract_code, context=context)
-                #if not account_id:
-                #    _logger.error(
-                #        '%s. Contract code not found [%s-%s-%s]: %s' % (
-                #            counter, causal, series, number, contract_code))
-                #    continue    
-                    
                 # Dict for manage contract under accounting lines:    
                 if name not in entry_contract:
                     entry_contract[name] = {}                  
@@ -304,6 +298,16 @@ class account_analytic_expense(osv.osv):
                         'department_id': department_id,
                         })
 
+                # Analytic account (contract False if directly to cdc):
+                account_id = contract_pool.get_code(
+                    cr, uid, contract_code, context=context)
+                # Check here for split_type test:    
+                if not account_id and data['split_type'] != 'contract':
+                    _logger.error(
+                        '%s. Contract code not found [%s-%s-%s]: %s' % (
+                            counter, causal, series, number, contract_code))
+                    continue    
+
                 account_ids = self.search(cr, uid, [ # Key items:
                     ('name', '=', name),
                     ('code_id', '=', code_id),
@@ -319,7 +323,7 @@ class account_analytic_expense(osv.osv):
                         cr, uid, data, context=context)
 
                 if contract_code: # Save in dict the contract:
-                    entry_contract[name][account_id] = amount                
+                    entry_contract[name][account_id] = amount
             except:
                 _logger.error('Error import deadline')
                 continue
