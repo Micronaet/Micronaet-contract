@@ -350,7 +350,7 @@ class account_analytic_expense(osv.osv):
                 
             for account_id, amount in contract_new.iteritems():
                 if account_id in contract_old: # contract present
-                    delete(contract_old[account_id])
+                    del(contract_old[account_id])
                     line_pool.write(cr, uid, contract_old[account_id], {
                         'amount': amount,
                         }, context=context)
@@ -717,8 +717,9 @@ class account_analytic_line_extra_fields(osv.osv):
         # Expense:
         'expense_id': fields.many2one('account.analytic.expense', 'Expense',
             ondelete='cascade'),
-        'contract_id': fields.many2one('account.analytic.account', 
-            'Exp. account', ondelete='cascade'),
+        # not necessary (account_id yet present)    
+        #'contract_id': fields.many2one('account.analytic.account', 
+        #    'Exp. account', ondelete='cascade'),
         }
 
     _defaults = {
