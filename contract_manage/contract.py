@@ -209,7 +209,7 @@ class account_analytic_expense(osv.osv):
                 period = csv_pool.decode_string(line[6])
                 date = csv_pool.decode_date(line[7], with_slash=False)
                 
-                amount = csv_pool.decode_float(line[8])
+                amount = -csv_pool.decode_float(line[8])
                 department_code = csv_pool.decode_string(line[9])
                 name = csv_pool.decode_string(line[10]) # prot_id
                 year = csv_pool.decode_string(line[11])
@@ -350,16 +350,16 @@ class account_analytic_expense(osv.osv):
                 
             for account_id, amount in contract_new.iteritems():
                 if account_id in contract_old: # contract present
-                    del(contract_old[account_id])
                     line_pool.write(cr, uid, contract_old[account_id], {
                         'amount': amount,
                         }, context=context)
+                    del(contract_old[account_id])
                 else: # not present create
                     line_pool.create(cr, uid, {
                         # TODO create analytic line:
-                        'amount': -amount,
+                        'amount': amount,
                         'user_id': uid,
-                        'name': _('Ref. %s/%s/%s [# %s]') % (
+                        'name': _('Ref. %s/%s:%s [#%s]') % (
                             entry.causal,
                             entry.series,
                             entry.number,
