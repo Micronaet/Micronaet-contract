@@ -168,10 +168,11 @@ class account_analytic_expense(osv.osv):
 
         # -------------------
         # Load from CSV file:
-        # -------------------        
+        # -------------------
         entry_contract = {} # Contract for accounting record
         tot_col = 0
         counter = -header
+        import pdb; pdb.set_trace()
         for line in csv.reader(open(os.path.expanduser(
                 csv_file), 'rb'), delimiter=delimiter):
             try:
@@ -191,7 +192,7 @@ class account_analytic_expense(osv.osv):
                         'Riga: %s Empty line of col different [%s!=%s]' % (
                             counter, tot_col, len(line)))
                     continue
-                
+
                 # --------------------------
                 # Load fields from CSV file:
                 # --------------------------
@@ -254,10 +255,6 @@ class account_analytic_expense(osv.osv):
                             counter, account_code))
                     continue    
                 
-                # Dict for manage contract under accounting lines:    
-                if name not in entry_contract:
-                    entry_contract[name] = {}                  
-
                 # ------------------------
                 # Sync or create elements:        
                 # ------------------------
@@ -279,7 +276,7 @@ class account_analytic_expense(osv.osv):
                     data.update({
                         'split_type': 'all',
                         'amount': amount,
-                        'department_id': False,
+                        'department_id': department_id, # False?
                         })
                 elif contract_code: # Directly to contract
                     # Contract if contract if present
@@ -287,7 +284,7 @@ class account_analytic_expense(osv.osv):
                         'split_type': 'contract',
                         'amount': 0.0,
                         'department_id': department_id,
-                        })                    
+                        })                 
                 else: # no contract
                     # Department in not present contract (only department)
                     data.update({
@@ -304,7 +301,11 @@ class account_analytic_expense(osv.osv):
                     _logger.error(
                         '%s. Contract code not found [%s-%s-%s]: %s' % (
                             counter, causal, series, number, contract_code))
-                    continue    
+                    continue
+
+                # Dict for manage contract under accounting lines:    
+                if name not in entry_contract:
+                    entry_contract[name] = {}                  
 
                 entry_ids = self.search(cr, uid, [ # Key items:
                     ('name', '=', name),
@@ -320,7 +321,8 @@ class account_analytic_expense(osv.osv):
                     entry_id = self.create(
                         cr, uid, data, context=context)
 
-                if contract_code: # Save in dict the contract:
+                # Save in dict the contract: 
+                if account_id: # extend with split = contract?
                     entry_contract[name][account_id] = amount
             except:
                 _logger.error('Error import deadline:')
@@ -374,7 +376,8 @@ class account_analytic_expense(osv.osv):
                             entry.name,
                             ),
                         'unit_amount': 1.0,
-                        'date': entry.date, # TODO change with one period date (in range)                       
+                        # TODO change with one period date (in range)
+                        'date': entry.date, 
                         'account_id': account_id,
                         'general_account_id': general_id,
                         'journal_id': journal_id, 
@@ -401,6 +404,7 @@ class account_analytic_expense(osv.osv):
                 contract_old[k] for k in contract_old]) 
             
         line_pool.unlink(cr, uid, unlink_line_ids, context=context)
+        _logger.info('End entry import!')
         return True
 
     _columns = {
