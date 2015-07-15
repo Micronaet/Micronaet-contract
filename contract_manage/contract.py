@@ -172,7 +172,6 @@ class account_analytic_expense(osv.osv):
         entry_contract = {} # Contract for accounting record (key=entry key)
         tot_col = 0
         counter = -header
-        import pdb; pdb.set_trace()
         for line in csv.reader(open(os.path.expanduser(
                 csv_file), 'rb'), delimiter=delimiter):
             try:
@@ -321,7 +320,9 @@ class account_analytic_expense(osv.osv):
                 if entry_id not in entry_contract:
                     entry_contract[entry_id] = {}                  
                 elif data['split_type'] != 'contract':
-                    _logger.error('Error multiple key elements found!')
+                    _logger.error(
+                        'Error multiple key elements found, jumped: %s!' % (
+                            line))
                     # TODO correct or in assert test?
 
                 # Save in dict the contract: 
