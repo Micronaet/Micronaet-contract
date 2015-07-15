@@ -329,8 +329,10 @@ class account_analytic_expense(osv.osv):
                 if account_id: # extend with split = contract?
                     entry_contract[entry_id][account_id] = amount
             except:
-                _logger.error('Error import deadline:')
-                _logger.error(sys.exc_info())
+                _logger.error('Entry import error: %s [%s]' % (
+                    line,
+                    sys.exc_info(),
+                    ))
                 continue
                 
         # --------------------------------------
