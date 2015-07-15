@@ -233,10 +233,11 @@ class account_analytic_expense(osv.osv):
                     date_from = False
                     date_to = False
                         
-                # Department:        
+                # Department (always present):
                 department_id = dept_pool.get_department(
                     cr, uid, department_code, context=context)
                 
+                # Test if is a general department:
                 if not department_id and department_code not in \
                         department_code_all:
                     _logger.error(
@@ -244,7 +245,7 @@ class account_analytic_expense(osv.osv):
                             counter, department_code))
                     continue    
                 
-                # General account:    
+                # General account (always present):    
                 code_id = code_pool.get_create_code(
                     cr, uid, account_code, account_name, context=context)
                 if not code_id:
@@ -305,24 +306,25 @@ class account_analytic_expense(osv.osv):
                             counter, causal, series, number, contract_code))
                     continue    
 
-                account_ids = self.search(cr, uid, [ # Key items:
+                entry_ids = self.search(cr, uid, [ # Key items:
                     ('name', '=', name),
                     ('code_id', '=', code_id),
                     ('department_id', '=', department_id),
                     ], context=context)
 
-                if account_ids:
-                    assert len(account_ids) == 1, 'Key broken prot-ledge-dept!'
-                    item_id = account_ids[0]                    
-                    self.write(cr, uid, item_id, data, context=context)
+                if entry_ids:
+                    assert len(entry_ids) == 1, 'Key broken prot-ledge-dept!'
+                    entry_id = entry_ids[0]                    
+                    self.write(cr, uid, entry_id, data, context=context)
                 else:
-                    item_id = self.create(
+                    entry_id = self.create(
                         cr, uid, data, context=context)
 
                 if contract_code: # Save in dict the contract:
                     entry_contract[name][account_id] = amount
             except:
-                _logger.error('Error import deadline')
+                _logger.error('Error import deadline:')
+                _logger.error(sys.exc_info())
                 continue
                 
         # --------------------------------------
@@ -351,7 +353,8 @@ class account_analytic_expense(osv.osv):
             # Load contract-line for current write operation
             contract_old = {} # yet present on record
             for line in entry.analytic_line_ids:
-                contract_old[line.account_id.id] = line.id
+                contract_old[
+                    line.account_id.id if line.account_id else False] = line.id
                 
             for account_id, amount in contract_new.iteritems():
                 if account_id in contract_old: # contract present
