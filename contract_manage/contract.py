@@ -271,35 +271,32 @@ class account_analytic_expense(osv.osv):
                     }
 
                 if department_code in department_code_all:
-                    # All if department in list passed as parameter
-                    data.update({
-                        'split_type': 'all',
-                        'amount': amount,
-                        'department_id': department_id, # False?
-                        })
+                    split_type = 'all'
                 elif contract_code: # Directly to contract
-                    # Contract if contract if present
-                    data.update({
-                        'split_type': 'contract',
-                        'amount': 0.0,
-                        'department_id': department_id,
-                        })                 
-                else: # no contract
-                    # Department in not present contract (only department)
-                    data.update({
-                        'split_type': 'department',
-                        'amount': amount,
-                        'department_id': department_id,
-                        })
+                    split_type = 'contract'
+                else: # no contract so department
+                    split_type = 'department'
+
+                data.update({
+                    'split_type': split_type,
+                    'amount': amount,
+                    'department_id': department_id,
+                    })
 
                 # Analytic account (contract False if directly to cdc):
                 account_id = contract_pool.get_code(
                     cr, uid, contract_code, context=context)
                 # Check here for split_type test:    
-                if not account_id and data['split_type'] == 'contract':
+                if not account_id and split_type == 'contract':
                     _logger.error(
                         '%s. Contract code not found [%s-%s-%s]: %s' % (
                             counter, causal, series, number, contract_code))
+                    continue
+                if not amount and split_type == 'contract':
+                    _logger.error(
+                        '%s. Contract amount not found [%s-%s-%s]: %s/%s' % (
+                            counter, causal, series, number, department_code,
+                            contract_code))
                     continue
 
                 entry_ids = self.search(cr, uid, [ # Key items:
@@ -329,10 +326,8 @@ class account_analytic_expense(osv.osv):
                 if account_id: # extend with split = contract?
                     entry_contract[entry_id][account_id] = amount
             except:
-                _logger.error('Entry import error: %s [%s]' % (
-                    line,
-                    sys.exc_info(),
-                    ))
+                _logger.error(sys.exc_info(), )
+                _logger.error(line, )
                 continue
                 
         # --------------------------------------
