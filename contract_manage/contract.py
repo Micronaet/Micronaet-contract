@@ -169,7 +169,7 @@ class account_analytic_expense(osv.osv):
         # -------------------
         # Load from CSV file:
         # -------------------
-        entry_contract = {} # Contract for accounting record
+        entry_contract = {} # Contract for accounting record (key=entry key)
         tot_col = 0
         counter = -header
         import pdb; pdb.set_trace()
@@ -303,10 +303,6 @@ class account_analytic_expense(osv.osv):
                             counter, causal, series, number, contract_code))
                     continue
 
-                # Dict for manage contract under accounting lines:    
-                if name not in entry_contract:
-                    entry_contract[name] = {}                  
-
                 entry_ids = self.search(cr, uid, [ # Key items:
                     ('name', '=', name),
                     ('code_id', '=', code_id),
@@ -321,9 +317,16 @@ class account_analytic_expense(osv.osv):
                     entry_id = self.create(
                         cr, uid, data, context=context)
 
+                # Dict for manage contract under accounting lines:
+                if entry_id not in entry_contract:
+                    entry_contract[entry_id] = {}                  
+                elif data['split_type'] != 'contract':
+                    _logger.error('Error multiple key elements found!')
+                    # TODO correct or in assert test?
+
                 # Save in dict the contract: 
                 if account_id: # extend with split = contract?
-                    entry_contract[name][account_id] = amount
+                    entry_contract[entry_id][account_id] = amount
             except:
                 _logger.error('Error import deadline:')
                 _logger.error(sys.exc_info())
@@ -337,7 +340,7 @@ class account_analytic_expense(osv.osv):
         
         # Loop on all accounting lines:
         for entry in self.browse(cr, uid, record_ids, context=context): 
-            if entry.name not in entry_contract: # all record + sub-contract
+            if entry.id not in entry_contract: # all record + sub-contract
                 self.unlink(cr, uid, entry.id, context=context)
                 continue
                 
@@ -350,7 +353,7 @@ class account_analytic_expense(osv.osv):
                 contract_new = {} # TODO Load list of active contract (dept.)
                 
             elif entry.split_type == 'contract': # use dict record
-                contract_new = entry_contract[entry.name]
+                contract_new = entry_contract[entry.id]
 
             # Load contract-line for current write operation
             contract_old = {} # yet present on record
@@ -382,21 +385,11 @@ class account_analytic_expense(osv.osv):
                         'general_account_id': general_id,
                         'journal_id': journal_id, 
                         'expense_id': entry.id,
-                        #'company_id',
-                        #'code',
-                        #'currency_id',
-                        #'move_id',
-                        #'product_id',
-                        #'product_uom_id',
-                        #'amount_currency',
-                        #'ref',
-                        #'to_invoice',
-                        #'invoice_id',
-                        #'extra_analytic_line_timesheet_id',
-                        ##'import_type',
-                        ##'activity_id' ,
-                        #'mail_raccomanded',
-                        ##'location',
+                        #'company_id', 'code', 'currency_id', 'move_id',
+                        #'product_id', 'product_uom_id', 'amount_currency',
+                        #'ref', 'to_invoice', 'invoice_id', 
+                        # 'extra_analytic_line_timesheet_id', 'import_type',
+                        ##'activity_id', 'mail_raccomanded', 'location',
                         }, context=context)                            
                     
             # unlink record (once at the end of all loops)
