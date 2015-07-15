@@ -134,7 +134,7 @@ class account_analytic_expense(osv.osv):
             department_code_all: list of department code that split on all dep.
             general_code = account for analytic line
         '''
-        _logger.info('Start import accounting movement, filee: %s' % csv_file)
+        _logger.info('Start import accounting movement, file: %s' % csv_file)
 
         # ------------------
         # Startup parameters        
@@ -242,7 +242,7 @@ class account_analytic_expense(osv.osv):
                         department_code_all:
                     _logger.error(
                         '%s. Department code not found: %s' % (
-                            counter, department_code))
+                            counter, line))
                     continue    
                 
                 # General account (always present):    
@@ -251,7 +251,7 @@ class account_analytic_expense(osv.osv):
                 if not code_id:
                     _logger.error(
                         '%s. General ledge code not found: %s' % (
-                            counter, account_code))
+                            counter, line))
                     continue    
                 
                 # ------------------------
@@ -290,13 +290,12 @@ class account_analytic_expense(osv.osv):
                 if not account_id and split_type == 'contract':
                     _logger.error(
                         '%s. Contract code not found [%s-%s-%s]: %s' % (
-                            counter, causal, series, number, contract_code))
+                            counter, causal, series, number, line))
                     continue
                 if not amount and split_type == 'contract':
                     _logger.error(
-                        '%s. Contract amount not found [%s-%s-%s]: %s/%s' % (
-                            counter, causal, series, number, department_code,
-                            contract_code))
+                        '%s. Contract amount not found [%s-%s-%s]: %s' % (
+                            counter, causal, series, number, line))
                     continue
 
                 entry_ids = self.search(cr, uid, [ # Key items:
@@ -333,6 +332,7 @@ class account_analytic_expense(osv.osv):
         # --------------------------------------
         # Read all lines and sync contract state
         # --------------------------------------        
+        _logger.info('Assign contract to entry:')
         unlink_line_ids = [] # element not found during this sync (to delete)
         record_ids = self.search(cr, uid, [], context=context)
         
