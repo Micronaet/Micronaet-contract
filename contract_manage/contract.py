@@ -377,8 +377,10 @@ class account_analytic_expense(osv.osv):
                 
             for account_id, amount in contract_new.iteritems():
                 if account_id in contract_old: # contract present
+                    # Update only certain fields (who can change):
                     line_pool.write(cr, uid, contract_old[account_id], {
                         'amount': amount,
+                        'date': entry.date, 
                         }, context=context)
                     del(contract_old[account_id])
                 else: # not present create
@@ -394,7 +396,6 @@ class account_analytic_expense(osv.osv):
                             ),
                         'unit_amount': 1.0,
                         # TODO change with one period date (in range)
-                        'date': entry.date, 
                         'account_id': account_id,
                         'general_account_id': general_id,
                         'journal_id': journal_id, 

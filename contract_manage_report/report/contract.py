@@ -302,17 +302,17 @@ class Parser(report_sxw.rml_parse):
         if data is None:
            data = {}
 
-        if block=='intervent':
+        if block == 'intervent':
             return data.get('hour', True)
-        elif block=='cost':
+        elif block == 'cost':
             return data.get('cost', True)
-        elif block=='invoice': 
+        elif block == 'invoice': 
             return data.get('invoice', True)
-        elif block=='balance': 
+        elif block == 'balance': 
             return data.get('balance', True)
-        elif block=='date_summary':
+        elif block == 'date_summary':
             return data.get('balance_summary', True)
-        elif block=='supplier':
+        elif block == 'supplier':
             return data.get('supplier', True) 
         return True
         
