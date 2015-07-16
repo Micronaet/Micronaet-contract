@@ -319,7 +319,6 @@ class account_analytic_expense(osv.osv):
                     _logger.error(
                         'Error multiple key elements found, jumped: %s!' % (
                             line))
-                    # TODO correct or in assert test?
 
                 # Save in dict the contract: 
                 if account_id: # extend with split = contract?
@@ -342,14 +341,20 @@ class account_analytic_expense(osv.osv):
                 self.unlink(cr, uid, entry.id, context=context)
                 continue
                 
-            if entry.split_type == 'all': 
+            if entry.split_type in ('all', 'department'):
                 # Compute all active contract and split amount                
-                contract_new = {} # TODO Load list of active contract
+                domain = [('date_start', '>=', '2015/01/01')] # TODO param.                
+                if entry.split_type == 'department': # add extra filter
+                    domain.append(
+                        ('department_id', '=', entry.department_id.id))
+                        
+                account_ids = account_pool.search(
+                    cr, uid, domain, context=context)
                 
-            elif entry.split_type == 'department': 
-                # Compute dept. active contract and split amount
-                contract_new = {} # TODO Load list of active contract (dept.)
-                
+                # Split cost in all contract (not directly depend on amount):
+                contract_new = dict.fromkeys(
+                    account_ids, 
+                    entry.amount / len(account_ids))
             elif entry.split_type == 'contract': # use dict record
                 contract_new = entry_contract[entry.id]
 
