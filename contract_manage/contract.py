@@ -343,7 +343,10 @@ class account_analytic_expense(osv.osv):
                 
             if entry.split_type in ('all', 'department'):
                 # Compute all active contract and split amount                
-                domain = [('date_start', '>=', '2015/01/01')] # TODO param.                
+                domain = [
+                    ('date_start', '>=', '2015/01/01'), # TODO param.
+                    ('state', '>=', 'cancelled'),                    
+                    ] 
                 if entry.split_type == 'department': # add extra filter
                     domain.append(
                         ('department_id', '=', entry.department_id.id))
