@@ -279,7 +279,8 @@ class account_analytic_expense(osv.osv):
 
                 data.update({
                     'split_type': split_type,
-                    'amount': amount,
+                     # TODO calculate for contract:
+                    'amount': False if split_type == 'contract' else amount,
                     'department_id': department_id,
                     })
 
@@ -342,6 +343,7 @@ class account_analytic_expense(osv.osv):
                 continue
                 
             if entry.split_type in ('all', 'department'):
+                name_mask = _('Ref. %s/%s:%s [#%s] (autom.)')
                 # Compute all active contract and split amount                
                 domain = [
                     ('date_start', '>=', '2015/01/01'), # TODO param.
@@ -351,14 +353,20 @@ class account_analytic_expense(osv.osv):
                     domain.append(
                         ('department_id', '=', entry.department_id.id))
                         
-                account_ids = account_pool.search(
+                open_contract_ids = contract_pool.search(
                     cr, uid, domain, context=context)
                 
                 # Split cost in all contract (not directly depend on amount):
+                if not open_contract_ids:
+                    _logger.info('Error jump, no list of contracts in %s' % (
+                        entry.name))
+                    continue
+                    
                 contract_new = dict.fromkeys(
-                    account_ids, 
-                    entry.amount / len(account_ids))
+                    open_contract_ids, 
+                    entry.amount / len(open_contract_ids))
             elif entry.split_type == 'contract': # use dict record
+                name_mask = _('Ref. %s/%s:%s [#%s]')
                 contract_new = entry_contract[entry.id]
 
             # Load contract-line for current write operation
@@ -378,7 +386,7 @@ class account_analytic_expense(osv.osv):
                         # TODO create analytic line:
                         'amount': amount,
                         'user_id': uid,
-                        'name': _('Ref. %s/%s:%s [#%s]') % (
+                        'name': name_mask % (
                             entry.causal,
                             entry.series,
                             entry.number,

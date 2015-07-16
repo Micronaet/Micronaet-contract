@@ -109,9 +109,9 @@ class Parser(report_sxw.rml_parse):
             'format_data_italian': self.format_data_italian,
             })
 
-    # --------------------   
-    # Counters operations:    
-    # --------------------   
+    # -------------------------------------------------------------------------  
+    #                          Counters operations:    
+    # -------------------------------------------------------------------------  
     def reset_all_counter(self):
         self.counters = {}
         return
@@ -129,7 +129,7 @@ class Parser(report_sxw.rml_parse):
         if name not in self.counters:  # create if not present (0.0)
             self.counters[name] = 0.0
         return self.counters.get(name, 0.0)
-    # --------------------   
+    # -------------------------------------------------------------------------  
     
     # TODO to remove!!!    
     def format_data_italian(self, value):
@@ -456,7 +456,7 @@ class Parser(report_sxw.rml_parse):
         # get 2 journal service and material:
         journal_pool = self.pool.get('account.analytic.intervent.type')
         journal_ids = journal_pool.search(
-            self.cr, self.uid, [('name','!=','invoice')]) # all but not invoice
+            self.cr, self.uid, [('name', '!=', 'invoice')]) # all but not inv.
         journal_proxy = journal_pool.browse(self.cr, self.uid, journal_ids)
         journal_list = [item.journal_id.id for item in journal_proxy]
 
