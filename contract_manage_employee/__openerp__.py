@@ -21,27 +21,32 @@
 ##############################################################################
 
 {
-    'name' : 'Contract Manage Employee',
-    'version' : '0.0.1',
-    'category' : 'Generic Modules/Customization',
-    'description' : """ Manage with 'contract manage' module the contract of 
-                        employee and report for presence, hour worked etc.
-                    """,
-    'author' : 'Micronaet s.r.l.',
-    'website' : 'http://www.micronaet.it',
-    'depends' : ['base',
-                 'base_import_fraternita',
-                 'contract_manage',
-                 'report_aeroo',
-                 'report_aeroo_ooo',
-                ],
-    'init_xml' : [], 
-    'update_xml' : [
-                   'security/ir.model.access.csv',
-                   'employee_view.xml',
-                   'data/festivity.xml',
-                   ],
-    'demo_xml' : [],
-    'active' : False, 
-    'installable' : True, 
+    'name': 'Contract Manage Employee',
+    'version': '0.0.1',
+    'category': 'Generic Modules/Customization',
+    'description': """ 
+        Manage with 'contract manage' module the contract of 
+        employee and report for presence, hour worked etc.
+        
+        Wizard for import hour cost assign to every employee a product with
+        hour cost
+        """,
+    'author': 'Micronaet s.r.l.',
+    'website': 'http://www.micronaet.it',
+    'depends': [
+        'base',
+        'base_import_fraternita',
+        'contract_manage',
+        'report_aeroo',
+        'report_aeroo_ooo',
+        ],
+    'init_xml': [], 
+    'update_xml': [
+        'security/ir.model.access.csv',
+        'employee_view.xml',
+        'data/festivity.xml',
+        ],
+    'demo_xml': [],
+    'active': False, 
+    'installable': True, 
 }
