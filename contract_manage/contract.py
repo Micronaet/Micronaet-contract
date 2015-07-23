@@ -125,17 +125,20 @@ class account_analytic_expense(osv.osv):
     # Scheduler event:
     def schedule_csv_accounting_movement_import(self, cr, uid, csv_file,
             delimiter, header, verbose=100, department_code_all=None, 
-            general_code = '410100', context=None):
+            department_code_jump=None, general_code = '410100', 
+            split_method='number', context=None):
         ''' Import movement sync with record in OpenERP
             csv_file: full path of file to import  (use ~ for home)
             delimiter: for csv separation
             header: number of line for header (jumped)
             verbose: every X record print a log message (else nothing)
             department_code_all: list of department code that split on all dep.
-            general_code = account for analytic line
+            department_code_jump: list of department code that will be jumper
+            general_code: account for analytic line
+            split_method: 'number', 'amount' (average depend on) 
         '''
         _logger.info('Start import accounting movement, file: %s' % csv_file)
-
+        # TODO  manage split method!!!
         # ------------------
         # Startup parameters        
         # ------------------
@@ -153,6 +156,9 @@ class account_analytic_expense(osv.osv):
         if department_code_all is None:
             department_code_all = [] 
             # list of department that split in all contracts
+
+        if department_code_jump is None:
+            department_code_jump = [] 
 
         general_id = account_pool.get_account_id(
             cr, uid, general_code, context=context)
@@ -236,6 +242,13 @@ class account_analytic_expense(osv.osv):
                 # Department (always present):
                 department_id = dept_pool.get_department(
                     cr, uid, department_code, context=context)
+
+                # Test if is department to jump:
+                if department_code in department_code_jump:
+                    _logger.warning(
+                        '%s. Jump expense for dept. "%s": %s' % (
+                            counter, department_code, line))
+                    continue
                 
                 # Test if is a general department:
                 if not department_id and department_code not in \
