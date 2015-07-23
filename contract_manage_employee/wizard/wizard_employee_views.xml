@@ -9,7 +9,9 @@
             <field name="arch" type="xml">
                 <form string="Force employe hour cost wizard">
                    <field name="operation"/>
+                   <newline />
                    <field name="from_date" attrs="{'required':[('operation','!=','load')], 'invisible':[('operation','=','load')]}"/> 
+                   <field name="name" attrs="{'invisible':[('operation','=','load')]}"/> 
                    <newline />
 
                    <button string="Cancel" special="cancel" colspan="1"/>
@@ -30,8 +32,8 @@
 
       <menuitem action="hr_employee_force_hour_wizard_action" 
                 id="contract_report_intervent_wizard_root_menuitem" 
-                sequence="90"
-                parent="contract_manage.menu_hr_root"
+                sequence="10"
+                parent="hr_employee_hour_cost_menuitem"
                 groups="analytic.group_analytic_accounting"
                 icon="STOCK_EXECUTE" />
     </data>

@@ -169,6 +169,50 @@
         <field name="domain">[('static','=',False)]</field>
     </record>
 
+    <!--hr.employee.hour.cost-->
+    <record id="view_hr_employee_hour_cost_tree" model="ir.ui.view">
+        <field name="name">Hour cost for employee</field>
+        <field name="model">hr.employee.hour.cost</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+           <tree string="Expense" colors="blue:new==True" editable="bottom">
+                <field name="employee_id" readonly="1"/>
+                <field name="product_id" readonly="1"/>
+                <field name="hour_cost" readonly="1"/>
+                <field name="hour_cost_new"/>
+                <field name="new" invisible="1"/>
+            </tree>
+       </field>
+   </record>
+
+    <record id="view_hr_employee_hour_cost_form" model="ir.ui.view">
+        <field name="name">Hour cost for employee</field>
+        <field name="model">hr.employee.hour.cost</field>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+           <form string="Expense">
+                <field name="employee_id" readonly="1"/>
+                <field name="product_id" readonly="1"/>
+                <field name="hour_cost" readonly="1"/>
+                <field name="hour_cost_new"/>
+                <field name="new" invisible="1"/>
+            </trformee>
+       </field>
+   </record>
+
+    <record id="action_hr_employee_hour_cost" model="ir.actions.act_window">
+        <field name="name">Current hour cost</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">hr.employee.hour.cost</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+        <field name="view_id" ref="view_hr_employee_hour_cost_tree"/>
+        <!--<field name="search_view_id" ref="view_account_analytic_expense_search"/>-->
+        <field name="context">{}</field>
+        <field name="domain">[]</field>
+        <field name="help">Current situation of employee product and hour cost</field>
+    </record>
+
     <!-- MENUITEM -->
     <!-- (in configuration menuitem of contract_manage) -->
     <menuitem id="menu_configuration_contract_tipology"
@@ -198,6 +242,19 @@
                  sequence="20"
                  action="action_view_contract_employee_festivity_dynamic"
                  parent="menu_configuration_festivity" />
+
+      <!--Force costs-->
+      <menuitem id="contract_report_force_root_menuitem" 
+                sequence="20"
+                name="Force costs"
+                parent="contract_manage.menu_hr_root"
+                groups="analytic.group_analytic_accounting"
+                icon="STOCK_EXECUTE" />
+          <menuitem action="action_hr_employee_hour_cost" 
+                    id="hr_employee_hour_cost_menuitem" 
+                    sequence="50"
+                    parent="contract_report_force_root_menuitem"
+                    icon="STOCK_EXECUTE" />
 
 </data>
 </openerp>

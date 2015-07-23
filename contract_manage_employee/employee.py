@@ -315,11 +315,13 @@ class hr_employee_force_log(osv.osv):
                 )
         return self.create(cr, uid, {
             #date
+            'name': wiz_proxy.name or 'Forced from date: %s' % from_date,
             'from_date': from_date,
             'note': note,
             }, context=context)        
         
     _columns = {
+        'name': fields.char('Description', required=True),
         'date': fields.datetime('Date operation'),
         'from_date': fields.date('From date', 
             help='All intervent from this date will use new value'),
