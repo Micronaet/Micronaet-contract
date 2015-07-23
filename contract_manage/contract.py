@@ -377,7 +377,7 @@ class account_analytic_expense(osv.osv):
                         entry.name))
                     continue
                     
-                if average_method == 'number' # TODO change me    
+                if average_method == 'number': # TODO change me    
                     contract_new = dict.fromkeys(
                         open_contract_ids, 
                         entry.amount / len(open_contract_ids))
@@ -397,10 +397,10 @@ class account_analytic_expense(osv.osv):
                                     
                     # Calculate average depend on amount / amount total                
                     rate = entry.amount / tot 
-                    if contract_id, total in contract_new.iteritems():
+                    for contract_id, total in contract_new.iteritems():
                         contract_new[contract_item.id] *= rate
                 else: # error
-                    _logger.error('Average method error: %s' % average_method
+                    _logger.error('Average method error: %s' % average_method)
                             
             elif entry.split_type == 'contract': # use dict record
                 name_mask = _('Ref. %s/%s:%s [#%s]')
