@@ -110,10 +110,10 @@ class hr_employee_force_hour(osv.osv_memory):
     _columns = {
         'date': fields.date('From date', 
             help='Choose the date, every intervent from that date take costs'),
-        'operation':fields.selection([
+        'operation': fields.selection([
             ('load', 'Load current'),
             ('absence', 'Force update'),
-            ], 'Operation', select=Truerequired=True),
+            ], 'Operation', select=True, required=True),
         }    
         
     _defaults = {
