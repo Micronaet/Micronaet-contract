@@ -126,7 +126,7 @@ class account_analytic_expense(osv.osv):
     def schedule_csv_accounting_movement_import(self, cr, uid, csv_file,
             delimiter, header, verbose=100, department_code_all=None, 
             department_code_jump=None, general_code = '410100', 
-            split_method='number', context=None):
+            average_method='number', context=None):
         ''' Import movement sync with record in OpenERP
             csv_file: full path of file to import  (use ~ for home)
             delimiter: for csv separation
@@ -135,10 +135,12 @@ class account_analytic_expense(osv.osv):
             department_code_all: list of department code that split on all dep.
             department_code_jump: list of department code that will be jumper
             general_code: account for analytic line
-            split_method: 'number', 'amount' (average depend on) 
+            average_method: 'number', 'amount' (average depend on) 
         '''
         _logger.info('Start import accounting movement, file: %s' % csv_file)
+
         # TODO  manage split method!!!
+
         # ------------------
         # Startup parameters        
         # ------------------
@@ -375,9 +377,31 @@ class account_analytic_expense(osv.osv):
                         entry.name))
                     continue
                     
-                contract_new = dict.fromkeys(
-                    open_contract_ids, 
-                    entry.amount / len(open_contract_ids))
+                if average_method == 'number' # TODO change me    
+                    contract_new = dict.fromkeys(
+                        open_contract_ids, 
+                        entry.amount / len(open_contract_ids))
+                elif average_method == 'amount':
+                    contract_new = {}
+                    tot = 0.0
+                    for contract_item in account_pool.browse(
+                            cr, uid, open_contract_ids, context=context):
+                        if contract_item.total_amount > 0.0:
+                            tot += contract_item.total_amount
+                            contract_new[
+                                contract_item.id] = contract_item.total_amount
+                        else:
+                            _logger.error(
+                                'Contract %s amount not found (or negat.)!' % \
+                                    contract_item.code) 
+                                    
+                    # Calculate average depend on amount / amount total                
+                    rate = entry.amount / tot 
+                    if contract_id, total in contract_new.iteritems():
+                        contract_new[contract_item.id] *= rate
+                else: # error
+                    _logger.error('Average method error: %s' % average_method
+                            
             elif entry.split_type == 'contract': # use dict record
                 name_mask = _('Ref. %s/%s:%s [#%s]')
                 contract_new = entry_contract[entry.id]

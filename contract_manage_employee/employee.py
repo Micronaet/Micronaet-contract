@@ -160,7 +160,8 @@ class hr_employee_extra(osv.osv):
     """    
     _inherit = 'hr.employee'
     
-    def check_consistency_employee_user_department(self, cr, uid, context=None):
+    def check_consistency_employee_user_department(
+            self, cr, uid, context=None):
         ''' Procedure for xml-rpc call for check consistency of DB
             1. check if employee has user linked
             2. check if 
