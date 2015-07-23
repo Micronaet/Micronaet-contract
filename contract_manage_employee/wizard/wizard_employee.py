@@ -41,6 +41,7 @@ class hr_employee_force_hour(osv.osv_memory):
         ''' Load all active employee and his product, create if not present
             After open view with the list
         '''
+        wiz_proxy = self.browse(cr, uid, ids)[0]
         return self.pool.get('hr.employee.hour.cost').load_all_employee(
             cr, uid, context=context)
 
@@ -108,7 +109,7 @@ class hr_employee_force_hour(osv.osv_memory):
         return True # or view?
 
     _columns = {
-        'name': fields.char('Description'),
+        'name': fields.char('Description', size=80),
         'from_date': fields.date('From date', 
             help='Choose the date, every intervent from that date take costs'),
         'operation': fields.selection([
@@ -118,6 +119,7 @@ class hr_employee_force_hour(osv.osv_memory):
         }    
         
     _defaults = {
+        'from_date': lambda *x: datetime.now().strftime('%Y-%m-%d'),
         'operation': lambda *a: 'load',
         }
 hr_employee_force_hour()

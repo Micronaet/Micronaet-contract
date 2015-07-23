@@ -15,8 +15,8 @@
                    <newline />
 
                    <button string="Cancel" special="cancel" colspan="1"/>
-                   <button name="load_button" type="object" string="Load current" icon="mail-forward" colspan="1" attrs="{'invisible':[('operation','=','load')]}"/>
-                   <button name="force_button" type="object" string="Force" icon="gtk-jump-to-ltr" colspan="1" attrs="{'invisible':[('operation','!=','load')]}"/>
+                   <button name="load_button" type="object" string="Load current" icon="mail-forward" colspan="1" attrs="{'invisible':[('operation','!=','load')]}"/>
+                   <button name="force_button" type="object" string="Force" icon="gtk-jump-to-ltr" colspan="1" attrs="{'invisible':[('operation','=','load')]}"/>
                 </form>
             </field>
       </record>
@@ -33,7 +33,7 @@
       <menuitem action="hr_employee_force_hour_wizard_action" 
                 id="contract_report_intervent_wizard_root_menuitem" 
                 sequence="10"
-                parent="hr_employee_hour_cost_menuitem"
+                parent="contract_report_force_root_menuitem"
                 groups="analytic.group_analytic_accounting"
                 icon="STOCK_EXECUTE" />
     </data>

@@ -212,10 +212,10 @@ class hr_employee_hour_cost(osv.osv):
     """    
     _name = 'hr.employee.hour.cost'
     _description = 'Employee load hour cost'
-    _rec_name = 'employee_id'
+    _rec_name = 'product_id'
 
     
-    def load_all_employee(cr, uid, context=None):
+    def load_all_employee(self, cr, uid, context=None):
         ''' Load all active employee, during operazion crete if not present
             Reference product (or linked) without associate, after a wizard do
             the magic 
@@ -227,7 +227,6 @@ class hr_employee_hour_cost(osv.osv):
         # ---------------------------------------------------------------------
         # Load new list:
         # ---------------------------------------------------------------------
-        
         employee_pool = self.pool.get('hr.employee')
         employee_ids = employee_pool.search(cr, uid, [
             ('active', '=', True)], context=None)
@@ -238,47 +237,50 @@ class hr_employee_hour_cost(osv.osv):
             ('product_employee_id', '!=', False)], context=None)
         products = {}
         costs = {}
+        default_cost = 10.0 # TODO parametrize
         for product in product_pool.browse(
                 cr, uid, product_ids, context=context):    
             # Save id and price:
             products[product_employee_id] = product.id
             costs[product_employee_id] = product.standard_price, 
-        
+
         for employee in employee_pool.browse(
                 cr, uid, employee_ids, context=context):
             if employee.id in products:
                 new = True
             else:
-                hour_id = False # TODO
-                categ_id = False # TODO
+                hour_id = 4 # TODO
+                categ_id = 1 # TODO
                 new = True
                 
                 # Create product element (not associate)
-                products[employee.id] = employee_pool.create(cr, uid, {
-                    'name': 'Hour cost: %s' % employee.name,
+                costs[employee.id] = 0.0        
+                products[employee.id] = product_pool.create(cr, uid, {
+                    'name': 'Hour cost: %s' % employee.id,
                     'type': 'service',
-                    #'procure_method':, # product tto stock
+                    'procure_method': 'make_to_stock',
                     'supply_method': 'buy',
-                    #'uom_id': hour_id,
-                    #'uom_po_id': hour_id,
+                    'uom_id': hour_id,
+                    'uom_po_id': hour_id,
                     'cost_method': 'standard',
-                    'standard_price': 0.0,
+                    'standard_price': default_cost,
+                    'uos_coeff': 1.0,
                     'mes_type': 'fixed',
-                    #'categ_id': categ_id,
+                    'categ_id': categ_id,
                     'product_employee_id': employee.id,
                     'sale_ok': True,
                     'purchase_ok': True,
                     'is_hour_cost': True,
                     }, context=context)
-                        
-                products[employee.id] = 0.0        
-                    
-            self.create(cr, uid, {
-                'product_id': products[employee.id],
+                
+            data = {
                 'employee_id': employee.id,
-                'hour_cost': hour_cost[employee.id],
+                'product_id': products[employee.id],
                 'new': new,
-                }, context=context)        
+                'hour_cost': costs[employee.id] or default_cost,
+                'hour_cost_new': costs[employee.id] or default_cost,
+                }         
+            self.create(cr, uid, data, context=context)        
         return {}
         
     _columns = {
@@ -286,9 +288,8 @@ class hr_employee_hour_cost(osv.osv):
         'product_id': fields.many2one('product.product', 'Product'),
         'new': fields.boolean('New product'),
         'hour_cost': fields.float('Current hour cost', digits=(16, 2)),
-        'hour_cost_new': fields.float('New hour cost', digits=(16, 2), 
-            required=True), # only this is user data!
-        }     
+        'hour_cost_new': fields.float('New hour cost', digits=(16, 2)),
+        }
 hr_employee_hour_cost()
 
 class hr_employee_force_log(osv.osv):
@@ -297,7 +298,7 @@ class hr_employee_force_log(osv.osv):
     
     _name = 'hr.employee.force.log'
     _description = 'Employee force log'
-    _rec_name = 'from_date'
+    _rec_name = 'name'
 
     def log_operation(self, cr, uid, from_date, context=None):    
         ''' Create new record with log of new price se for employee and date
@@ -315,13 +316,14 @@ class hr_employee_force_log(osv.osv):
                 )
         return self.create(cr, uid, {
             #date
-            'name': wiz_proxy.name or 'Forced from date: %s' % from_date,
+            'name': wiz_proxy.name or _(
+                'Forced costsfrom date: %s') % from_date,
             'from_date': from_date,
             'note': note,
             }, context=context)        
         
     _columns = {
-        'name': fields.char('Description', required=True),
+        'name': fields.char('Description', size=80),
         'date': fields.datetime('Date operation'),
         'from_date': fields.date('From date', 
             help='All intervent from this date will use new value'),
