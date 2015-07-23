@@ -431,11 +431,8 @@ class account_analytic_expense(osv.osv):
                         'amount': amount,
                         'user_id': uid,
                         'name': name_mask % (
-                            entry.causal,
-                            entry.series,
-                            entry.number,
-                            entry.name,
-                            ),
+                            entry.causal, entry.series, entry.number, 
+                            entry.name, ),
                         'unit_amount': 1.0,
                         # TODO change with one period date (in range)
                         'account_id': account_id,
