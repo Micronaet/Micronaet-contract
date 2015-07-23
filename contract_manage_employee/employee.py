@@ -194,14 +194,95 @@ class product_product(osv.osv):
     _inherit = 'product.product'
 
     _columns = {
-        'product_user_id': fields.many2one(
-            'res.users', 'User linked', 
-            help='Product as hour cost for selected user'),
+        'product_employee_id': fields.many2one(
+            'hr.employee', 'Employee linked', 
+            help='Product as hour cost for selected employee'),
         }
     _defaults = {
-        'product_user_id': lambda *x: False,
+        'product_employee_id': lambda *x: False,
         }    
      
 product_product()        
+
+class hr_employee_hour_cost(osv.osv):
+    """ Temporary zone for create a list of employee, set product and force 
+        update of product on OpenERP and analytic line value
+    """    
+    _name = 'hr.employee.hour.cost'
+    _description = 'Employee load hour cost'
+
+    
+    def load_all_employee(cr, uid, context=None):
+        ''' Load all active employee, during operazion crete if not present
+            Reference product (or linked) without associate, after a wizard do
+            the magic 
+        '''
+        # Remove current list:
+        current_ids = self.search(cr, uid, [], context=context)
+        self.unlink(cr, uid, current_ids, context=context)
+
+        # ---------------------------------------------------------------------
+        # Load new list:
+        # ---------------------------------------------------------------------
+        
+        employee_pool = self.pool.get('hr.employee')
+        employee_ids = employee_pool.search(cr, uid, [
+            ('active', '=', True)], context=None)
+            
+        # Load before all product employee list (to know if neet do be created)    
+        product_pool = self.pool.get('product.product')
+        product_ids = product_pool.search(cr, uid, [
+            ('product_employee_id', '!=', False)], context=None)
+        products = {}
+        costs = {}
+        for product in product_pool.browse(
+                cr, uid, product_ids, context=context):    
+            products[product_employee_id] = product.id, 
+                product.standard_price) # save ID and cost
+            costs[product_employee_id] = product.standard_price, 
+        
+        for employee in employee_pool.browse(
+                cr, uid, employee_ids, context=context):
+            if employee.id not in products:
+                hour_id = False # TODO
+                categ_id = False # TODO
+                
+                # Create product element (not associate)
+                products[employee.id] = employee_pool.create(cr, uid, {
+                        'name': 'Hour cost: %s' % employee.name,
+                        'type': 'service',
+                        'procure_method':, # produc tto stock
+                        'supply_method': 'buy',
+                        'uom_id': hour_id,
+                        'uom_po_id': hour_id,
+                        'cost_method': 'standard',
+                        'standard_price': 0.0,
+                        'mes_type': 'fixed',
+                        #'categ_id': categ_id,
+                        'product_employee_id': employee.id,
+                        'sale_ok': True,
+                        'purchase_ok': True,
+                        'is_hour_cost': True,
+                        }, context=context)
+                        
+                products[employee.id] = 0.0        
+                    
+            self.create(cr, uid, {
+                'product_id': products[employee.id],
+                'employee_id': employee.id,
+                'hour_cost': hour_cost[employee.id],
+                }, context=context)    
+        
+        return {}
+        
+    _columns = {
+        'employee_id': fields.many2one('hr.employee', 'Employee',
+            required=True),
+        'product_id': fields.many2one('product.product', 'Product',
+            required=True),
+        'hour_cost': fields.float('Hour cost', digits=(16, 2), required=True),
+        }
+     
+hr_employee_hour_cost()
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
