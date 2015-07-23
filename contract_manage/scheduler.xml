@@ -11,7 +11,8 @@
 			<field eval="5" name="priority"/>
 			<field eval="0" name="doall"/>
 			<field eval="1" name="active"/>
-			<field name="args">('~/etl/analitic.CMP', ';', 0, 100, ['1', '40', '90'], '410100')</field>
+			<!--File; separator; header; verbose; general department; jump department; general account code;-->
+			<field name="args">('~/etl/analitic.CMP', ';', 0, 100, [], ['40'], '410100')</field>
 			<field eval="1" name="interval_number"/>
 			<field eval="&quot;&quot;&quot;account.analytic.expense&quot;&quot;&quot;" name="model"/>
 		</record>

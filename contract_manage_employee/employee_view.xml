@@ -177,6 +177,7 @@
         <field name="arch" type="xml">
            <tree string="Expense" colors="blue:new==True" editable="bottom">
                 <field name="employee_id" readonly="1"/>
+                <field name="current_product_id" readonly="1"/>
                 <field name="product_id" readonly="1"/>
                 <field name="hour_cost" readonly="1"/>
                 <field name="hour_cost_new"/>
@@ -191,6 +192,7 @@
         <field name="arch" type="xml">
            <form string="Expense">
                 <field name="employee_id" readonly="1"/>
+                <field name="current_product_id" readonly="1"/>
                 <field name="product_id" readonly="1"/>
                 <field name="hour_cost" readonly="1"/>
                 <field name="hour_cost_new"/>

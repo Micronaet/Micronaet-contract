@@ -278,6 +278,7 @@ class hr_employee_hour_cost(osv.osv):
             data = {
                 'employee_id': employee.id,
                 'product_id': products[employee.id],
+                'current_product_id': employee.product_id.id,
                 'new': new,
                 'hour_cost': costs[employee.id] or default_cost,
                 'hour_cost_new': costs[employee.id] or default_cost,
@@ -287,6 +288,8 @@ class hr_employee_hour_cost(osv.osv):
         
     _columns = {
         'employee_id': fields.many2one('hr.employee', 'Employee'),
+        'current_product_id': fields.many2one('product.product', 
+            'Current product'),
         'product_id': fields.many2one('product.product', 'Product'),
         'new': fields.boolean('New product'),
         'hour_cost': fields.float('Current hour cost', digits=(16, 2)),
