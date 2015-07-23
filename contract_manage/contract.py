@@ -396,11 +396,16 @@ class account_analytic_expense(osv.osv):
                                     contract_item.code) 
                                     
                     # Calculate average depend on amount / amount total                
+                    if not tot:
+                        _logger.error('All contract has 0 amount')
+                        continue # next movement!
+                        
                     rate = entry.amount / tot 
                     for contract_id, total in contract_new.iteritems():
                         contract_new[contract_item.id] *= rate
                 else: # error
                     _logger.error('Average method error: %s' % average_method)
+                    return False # exit import procedure
                             
             elif entry.split_type == 'contract': # use dict record
                 name_mask = _('Ref. %s/%s:%s [#%s]')
