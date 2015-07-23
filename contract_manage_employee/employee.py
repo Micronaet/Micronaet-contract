@@ -241,37 +241,40 @@ class hr_employee_hour_cost(osv.osv):
         for product in product_pool.browse(
                 cr, uid, product_ids, context=context):    
             # Save id and price:
-            products[product_employee_id] = product.id
-            costs[product_employee_id] = product.standard_price, 
+            products[product.product_employee_id.id] = product.id
+            costs[product.product_employee_id.id] = product.standard_price 
 
         for employee in employee_pool.browse(
                 cr, uid, employee_ids, context=context):
+            hour_id = 4 # TODO
+            categ_id = 1 # TODO
+            data = {
+                'name': 'Hour cost: %s' % employee.name,
+                'type': 'service',
+                'procure_method': 'make_to_stock',
+                'supply_method': 'buy',
+                'uom_id': hour_id,
+                'uom_po_id': hour_id,
+                'cost_method': 'standard',
+                'standard_price': default_cost,
+                'uos_coeff': 1.0,
+                'mes_type': 'fixed',
+                'categ_id': categ_id,
+                'product_employee_id': employee.id,
+                'sale_ok': True,
+                'purchase_ok': True,
+                'is_hour_cost': True,
+                }    
             if employee.id in products:
-                new = True
+                new = False
+                product_pool.write( # TODO remove?
+                    cr, uid, products[employee.id], data, context=context)
             else:
-                hour_id = 4 # TODO
-                categ_id = 1 # TODO
-                new = True
-                
+                new = True                
                 # Create product element (not associate)
                 costs[employee.id] = 0.0        
-                products[employee.id] = product_pool.create(cr, uid, {
-                    'name': 'Hour cost: %s' % employee.id,
-                    'type': 'service',
-                    'procure_method': 'make_to_stock',
-                    'supply_method': 'buy',
-                    'uom_id': hour_id,
-                    'uom_po_id': hour_id,
-                    'cost_method': 'standard',
-                    'standard_price': default_cost,
-                    'uos_coeff': 1.0,
-                    'mes_type': 'fixed',
-                    'categ_id': categ_id,
-                    'product_employee_id': employee.id,
-                    'sale_ok': True,
-                    'purchase_ok': True,
-                    'is_hour_cost': True,
-                    }, context=context)
+                products[employee.id] = product_pool.create(
+                    cr, uid, data, context=context)
                 
             data = {
                 'employee_id': employee.id,
@@ -279,7 +282,7 @@ class hr_employee_hour_cost(osv.osv):
                 'new': new,
                 'hour_cost': costs[employee.id] or default_cost,
                 'hour_cost_new': costs[employee.id] or default_cost,
-                }         
+                }   
             self.create(cr, uid, data, context=context)        
         return {}
         

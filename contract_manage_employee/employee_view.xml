@@ -223,21 +223,29 @@
                 <field name="from_date"/>
             </tree>
        </field>
-   </record>
+    </record>
     <record id="view_hr_employee_force_log_form" model="ir.ui.view">
         <field name="name">Hour cost change log</field>
         <field name="model">hr.employee.force.log</field>
         <field name="type">form</field>
         <field name="arch" type="xml">
            <form string="Change log costs">
-                <field name="name" />
-                <field name="date" />
-                <field name="from_date" />
-                <separator string="Note" colspan="4" />
-                <field name="note" colspan="4" nolabel="1"/>
+                <field name="name" readonly="1"/>
+                <field name="date" readonly="1"/>
+                <field name="from_date" readonly="1" />
+                <notebook colspan="4"> 
+                    <page string="Note">
+                        <separator string="Note" colspan="4" />
+                        <field name="note" colspan="4" nolabel="1" readonly="1"/>                    
+                    </page>
+                    <page string="Analytic line">
+                        <separator string="Update lines" colspan="4" />
+                        <field name="line_ids" colspan="4" nolabel="1" readonly="1"/> 
+                    </page>
+                </notebook>
             </form>
        </field>
-   </record>
+    </record>
     <record id="action_hr_employee_force_log" model="ir.actions.act_window">
         <field name="name">Log cost change</field>
         <field name="type">ir.actions.act_window</field>
