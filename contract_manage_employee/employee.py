@@ -168,7 +168,8 @@ class hr_employee_extra(osv.osv):
         '''
         #TODO finirla
         user_pool = self.pool.get("res.users")
-        employee_proxy=self.browse(cr, uid, self.search(cr, uid, [], context=context))
+        employee_proxy=self.browse(cr, uid, self.search(
+            cr, uid, [], context=context))
         
         for employee in employee_proxy:
             if employee.user_id and employee.department_id:                
@@ -211,6 +212,7 @@ class hr_employee_hour_cost(osv.osv):
     """    
     _name = 'hr.employee.hour.cost'
     _description = 'Employee load hour cost'
+    _rec_name = 'employee_id'
 
     
     def load_all_employee(cr, uid, context=None):
@@ -238,33 +240,36 @@ class hr_employee_hour_cost(osv.osv):
         costs = {}
         for product in product_pool.browse(
                 cr, uid, product_ids, context=context):    
-            products[product_employee_id] = product.id, 
-                product.standard_price) # save ID and cost
+            # Save id and price:
+            products[product_employee_id] = product.id
             costs[product_employee_id] = product.standard_price, 
         
         for employee in employee_pool.browse(
                 cr, uid, employee_ids, context=context):
-            if employee.id not in products:
+            if employee.id in products:
+                new = True
+            else:
                 hour_id = False # TODO
                 categ_id = False # TODO
+                new = True
                 
                 # Create product element (not associate)
                 products[employee.id] = employee_pool.create(cr, uid, {
-                        'name': 'Hour cost: %s' % employee.name,
-                        'type': 'service',
-                        'procure_method':, # produc tto stock
-                        'supply_method': 'buy',
-                        'uom_id': hour_id,
-                        'uom_po_id': hour_id,
-                        'cost_method': 'standard',
-                        'standard_price': 0.0,
-                        'mes_type': 'fixed',
-                        #'categ_id': categ_id,
-                        'product_employee_id': employee.id,
-                        'sale_ok': True,
-                        'purchase_ok': True,
-                        'is_hour_cost': True,
-                        }, context=context)
+                    'name': 'Hour cost: %s' % employee.name,
+                    'type': 'service',
+                    #'procure_method':, # product tto stock
+                    'supply_method': 'buy',
+                    #'uom_id': hour_id,
+                    #'uom_po_id': hour_id,
+                    'cost_method': 'standard',
+                    'standard_price': 0.0,
+                    'mes_type': 'fixed',
+                    #'categ_id': categ_id,
+                    'product_employee_id': employee.id,
+                    'sale_ok': True,
+                    'purchase_ok': True,
+                    'is_hour_cost': True,
+                    }, context=context)
                         
                 products[employee.id] = 0.0        
                     
@@ -272,12 +277,14 @@ class hr_employee_hour_cost(osv.osv):
                 'product_id': products[employee.id],
                 'employee_id': employee.id,
                 'hour_cost': hour_cost[employee.id],
+                'new': new,
                 }, context=context)        
         return {}
         
     _columns = {
         'employee_id': fields.many2one('hr.employee', 'Employee'),
         'product_id': fields.many2one('product.product', 'Product'),
+        'new': fields.boolean('New product'),
         'hour_cost': fields.float('Current hour cost', digits=(16, 2)),
         'hour_cost_new': fields.float('New hour cost', digits=(16, 2), 
             required=True), # only this is user data!
@@ -290,8 +297,9 @@ class hr_employee_force_log(osv.osv):
     
     _name = 'hr.employee.force.log'
     _description = 'Employee force log'
+    _rec_name = 'from_date'
 
-    def log_operation(cr, uid, from_date, context=context):    
+    def log_operation(self, cr, uid, from_date, context=None):    
         ''' Create new record with log of new price se for employee and date
             of intervent update (in analytic lines)
             Return line (to save in analytic modification)
@@ -319,8 +327,9 @@ class hr_employee_force_log(osv.osv):
         }
 
     _defaults = {
-        'date': lambda *x: datetime.now().strftime('%Y-%m-%d %H:%M:%S),
-        }    
+        'date': lambda *x: datetime.now().strftime('%Y-%m-%d %H:%M:%S'),
+        'from_date': lambda *x: datetime.now().strftime('%Y-%m-%d'),
+        }
 hr_employee_force_log()
 
 class account_analytic_line(osv.osv):
@@ -345,5 +354,5 @@ class hr_employee_force_log(osv.osv):
         'line_ids': fields.one2many('account.analytic.line', 'update_log_id',
             'Line update from this log'),
         }
-hr_employee_force_log(
+hr_employee_force_log()
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

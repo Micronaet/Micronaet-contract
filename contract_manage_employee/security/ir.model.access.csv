@@ -2,5 +2,6 @@
 "access_contract_employee_timesheet_tipology_user","contract.employee.timesheet.tipology","model_contract_employee_timesheet_tipology","base.group_user",1,1,1,1
 "access_contract_employee_timesheet_tipology_line_user","contract.employee.timesheet.tipology.line","model_contract_employee_timesheet_tipology_line","base.group_user",1,1,1,1
 "access_contract_employee_festivity_user","contract.employee.festivity","model_contract_employee_festivity","base.group_user",1,1,1,1
-
+"access_hr_employee_hour_cost_user","hr.employee.hour.cost","model_hr_employee_hour_cost","base.group_user",1,1,1,1
+"access_hr_employee_force_log_user","hr.employee.force.log","model_hr_employee_force_log","base.group_user",1,1,1,1
 

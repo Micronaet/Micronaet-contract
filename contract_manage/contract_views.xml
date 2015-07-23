@@ -1067,6 +1067,82 @@
         <field name="help">Expense list </field>
     </record>
 
+    <!--hr.employee.hour.cost-->
+    <record id="view_hr_employee_hour_cost_tree" model="ir.ui.view">
+        <field name="name">Hour cost for employee</field>
+        <field name="model">hr.employee.hour.cost</field>
+        <field name="type">tree</field>
+        <field name="arch" type="xml">
+           <tree string="Expense" colors="blue:split_type=='department';green:split_type=='all'">
+                <field name="name"/>
+                <field name="date"/>
+                <field name="code_id"/>
+                <field name="amount"/>
+                <field name="note"/>
+                <field name="causal"/>
+                <field name="series"/>
+                <field name="number"/>
+                <field name="date_to"/>
+                <field name="date_from"/>
+                <field name="year"/>
+                <field name="split_type"/>
+                <field name="department_id"/>
+            </tree>
+       </field>
+   </record>
+
+   <record id="view_account_analytic_expense_form" model="ir.ui.view">
+       <field name="name">Expense form</field>
+       <field name="model">account.analytic.expense</field>
+       <field name="type">form</field>
+       <field name="arch" type="xml">
+           <form string="Expense">
+                <field name="name" readonly="1"/>
+                <field name="date" readonly="1"/>
+                
+                <field name="causal" readonly="1"/>
+                <field name="series" readonly="1"/>
+                
+                <field name="number" readonly="1"/>
+                <field name="year" readonly="1"/>
+                
+                <field name="date_to" readonly="1"/>
+                <field name="date_from" readonly="1"/>
+                
+                <field name="amount" readonly="1"/>
+                <field name="code_id" readonly="1"/>
+
+                <field name="split_type" readonly="1"/>
+                <field name="department_id" widget="selection" readonly="1"/>
+                <!--<field name="note"/>-->
+                
+                <field name="analytic_line_ids" nolabel="1" colspan="4" readonly="1">
+                    <tree string="Analytic line">
+                        <field name="name" />
+                        <field name="date" />
+                        <field name="journal_id" />
+                        <field name="account_id" />
+                        <field name="general_account_id" />
+                        <field name="amount" sum="total"/>
+                    </tree>
+                </field>
+            </form>
+       </field>
+    </record>    
+
+    <record id="action_account_analytic_expense" model="ir.actions.act_window">
+        <field name="name">Expense list</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">account.analytic.expense</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field> <!--TODO calendar ?? -->
+        <field name="view_id" ref="view_account_analytic_expense_tree"/>
+        <field name="search_view_id" ref="view_account_analytic_expense_search"/>
+        <field name="context">{}</field>
+        <field name="domain">[]</field>
+        <field name="help">Expense list </field>
+    </record>
+
     <!-- MENUITEM -->
    <menuitem id="menu_contract_manage_root"
              name="Contract Manage"

@@ -108,7 +108,7 @@ class hr_employee_force_hour(osv.osv_memory):
         return True # or view?
 
     _columns = {
-        'date': fields.date('From date', 
+        'from_date': fields.date('From date', 
             help='Choose the date, every intervent from that date take costs'),
         'operation': fields.selection([
             ('load', 'Load current'),
