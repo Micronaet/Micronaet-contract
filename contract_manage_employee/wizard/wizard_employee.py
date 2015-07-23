@@ -102,10 +102,10 @@ class hr_employee_force_hour(osv.osv_memory):
                     for line in line_pool.browse(
                             cr, uid, line_ids, context=context):    
                         line_pool.write(cr, uid, line_ids, {
-                            'unit_amount': cost.hour_cost_new,
                             'amount': -cost.hour_cost_new * line.unit_amount,
                             'update_log_id': update_log_id,
                             'product_id': cost.product_id.id, 
+                            #'unit_amount': cost.hour_cost_new,
                             # total?
                             }, context=context)
             except:
