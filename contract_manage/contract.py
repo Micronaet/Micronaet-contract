@@ -384,7 +384,7 @@ class account_analytic_expense(osv.osv):
                 elif average_method == 'amount':
                     contract_new = {}
                     tot = 0.0
-                    for contract_item in account_pool.browse(
+                    for contract_item in contract_pool.browse(
                             cr, uid, open_contract_ids, context=context):
                         if contract_item.total_amount > 0.0:
                             tot += contract_item.total_amount
