@@ -21,8 +21,9 @@
 ###############################################################################
 
 
-from osv import osv, fields
 import time 
+from datetime import datetime
+from osv import osv, fields
 from tools.translate import _
 
 # python represent weekday starting from 0 = Monday
@@ -276,13 +277,74 @@ class hr_employee_hour_cost(osv.osv):
         return {}
         
     _columns = {
-        'employee_id': fields.many2one('hr.employee', 'Employee',
-            required=True),
-        'product_id': fields.many2one('product.product', 'Product',
-            required=True),
-        'hour_cost': fields.float('Hour cost', digits=(16, 2), required=True),
-        }
-     
+        'employee_id': fields.many2one('hr.employee', 'Employee'),
+        'product_id': fields.many2one('product.product', 'Product'),
+        'hour_cost': fields.float('Current hour cost', digits=(16, 2)),
+        'hour_cost_new': fields.float('New hour cost', digits=(16, 2), 
+            required=True), # only this is user data!
+        }     
 hr_employee_hour_cost()
 
+class hr_employee_force_log(osv.osv):
+    """ Object that log all force operations
+    """    
+    
+    _name = 'hr.employee.force.log'
+    _description = 'Employee force log'
+
+    def log_operation(cr, uid, from_date, context=context):    
+        ''' Create new record with log of new price se for employee and date
+            of intervent update (in analytic lines)
+            Return line (to save in analytic modification)
+        '''
+        cost_pool = self.pool.get('hr.employee.hour.cost')
+        cost_ids = cost_pool.search(cr, uid, [], context=context)
+        note = ''
+        for cost in cost_pool.browse(cr, uid, cost_ids, context=context):
+            note = _('%s hour cost %s >> %s\n') % (
+                cost.employee.name,
+                cost.hour_cost,
+                cost.hour_cost_new,
+                )
+        return self.create(cr, uid, {
+            #date
+            'from_date': from_date,
+            'note': note,
+            }, context=context)        
+        
+    _columns = {
+        'date': fields.datetime('Date operation'),
+        'from_date': fields.date('From date', 
+            help='All intervent from this date will use new value'),
+        'note': fields.text('Note'),
+        }
+
+    _defaults = {
+        'date': lambda *x: datetime.now().strftime('%Y-%m-%d %H:%M:%S),
+        }    
+hr_employee_force_log()
+
+class account_analytic_line(osv.osv):
+    """ Auto update record (save element for get list)
+    """    
+    
+    _inherit = 'account.analytic.line'
+
+    _columns = {
+        'update_log_id': fields.many2one(
+            'hr.employee.force.log', 'Auto update'),        
+        }
+account_analytic_line()
+
+class hr_employee_force_log(osv.osv):
+    """ Update log with *many relation fileds
+    """    
+    
+    _inherit = 'hr.employee.force.log'
+    
+    _columns = {
+        'line_ids': fields.one2many('account.analytic.line', 'update_log_id',
+            'Line update from this log'),
+        }
+hr_employee_force_log(
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<openerp>
+    <data>
+       <!-- contract.report.intervent.wizard -->
+       <record id="contract_report_intervent_wizard" model="ir.ui.view">
+            <field name="name">Intervent wizard</field>
+            <field name="model">contract.report.intervent.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Intervent report">
+                   <field name="mode"/>
+                   <field name="absence_account_id" domain="[('not_working','=',True)]" attrs="{'invisible':[('mode','!=','absence')]}"/> 
+                   <newline />
+                   
+                   <field name="all"/>
+                   <field name="department_id" attrs="{'invisible':[('all','=',True)],'required':[('all','=',False)]}" widget="selection" />
+                   <field name="month"/>
+                   <field name="year"/>
+                   <newline />
+
+                   <button string="Cancel" special="cancel" colspan="2"/>                   
+                   <button name="print_invoice" type="object" string="Print" icon="gtk-print" colspan="2" />
+                </form>
+            </field>
+      </record>
+
+      <record id="contract_report_intervent_wizard_action" model="ir.actions.act_window">
+        <field name="name">Intervent wizard</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">contract.report.intervent.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+      </record>
+      <record id="contract_report_intervent_dept_wizard_action" model="ir.actions.act_window">
+        <field name="name">Intervent per dept. wizard</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">contract.report.intervent.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="context">{'default_all':False,'default_department_id':department_id}</field>        
+        <field name="target">new</field>
+      </record>
+
+      <menuitem id="contract_report_intervent_wizard_root_menuitem" 
+                sequence="10"
+                name="Intervent"
+                parent="menu_reports_root"
+                groups="analytic.group_analytic_accounting,contract_manage.group_contract_department_manager"
+                icon="STOCK_EXECUTE" />
+
+          <menuitem action="contract_report_intervent_wizard_action" 
+                    id="contract_report_intervent_wizard_menuitem" 
+                    sequence="10"
+                    parent="contract_report_intervent_wizard_root_menuitem"
+                    groups="analytic.group_analytic_accounting"
+                    icon="STOCK_EXECUTE" />
+
+          <menuitem action="contract_report_intervent_dept_wizard_action" 
+                    id="contract_report_intervent_dept_wizard_menuitem" 
+                    sequence="20"
+                    parent="contract_report_intervent_wizard_root_menuitem"
+                    groups="contract_manage.group_contract_department_manager"
+                    icon="STOCK_EXECUTE" />
+
+       <!-- contract.department.report.wizard -->
+       <record id="contract_department_report_wizard" model="ir.ui.view">
+            <field name="name">Contract list wizard</field>
+            <field name="model">contract.department.report.wizard</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                <form string="Contract per dept. report">
+                   <separator string="Report mode:"/> <!-- all -->
+                   <field name="mode" nolabel="1"/>
+                   <newline />
+                   
+                   <!-- only detailed -->
+                   <group colspan="4" col="8" attrs="{'invisible':[('mode','!=','detailed')]}"> 
+                      <separator string="Filter: Parameter for detailed report" colspan="8"/>
+                      <field name="hour"/>
+                      <field name="cost"/>
+                      <field name="invoice"/>
+                      <field name="supplier"/>
+                   </group>   
+
+                   <!-- only summary --> 
+                   <group colspan="4" col="4" attrs="{'invisible':[('mode','!=','summary')]}"> 
+                      <separator string="Filter: Parameter for summary report" colspan="4" />
+                   </group> 
+                   
+                   <!-- summary and detailed -->
+                   <group col="6" colspan="4"  attrs="{'invisible':[('mode','=','list')]}"> 
+                      <field name="start_date" attrs="{'required':[('mode','=','detailed'),('active_contract','=',True)]}"/>
+                      <field name="end_date"   attrs="{'required':[('mode','=','detailed'),('active_contract','=',True)]}"/>
+                      <field name="date_summary" attrs="{'invisible':[('mode','!=','detailed')]}"/>
+                   </group>   
+                   
+                   <!-- list and detailed -->
+                   <group colspan="4" col="10" attrs="{'invisible':[('mode','=','summary')]}"> 
+                      <separator string="Filter: Contract" colspan="10" />
+                      
+                      <field name="all_contract" colspan="2" attrs="{'readonly':[('mode','=','detailed'),('active_contract','=',True)]}"/>
+                      <field name="active" colspan="2" attrs="{'invisible':[('mode','!=','list')]}"/>
+                      <field name="active_contract" colspan="2" attrs="{'invisible':['|',('mode','=','list'),('all_contract','=',False)]}"/>
+                      <field name="contract_id" attrs="{'invisible':[('all_contract','=',True)],'required':[('all_contract','=',False)]}" domain="[('not_working','=',False)]" colspan="7"/>
+                   </group>
+
+                   <!-- not check 'all contract' or summary -->
+                   <group colspan="4" col="10" attrs="{'invisible':[('all_contract','=',False)]}" >
+                      <separator string="Filter: Department" colspan="10"/>
+                      <field name="all" colspan="2"/>
+                      <field name="department_id" attrs="{'invisible':[('all','=',True)],'required':[('all_contract','=',True),('all','=',False)]}" widget="selection" colspan="7"/>
+                   </group>   
+
+                   <!-- all -->
+                   <group colspan="4" col="6">
+                     <button string="Cancel" special="cancel" colspan="3"/>
+                     <button name="print_invoice" type="object" string="Print" icon="gtk-print" colspan="3" />
+                   </group>
+
+                </form>
+            </field>
+      </record>
+
+      <record id="contract_department_report_wizard_action" model="ir.actions.act_window">
+        <field name="name">Contract list wizard</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">contract.department.report.wizard</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">form</field>
+        <field name="target">new</field>
+      </record>
+
+      <menuitem action="contract_department_report_wizard_action" 
+                    id="contract_department_report_wizard_menuitem" 
+                    sequence="20"
+                    groups="analytic.group_analytic_accounting"
+                    parent="menu_reports_root"
+                    icon="STOCK_EXECUTE" />                    
+    </data>
+</openerp>

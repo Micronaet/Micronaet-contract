@@ -45,6 +45,7 @@
         'security/ir.model.access.csv',
         'employee_view.xml',
         'data/festivity.xml',
+        'wizard/wizard_employee_views.xml',
         ],
     'demo_xml': [],
     'active': False, 
