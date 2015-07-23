@@ -25,9 +25,14 @@
 #
 ##############################################################################
 
+import os
+import sys
+import logging
 from osv import osv, fields
-from datetime import datetime
+from datetime import datetime, timedelta
 
+
+_logger = logging.getLogger(__name__)
 
 class hr_employee_force_hour(osv.osv_memory):
     ''' Load elements and force hour cost in employee update analytic lines
@@ -49,7 +54,7 @@ class hr_employee_force_hour(osv.osv_memory):
         ''' Force button update records
         ''' 
         wiz_proxy = self.browse(cr, uid, ids)[0]
-        
+
         # Pools used:
         cost_pool = self.pool.get('hr.employee.hour.cost')
         product_pool = self.pool.get('product.product')
@@ -62,48 +67,56 @@ class hr_employee_force_hour(osv.osv_memory):
         # ---------------
         # Note: Logged before for get ID
         update_log_id = log_pool.log_operation(
-            cr, uid, wiz_proxy.from_date, context=context)
+            cr, uid, wiz_proxy.name, wiz_proxy.from_date, context=context)
 
         cost_ids = cost_pool.search(cr, uid, [], context=context)
         # TODO filter new = old?
+        current_ids = cost_pool.search(cr, uid, [], context=context)
         for cost in cost_pool.browse(cr, uid, cost_ids, context=context):
-            # ---------------------------------------------
-            # Force product to employee (for new creations):
-            # ---------------------------------------------
-            # TODO optimize for crete update only new product
-            employee_pool.write(cr, uid, cost.employee.id, {
-                'product_id': cost.product_id.id,
-                }, context=context)            
+            try:
+                # ---------------------------------------------
+                # Force product to employee (for new creations):
+                # ---------------------------------------------
+                # TODO optimize for crete update only new product
+                employee_pool.write(cr, uid, cost.employee_id.id, {
+                    'product_id': cost.product_id.id,
+                    }, context=context)            
 
-            # -----------------------------
-            # Force new product hour costs:
-            # -----------------------------        
-            if cost.hour_cost != cost.hour_cost_new:
-                # if different update product record
+                # -----------------------------
+                # Force new product hour costs:
+                # -----------------------------        
                 product_pool.write(cr, uid, cost.product_id.id, {
                     'standard_price': cost.hour_cost_new
                     }, context=context)
-                    
-                # ------------------------------------------------
-                # Update analytic lines save log operation parent:
-                # ------------------------------------------------
-                line_ids = line_pool.search(cr, uid, [
-                    ('user_id', '=', cost.employee_id.user_id.id), # TODO test
-                    ('date', '>=', cost.from_date),
-                    ], context=context)
-                # loop cause total calculation value:
-                for line in line_pool.browse(
-                        cr, uid, line_ids, context=context):    
-                    line_pool.write(cr, uid, line_ids, {
-                        'unit_amount': cost.hour_cost_new,
-                        'amount': cost.hour_cost_new * line.unit_amount,
-                        'update_log_id': update_log_id,
-                        # total?
-                        }, context=context)
-        # ------------------
-        # Remove all record:
-        # ------------------
-        current_ids = cost_pool.search(cr, uid, [], context=context)
+                
+                if abs(cost.hour_cost - cost.hour_cost_new) >= 0.01 : # TODO approx
+                    # ------------------------------------------------
+                    # Update analytic lines save log operation parent:
+                    # ------------------------------------------------
+                    line_ids = line_pool.search(cr, uid, [
+                        ('user_id', '=', cost.employee_id.user_id.id), # TODO test
+                        ('date', '>=', wiz_proxy.from_date),
+                        ], context=context)
+                        
+                    # loop cause total calculation value:
+                    for line in line_pool.browse(
+                            cr, uid, line_ids, context=context):    
+                        line_pool.write(cr, uid, line_ids, {
+                            'unit_amount': cost.hour_cost_new,
+                            'amount': -cost.hour_cost_new * line.unit_amount,
+                            'update_log_id': update_log_id,
+                            'product_id': cost.product_id.id, 
+                            # total?
+                            }, context=context)
+            except:
+                _logger.error('Emploee update: %s' % cost.employee_id.name)
+                _logger.error(sys.exc_info(), )
+                current_ids.remove(cost.id) # not update (remain)
+                continue
+                            
+        # -------------------------------------
+        # Remove all record (update correctly):
+        # -------------------------------------
         cost_pool.unlink(cr, uid, current_ids, context=context)
             
         return True # or view?
@@ -116,6 +129,7 @@ class hr_employee_force_hour(osv.osv_memory):
             ('load', 'Load current'),
             ('absence', 'Force update'),
             ], 'Operation', select=True, required=True),
+        # TODO department load (separate?)    
         }    
         
     _defaults = {

@@ -88,7 +88,6 @@ class contract_employee_festivity(osv.osv):
     _name = 'contract.employee.festivity'
     _description = 'Contract festivity'
     
-    import time
     # TODO: function for compute festivity
     # TODO: function for validate: 
     #       static date (max day for day-month)
@@ -147,12 +146,12 @@ class contract_employee_festivity(osv.osv):
         
         # dinamic festivity (no periodic is allowed):
         'dynamic_date': fields.date('Dynamic Date'),
-    }
+        }
     
     _defaults = {
         'periodic_from': lambda *a: time.strftime('%Y'),
         'periodic_to': lambda *a: time.strftime('%Y'),
-    }
+        }
 contract_employee_festivity()
 
 class hr_employee_extra(osv.osv):
@@ -303,7 +302,7 @@ class hr_employee_force_log(osv.osv):
     _description = 'Employee force log'
     _rec_name = 'name'
 
-    def log_operation(self, cr, uid, from_date, context=None):    
+    def log_operation(self, cr, uid, name, from_date, context=None):    
         ''' Create new record with log of new price se for employee and date
             of intervent update (in analytic lines)
             Return line (to save in analytic modification)
@@ -312,15 +311,15 @@ class hr_employee_force_log(osv.osv):
         cost_ids = cost_pool.search(cr, uid, [], context=context)
         note = ''
         for cost in cost_pool.browse(cr, uid, cost_ids, context=context):
-            note = _('%s hour cost %s >> %s\n') % (
-                cost.employee.name,
+            note += _('%s hour cost %s >> %s\n') % (
+                cost.employee_id.name,
                 cost.hour_cost,
                 cost.hour_cost_new,
                 )
         return self.create(cr, uid, {
             #date
-            'name': wiz_proxy.name or _(
-                'Forced costsfrom date: %s') % from_date,
+            'name': name or _(
+                'Forced costs from date: %s') % from_date,
             'from_date': from_date,
             'note': note,
             }, context=context)        
