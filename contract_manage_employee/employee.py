@@ -272,8 +272,7 @@ class hr_employee_hour_cost(osv.osv):
                 'product_id': products[employee.id],
                 'employee_id': employee.id,
                 'hour_cost': hour_cost[employee.id],
-                }, context=context)    
-        
+                }, context=context)        
         return {}
         
     _columns = {
