@@ -401,8 +401,8 @@ class account_analytic_expense(osv.osv):
                         continue # next movement!
                         
                     rate = entry.amount / tot 
-                    for contract_id, total in contract_new.iteritems():
-                        contract_new[contract_item.id] *= rate
+                    for contract_id in contract_new:
+                        contract_new[contract_id] *= rate
                 else: # error
                     _logger.error('Average method error: %s' % average_method)
                     return False # exit import procedure
