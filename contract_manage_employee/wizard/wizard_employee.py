@@ -47,8 +47,20 @@ class hr_employee_force_hour(osv.osv_memory):
             After open view with the list
         '''
         wiz_proxy = self.browse(cr, uid, ids)[0]
-        return self.pool.get('hr.employee.hour.cost').load_all_employee(
+        self.pool.get('hr.employee.hour.cost').load_all_employee(
             cr, uid, context=context)
+            
+        return {
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'hr.employee.hour.cost', # object linked to the view
+            #'views': [(view_id, 'form')],
+            'view_id': False,
+            'type': 'ir.actions.act_window',
+            #'target': 'new',
+            #'res_id': res_id, # ID selected
+            }
+    
 
     def force_button(self, cr, uid, ids, context=None):
         ''' Force button update records
@@ -113,12 +125,11 @@ class hr_employee_force_hour(osv.osv_memory):
                 _logger.error(sys.exc_info(), )
                 current_ids.remove(cost.id) # not update (remain)
                 continue
-                            
+
         # -------------------------------------
         # Remove all record (update correctly):
         # -------------------------------------
         cost_pool.unlink(cr, uid, current_ids, context=context)
-            
         return True # or view?
 
     _columns = {
