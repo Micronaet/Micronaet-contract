@@ -47,8 +47,11 @@ class hr_employee_force_hour(osv.osv_memory):
             After open view with the list
         '''
         wiz_proxy = self.browse(cr, uid, ids)[0]
+        domain = []
+        if wiz_proxy.department_id:
+            domain.append(('department_id', '=', wiz_proxy.department_id.id))
         self.pool.get('hr.employee.hour.cost').load_all_employee(
-            cr, uid, context=context)
+            cr, uid, domain, context=context)
             
         return {
             'view_type': 'form',
@@ -130,7 +133,7 @@ class hr_employee_force_hour(osv.osv_memory):
         # Remove all record (update correctly):
         # -------------------------------------
         cost_pool.unlink(cr, uid, current_ids, context=context)
-        return True # or view?
+        return {'type': 'ir.actions.act_window_close'}
 
     _columns = {
         'name': fields.char('Description', size=80),
@@ -140,7 +143,7 @@ class hr_employee_force_hour(osv.osv_memory):
             ('load', 'Load current'),
             ('absence', 'Force update'),
             ], 'Operation', select=True, required=True),
-        # TODO department load (separate?)    
+        'department_id': fields.many2one('hr.department', 'Department')   
         }    
         
     _defaults = {

@@ -9,7 +9,9 @@
             <field name="arch" type="xml">
                 <form string="Force employe hour cost wizard">
                    <field name="operation"/>
-                   <newline />
+                   <field name="department_id" attrs="{'invisible':[('operation','!=','load')]}"/>                    
+                   <newline />                   
+                   
                    <field name="from_date" attrs="{'required':[('operation','!=','load')], 'invisible':[('operation','=','load')]}"/> 
                    <field name="name" attrs="{'invisible':[('operation','=','load')]}"/> 
                    <newline />

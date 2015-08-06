@@ -215,21 +215,24 @@ class hr_employee_hour_cost(osv.osv):
     _rec_name = 'product_id'
 
     
-    def load_all_employee(self, cr, uid, context=None):
+    def load_all_employee(self, cr, uid, domain=None, context=None):
         ''' Load all active employee, during operazion crete if not present
             Reference product (or linked) without associate, after a wizard do
-            the magic 
+            the magic
         '''
         # Remove current list:
+        if domain is None:
+            domain = []
+            
         current_ids = self.search(cr, uid, [], context=context)
         self.unlink(cr, uid, current_ids, context=context)
 
         # ---------------------------------------------------------------------
         # Load new list:
         # ---------------------------------------------------------------------
+        domain.append(('active', '=', True))
         employee_pool = self.pool.get('hr.employee')
-        employee_ids = employee_pool.search(cr, uid, [
-            ('active', '=', True)], context=None)
+        employee_ids = employee_pool.search(cr, uid, domain, context=None)
             
         # Load before all product employee list (to know if neet do be created)    
         product_pool = self.pool.get('product.product')
