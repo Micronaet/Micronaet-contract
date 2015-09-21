@@ -216,7 +216,7 @@ class hr_employee_hour_cost(osv.osv):
 
     
     def load_all_employee(self, cr, uid, domain=None, context=None):
-        ''' Load all active employee, during operazion crete if not present
+        ''' Load all active employee, during operazion create if not present
             Reference product (or linked) without associate, after a wizard do
             the magic
         '''

@@ -8,12 +8,14 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Force employe hour cost wizard">
+                   <field name="mode" invisible="1"/>
+
                    <field name="operation"/>
-                   <field name="department_id" attrs="{'invisible':[('operation','!=','load')]}"/>                    
-                   <newline />                   
+                   <field name="department_id" attrs="{'invisible':[('operation','!=','load')]}" attrs="{'invisible':[('mode','=','file')]}"/>
+                   <newline />
                    
-                   <field name="from_date" attrs="{'required':[('operation','!=','load')], 'invisible':[('operation','=','load')]}"/> 
-                   <field name="name" attrs="{'invisible':[('operation','=','load')]}"/> 
+                   <field name="from_date" attrs="{'required':[('operation','!=','load')], 'invisible':[('operation','=','load')]}" attrs="{'invisible':[('mode','=','file')]}"/>
+                   <field name="name" attrs="{'invisible':[('operation','=','load')]}" attrs="{'invisible':[('mode','=','file')]}"/>
                    <newline />
 
                    <button string="Cancel" special="cancel" colspan="1"/>

@@ -47,9 +47,45 @@ class hr_employee_force_hour(osv.osv_memory):
             After open view with the list
         '''
         wiz_proxy = self.browse(cr, uid, ids)[0]
+        filename = '~/etl/Servizi/employee/20150901_department.csv'
+        
+        # Domain depend on mode
         domain = []
-        if wiz_proxy.department_id:
-            domain.append(('department_id', '=', wiz_proxy.department_id.id))
+        if wiz_proxy.mode == 'file':
+            # Load from file employee:
+            employee_pool = self.pool.get('hr.employee')            
+            item_ids = [] # employee list
+            # check file present?
+            for line in open(os.path.expanduser(filename), 'rb'):
+                name = line[0]
+                surname = line[1] 
+                cost = line[2] 
+                
+                employee_ids = self.search(cr, uid, [
+                    '|',
+                    ('name', '=', "%s %s" % (name, surname)),
+                    ('name', '=', "%s %s" % (surname, name)),                     
+                    ], context=context)
+                if len(employee_ids) == 1:
+                    employee_id = employee_ids[0]
+                    if employee_id in item_ids:
+                        _logger.error('Double in CSV file: %s %s':% (
+                            surname, name))     
+                    else:
+                        item_ids.append(employee_id)
+                elif len(employee_ids) > 1:
+                    _logger.error('Fount more employee: %s %s':% (
+                        surname, name))                   
+                else:
+                    _logger.error('Employee not found: %s %s':% (
+                        surname, name))
+                
+            domain.append(('id', '=', item_ids))
+        else:
+            if wiz_proxy.department_id:
+                domain.append(
+                    ('department_id', '=', wiz_proxy.department_id.id))
+
         self.pool.get('hr.employee.hour.cost').load_all_employee(
             cr, uid, domain, context=context)
             
@@ -63,7 +99,6 @@ class hr_employee_force_hour(osv.osv_memory):
             #'target': 'new',
             #'res_id': res_id, # ID selected
             }
-    
 
     def force_button(self, cr, uid, ids, context=None):
         ''' Force button update records
@@ -143,12 +178,17 @@ class hr_employee_force_hour(osv.osv_memory):
             ('load', 'Load current'),
             ('absence', 'Force update'),
             ], 'Operation', select=True, required=True),
-        'department_id': fields.many2one('hr.department', 'Department')   
+        'department_id': fields.many2one('hr.department', 'Department'),
+        'mode': fields.selection([
+            ('file', 'From file'),
+            ('employee', 'From employee list'),
+            ], 'Mode'),
         }    
         
     _defaults = {
         'from_date': lambda *x: datetime.now().strftime('%Y-%m-%d'),
         'operation': lambda *a: 'load',
+        'mode': lambda *a: 'file',
         }
 hr_employee_force_hour()
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
