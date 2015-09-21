@@ -147,7 +147,7 @@ class contract_employee_festivity(osv.osv):
         # dinamic festivity (no periodic is allowed):
         'dynamic_date': fields.date('Dynamic Date'),
         }
-    
+
     _defaults = {
         'periodic_from': lambda *a: time.strftime('%Y'),
         'periodic_to': lambda *a: time.strftime('%Y'),

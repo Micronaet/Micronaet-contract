@@ -188,6 +188,7 @@ class hr_employee_force_hour(osv.osv_memory):
                     }, context=context)
                 
                 if abs(cost.hour_cost - cost.hour_cost_new) >= 0.01 : # TODO approx
+                    # TODO remove ^^^ also for change period!!!!
                     # ------------------------------------------------
                     # Update analytic lines save log operation parent:
                     # ------------------------------------------------
@@ -200,7 +201,7 @@ class hr_employee_force_hour(osv.osv_memory):
                     for line in line_pool.browse(
                             cr, uid, line_ids, context=context):    
                         line_pool.write(cr, uid, line_ids, {
-                            'amount': -cost.hour_cost_new * line.unit_amount,
+                            'amount': -(cost.hour_cost_new * line.unit_amount),
                             'update_log_id': update_log_id,
                             'product_id': cost.product_id.id, 
                             #'unit_amount': cost.hour_cost_new,
