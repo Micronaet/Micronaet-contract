@@ -28,9 +28,9 @@
 import os
 import sys
 import logging
+from tools.translate import _
 from osv import osv, fields
 from datetime import datetime, timedelta
-
 
 _logger = logging.getLogger(__name__)
 
@@ -46,38 +46,76 @@ class hr_employee_force_hour(osv.osv_memory):
         ''' Load all active employee and his product, create if not present
             After open view with the list
         '''
+        def format_string(value):
+            try:
+                return value.strip()
+            except:
+                return ''    
+
+        def format_date(value):
+            return value
+
+        def format_float(value):
+            try:
+                return float(value)
+            except:    
+                return 0.0
+            
         wiz_proxy = self.browse(cr, uid, ids)[0]
         filename = '~/etl/Servizi/employee/20150901_department.csv'
+        separator = ';'
+        tot_col = 3
         
         # Domain depend on mode
         domain = []
+        force_cost = {}
         if wiz_proxy.mode == 'file':
             # Load from file employee:
             employee_pool = self.pool.get('hr.employee')            
             item_ids = [] # employee list
             # check file present?
-            for line in open(os.path.expanduser(filename), 'rb'):
-                name = line[0]
-                surname = line[1] 
-                cost = line[2] 
+            try: 
+                f = open(os.path.expanduser(filename), 'rb')
+            except:
+                raise osv.except_osv(
+                    _('Error!'), 
+                    _('No file found for import: %s' % filename))
                 
-                employee_ids = self.search(cr, uid, [
+            i = 0    
+            for line in f:
+                i += 1
+                line = line.strip()
+                if not line:
+                    _logger.warning('Empty line (jumped): %s' % i)
+                    continue
+                record = line.split(separator)
+                if len(record) != tot_col:
+                    _logger.error('Record different format: %s (col.: %s)' % (
+                        tot_col))
+                    continue
+                
+                name = format_string(record[0])
+                surname = format_string(record[1])
+                cost = format_float(record[2])
+                
+                employee_ids = employee_pool.search(cr, uid, [
                     '|',
                     ('name', '=', "%s %s" % (name, surname)),
-                    ('name', '=', "%s %s" % (surname, name)),                     
+                    ('name', '=', "%s %s" % (surname, name)),
                     ], context=context)
                 if len(employee_ids) == 1:
                     employee_id = employee_ids[0]
                     if employee_id in item_ids:
-                        _logger.error('Double in CSV file: %s %s':% (
-                            surname, name))     
+                        _logger.error('Double in CSV file: %s %s' % (
+                            surname, name))
                     else:
                         item_ids.append(employee_id)
+                        force_cost[employee_id] = cost # save cost
                 elif len(employee_ids) > 1:
-                    _logger.error('Fount more employee: %s %s':% (
+                    _logger.error('Fount more employee: %s %s' % (
                         surname, name))                   
                 else:
-                    _logger.error('Employee not found: %s %s':% (
+                    _logger.error('Employee not found: %s %s' % (
                         surname, name))
                 
             domain.append(('id', '=', item_ids))
@@ -87,7 +125,7 @@ class hr_employee_force_hour(osv.osv_memory):
                     ('department_id', '=', wiz_proxy.department_id.id))
 
         self.pool.get('hr.employee.hour.cost').load_all_employee(
-            cr, uid, domain, context=context)
+            cr, uid, domain, force_cost, context=context)
             
         return {
             'view_type': 'form',
