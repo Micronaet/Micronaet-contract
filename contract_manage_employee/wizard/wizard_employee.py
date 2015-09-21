@@ -57,19 +57,27 @@ class hr_employee_force_hour(osv.osv_memory):
 
         def format_float(value):
             try:
+                value = value.replace(',', '.')
                 return float(value)
-            except:    
+            except:
                 return 0.0
-            
-        wiz_proxy = self.browse(cr, uid, ids)[0]
-        filename = '~/etl/Servizi/employee/20150901_department.csv'
+
+        # ---------------------------------------------------------------------
+        # Import file parameters (TODO parametrize):
+        # ---------------------------------------------------------------------
+        filepath = '~/etl/servizi/employee/'
+        filename = os.path.join(os.path.expanduser(filepath), 'costi.csv')        
         separator = ';'
         tot_col = 3
-        
-        # Domain depend on mode
-        domain = []
+
+        wiz_proxy = self.browse(cr, uid, ids)[0]
+
+        domain = [] # Domain depend on mode
         force_cost = {}
         if wiz_proxy.mode == 'file':
+            # -----------------------------------------------------------------
+            #                      Load from file
+            # -----------------------------------------------------------------
             # Load from file employee:
             employee_pool = self.pool.get('hr.employee')            
             item_ids = [] # employee list
@@ -118,12 +126,14 @@ class hr_employee_force_hour(osv.osv_memory):
                     _logger.error('Employee not found: %s %s' % (
                         surname, name))
                 
-            domain.append(('id', '=', item_ids))
+            domain.append(('id', 'in', item_ids))
         else:
+            # -----------------------------------------------------------------
+            #                   Load from wizard filter
+            # -----------------------------------------------------------------
             if wiz_proxy.department_id:
                 domain.append(
                     ('department_id', '=', wiz_proxy.department_id.id))
-
         self.pool.get('hr.employee.hour.cost').load_all_employee(
             cr, uid, domain, force_cost, context=context)
             

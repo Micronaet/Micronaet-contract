@@ -215,20 +215,20 @@ class hr_employee_hour_cost(osv.osv):
     _rec_name = 'product_id'
 
     
-    def load_all_employee(self, cr, uid, domain=None, force_price=None,
+    def load_all_employee(self, cr, uid, domain=None, force_cost=None,
             context=None):
         ''' Load all active employee, during operazion create if not present
             Reference product (or linked) without associate, after a wizard do
             the magic
             domain = filter for hr.emploee
-            force_price: dict with key = employee ID, value = new price
+            force_cost: dict with key = employee ID, value = new price
         '''
         # Remove current list:
         if domain is None:
             domain = []
 
-        if force_price is None:
-            force_price = {}
+        if force_cost is None:
+            force_cost = {}
             
         current_ids = self.search(cr, uid, [], context=context)
         self.unlink(cr, uid, current_ids, context=context)
@@ -285,9 +285,9 @@ class hr_employee_hour_cost(osv.osv):
                 products[employee.id] = product_pool.create(
                     cr, uid, data, context=context)
                 
-            cost_new = force_cost.get(employee_id, False) or \
-                costs[employee.id] or \
-                default_cost
+            cost_new = (force_cost.get(employee.id, False) or 
+                costs[employee.id] or 
+                default_cost)
 
             data = {
                 'employee_id': employee.id,
