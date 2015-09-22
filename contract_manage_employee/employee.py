@@ -224,39 +224,46 @@ class hr_employee_hour_cost(osv.osv):
             force_cost: dict with key = employee ID, value = new price
         '''
         # Remove current list:
-        if domain is None:
+        if domain is None: # domain passed (file list or wizard list)
             domain = []
 
-        if force_cost is None:
+        if force_cost is None: # list of user pre-passed (file)
             force_cost = {}
-            
+
+        # Remove all previous elements:
         current_ids = self.search(cr, uid, [], context=context)
         self.unlink(cr, uid, current_ids, context=context)
 
         # ---------------------------------------------------------------------
         # Load new list:
         # ---------------------------------------------------------------------
-        domain.append(('active', '=', True))
+        if not force_cost: # for wizard load only (file admitted):
+            domain.append(('active', '=', True))
+
+        # Load before all product employee list (to know if need do be created)    
         employee_pool = self.pool.get('hr.employee')
-        employee_ids = employee_pool.search(cr, uid, domain, context=None)
-            
-        # Load before all product employee list (to know if neet do be created)    
         product_pool = self.pool.get('product.product')
+            
+        # Create dict from personal product-employee
+        products = {} # ID product for employee 
+        costs = {} # standard price for employee
+
+        # Pre-load cost and products:
+        employee_ids = employee_pool.search(cr, uid, domain, context=None)
         product_ids = product_pool.search(cr, uid, [
             ('product_employee_id', '!=', False)], context=None)
-        products = {}
-        costs = {}
-        default_cost = 10.0 # TODO parametrize
         for product in product_pool.browse(
                 cr, uid, product_ids, context=context):    
             # Save id and price:
             products[product.product_employee_id.id] = product.id
             costs[product.product_employee_id.id] = product.standard_price 
 
+        # Loop on selected employee:
         for employee in employee_pool.browse(
                 cr, uid, employee_ids, context=context):
             hour_id = 4 # TODO
             categ_id = 1 # TODO
+            cost_old = employee.product_id.standard_price or 0.0
             data = {
                 'name': 'Hour cost: %s' % employee.name,
                 'type': 'service',
@@ -265,7 +272,7 @@ class hr_employee_hour_cost(osv.osv):
                 'uom_id': hour_id,
                 'uom_po_id': hour_id,
                 'cost_method': 'standard',
-                'standard_price': default_cost,
+                'standard_price': cost_old,
                 'uos_coeff': 1.0,
                 'mes_type': 'fixed',
                 'categ_id': categ_id,
@@ -273,28 +280,30 @@ class hr_employee_hour_cost(osv.osv):
                 'sale_ok': True,
                 'purchase_ok': True,
                 'is_hour_cost': True,
-                }    
-            if employee.id in products:
+                }
+            
+            if employee.id in products: # employee has yet a product:
                 new = False
                 product_pool.write( # TODO remove?
                     cr, uid, products[employee.id], data, context=context)
             else:
                 new = True                
                 # Create product element (not associate)
-                costs[employee.id] = 0.0        
+                costs[employee.id] = cost_old
                 products[employee.id] = product_pool.create(
                     cr, uid, data, context=context)
-                
+
             cost_new = (force_cost.get(employee.id, False) or 
                 costs[employee.id] or 
-                default_cost)
+                0.0) # 0 not a sort of default value!
 
+            # Pre-load list:
             data = {
                 'employee_id': employee.id,
                 'product_id': products[employee.id],
                 'current_product_id': employee.product_id.id,
                 'new': new,
-                'hour_cost': costs[employee.id] or default_cost,
+                'hour_cost': cost_old,
                 'hour_cost_new': cost_new,
                 }   
             self.create(cr, uid, data, context=context)        
