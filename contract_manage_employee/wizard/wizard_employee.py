@@ -175,7 +175,7 @@ class hr_employee_force_hour(osv.osv_memory):
                 # ---------------------------------------------
                 # Force product to employee (for new creations):
                 # ---------------------------------------------
-                # TODO optimize for crete update only new product
+                # TODO optimize for create update only new product
                 employee_pool.write(cr, uid, cost.employee_id.id, {
                     'product_id': cost.product_id.id,
                     }, context=context)            
@@ -187,26 +187,25 @@ class hr_employee_force_hour(osv.osv_memory):
                     'standard_price': cost.hour_cost_new
                     }, context=context)
                 
-                if abs(cost.hour_cost - cost.hour_cost_new) >= 0.01 : # TODO approx
-                    # TODO remove ^^^ also for change period!!!!
-                    # ------------------------------------------------
-                    # Update analytic lines save log operation parent:
-                    # ------------------------------------------------
-                    line_ids = line_pool.search(cr, uid, [
-                        ('user_id', '=', cost.employee_id.user_id.id), # TODO test
-                        ('date', '>=', wiz_proxy.from_date),
-                        ], context=context)
-                        
-                    # loop cause total calculation value:
-                    for line in line_pool.browse(
-                            cr, uid, line_ids, context=context):    
-                        line_pool.write(cr, uid, line_ids, {
-                            'amount': -(cost.hour_cost_new * line.unit_amount),
-                            'update_log_id': update_log_id,
-                            'product_id': cost.product_id.id, 
-                            #'unit_amount': cost.hour_cost_new,
-                            # total?
-                            }, context=context)
+                # ------------------------------------------------
+                # Update analytic lines save log operation parent:
+                # ------------------------------------------------
+                #if abs(cost.hour_cost - cost.hour_cost_new) >= 0.01: # approx
+                line_ids = line_pool.search(cr, uid, [
+                    ('user_id', '=', cost.employee_id.user_id.id),
+                    ('date', '>=', wiz_proxy.from_date),
+                    ], context=context)
+                    
+                # loop for total calculation:
+                for line in line_pool.browse(
+                        cr, uid, line_ids, context=context):    
+                    line_pool.write(cr, uid, line_ids, {
+                        'amount': -(cost.hour_cost_new * line.unit_amount),
+                        'update_log_id': update_log_id,
+                        'product_id': cost.product_id.id, 
+                        #'unit_amount': cost.hour_cost_new,
+                        # total?
+                        }, context=context)
             except:
                 _logger.error('Emploee update: %s' % cost.employee_id.name)
                 _logger.error(sys.exc_info(), )
