@@ -265,7 +265,7 @@ class hr_employee_hour_cost(osv.osv):
             categ_id = 1 # TODO
             cost_old = employee.product_id.standard_price or 0.0
             data = {
-                'name': 'Hour cost: %s' % employee.name,
+                'name': _('Hour cost: %s') % employee.name,
                 'type': 'service',
                 'procure_method': 'make_to_stock',
                 'supply_method': 'buy',

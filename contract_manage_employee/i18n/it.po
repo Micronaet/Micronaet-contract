@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenERP Server 6.0.4\n"
 "Report-Msgid-Bugs-To: support@openerp.com\n"
-"POT-Creation-Date: 2015-07-23 14:56+0000\n"
-"PO-Revision-Date: 2015-07-23 14:56+0000\n"
+"POT-Creation-Date: 2015-09-22 11:10+0000\n"
+"PO-Revision-Date: 2015-09-22 11:10+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -47,17 +47,22 @@ msgid "Load current"
 msgstr "Carica utenti"
 
 #. module: contract_manage_employee
-#: field:hr.employee.hour.cost,new:0
-msgid "New product"
-msgstr "Nuovo prodotto"
+#: view:contract.employee.festivity:0
+msgid "Dynamic date"
+msgstr "Data dinamica"
 
 #. module: contract_manage_employee
-#: code:addons/contract_manage_employee/employee.py:317
+#: code:addons/contract_manage_employee/employee.py:340
 #, python-format
 msgid "%s hour cost %s >> %s\n"
 ""
 msgstr "%s costo orario %s >> %s\n"
 ""
+
+#. module: contract_manage_employee
+#: field:contract.employee.festivity,day:0
+msgid "Static day"
+msgstr "Giorno statico"
 
 #. module: contract_manage_employee
 #: help:contract.employee.festivity,static:0
@@ -81,9 +86,9 @@ msgid "Note"
 msgstr "Note"
 
 #. module: contract_manage_employee
-#: view:contract.employee.festivity:0
-msgid "Dynamic date"
-msgstr "Data dinamica"
+#: field:hr.employee.force.hour.wizard,department_id:0
+msgid "Department"
+msgstr "Department"
 
 #. module: contract_manage_employee
 #: view:hr.employee.force.hour.wizard:0
@@ -190,6 +195,12 @@ msgid "Dynamic Date"
 msgstr "Data dinamica"
 
 #. module: contract_manage_employee
+#: code:addons/contract_manage_employee/employee.py:268
+#, python-format
+msgid "Hour cost: %s"
+msgstr "Costo orario: %s"
+
+#. module: contract_manage_employee
 #: field:contract.employee.timesheet.tipology.line,week_day:0
 msgid "Week day"
 msgstr "Giorno settimana"
@@ -205,9 +216,9 @@ msgid "From year"
 msgstr "Dall'anno"
 
 #. module: contract_manage_employee
-#: field:hr.employee,contract_tipology_id:0
-msgid "Work time"
-msgstr "Orario lavorativo"
+#: selection:hr.employee.force.hour.wizard,mode:0
+msgid "From file"
+msgstr "From file"
 
 #. module: contract_manage_employee
 #: constraint:hr.employee:0
@@ -232,6 +243,11 @@ msgstr "Tipologia di contratto"
 #: view:hr.employee.force.log:0
 msgid "Analytic line"
 msgstr "Righe analitiche"
+
+#. module: contract_manage_employee
+#: view:hr.employee.force.log:0
+msgid "Update lines"
+msgstr "Aggiorna righe"
 
 #. module: contract_manage_employee
 #: field:contract.employee.timesheet.tipology,line_ids:0
@@ -264,6 +280,17 @@ msgid "Wednesday"
 msgstr "Mercoledì"
 
 #. module: contract_manage_employee
+#: code:addons/contract_manage_employee/wizard/wizard_employee.py:89
+#, python-format
+msgid "Error!"
+msgstr "Error!"
+
+#. module: contract_manage_employee
+#: field:hr.employee.force.hour.wizard,mode:0
+msgid "Mode"
+msgstr "Mode"
+
+#. module: contract_manage_employee
 #: field:product.product,product_employee_id:0
 msgid "Employee linked"
 msgstr "Impiegato collegato"
@@ -284,7 +311,7 @@ msgid "Employee force hour cost"
 msgstr "Forza costo orario impiegato"
 
 #. module: contract_manage_employee
-#: code:addons/contract_manage_employee/employee.py:325
+#: code:addons/contract_manage_employee/employee.py:348
 #, python-format
 msgid "Forced costs from date: %s"
 msgstr "Forza costi da data: %s"
@@ -303,6 +330,11 @@ msgstr "Tutti gli interventi da questa data utilizzano il nuovo valore"
 #: model:ir.model,name:contract_manage_employee.model_hr_employee_hour_cost
 msgid "Employee load hour cost"
 msgstr "Carica costo orario impiegato"
+
+#. module: contract_manage_employee
+#: field:hr.employee,contract_tipology_id:0
+msgid "Work time"
+msgstr "Orario lavorativo"
 
 #. module: contract_manage_employee
 #: view:hr.employee.force.hour.wizard:0
@@ -325,9 +357,9 @@ msgid "Static date"
 msgstr "Data statica"
 
 #. module: contract_manage_employee
-#: field:contract.employee.festivity,day:0
-msgid "Static day"
-msgstr "Giorno statico"
+#: selection:hr.employee.force.hour.wizard,mode:0
+msgid "From employee list"
+msgstr "From employee list"
 
 #. module: contract_manage_employee
 #: field:contract.employee.festivity,static:0
@@ -343,6 +375,11 @@ msgstr "Dinamico"
 #: selection:contract.employee.timesheet.tipology.line,week_day:0
 msgid "Sunday"
 msgstr "Domenica"
+
+#. module: contract_manage_employee
+#: selection:contract.employee.timesheet.tipology.line,week_day:0
+msgid "Saturday"
+msgstr "Sabato"
 
 #. module: contract_manage_employee
 #: constraint:product.product:0
@@ -361,9 +398,9 @@ msgid "From date"
 msgstr "Dalla data"
 
 #. module: contract_manage_employee
-#: view:hr.employee.force.log:0
-msgid "Update lines"
-msgstr "Aggiorna righe"
+#: field:hr.employee.hour.cost,new:0
+msgid "New product"
+msgstr "Nuovo prodotto"
 
 #. module: contract_manage_employee
 #: view:hr.employee.force.hour.wizard:0
@@ -386,9 +423,104 @@ msgid "Festivity (static)"
 msgstr "Festitivà (statica)"
 
 #. module: contract_manage_employee
-#: selection:contract.employee.timesheet.tipology.line,week_day:0
-msgid "Saturday"
-msgstr "Sabato"
+#: code:addons/contract_manage_employee/wizard/wizard_employee.py:90
+#, python-format
+msgid "No file found for import: %s' % filename))\n"
+"                \n"
+"            i = 0    \n"
+"            for line in f:\n"
+"                i += 1\n"
+"                line = line.strip()\n"
+"                if not line:\n"
+"                    _logger.warning('Empty line (jumped): %s' % i)\n"
+"                    continue\n"
+"                record = line.split(separator)\n"
+"                if len(record) != tot_col:\n"
+"                    _logger.error('Record different format: %s (col.: %s)' % (\n"
+"                        tot_col))\n"
+"                    continue\n"
+"                \n"
+"                name = format_string(record[0])\n"
+"                surname = format_string(record[1])\n"
+"                cost = format_float(record[2])\n"
+"                \n"
+"                employee_ids = employee_pool.search(cr, uid, [\n"
+"                    '|',\n"
+"                    ('name', '=', \"%s %s\" % (name, surname)),\n"
+"                    ('name', '=', \"%s %s\" % (surname, name)),\n"
+"                    ], context=context)\n"
+"                if len(employee_ids) == 1:\n"
+"                    employee_id = employee_ids[0]\n"
+"                    if employee_id in item_ids:\n"
+"                        _logger.error('Double in CSV file: %s %s' % (\n"
+"                            surname, name))\n"
+"                    else:\n"
+"                        item_ids.append(employee_id)\n"
+"                        force_cost[employee_id] = cost # save cost\n"
+"                elif len(employee_ids) > 1:\n"
+"                    _logger.error('Fount more employee: %s %s' % (\n"
+"                        surname, name))                   \n"
+"                else:\n"
+"                    _logger.error('Employee not found: %s %s' % (\n"
+"                        surname, name))\n"
+"                \n"
+"            domain.append(('id', 'in', item_ids))\n"
+"        else:\n"
+"            # -----------------------------------------------------------------\n"
+"            #                   Load from wizard filter\n"
+"            # -----------------------------------------------------------------\n"
+"            if wiz_proxy.department_id:\n"
+"                domain.append(\n"
+"                    ('department_id', '=', wiz_proxy.department_id.id))\n"
+"        self.pool.get('hr.employee.hour.cost"
+msgstr "No file found for import: %s' % filename))\n"
+"                \n"
+"            i = 0    \n"
+"            for line in f:\n"
+"                i += 1\n"
+"                line = line.strip()\n"
+"                if not line:\n"
+"                    _logger.warning('Empty line (jumped): %s' % i)\n"
+"                    continue\n"
+"                record = line.split(separator)\n"
+"                if len(record) != tot_col:\n"
+"                    _logger.error('Record different format: %s (col.: %s)' % (\n"
+"                        tot_col))\n"
+"                    continue\n"
+"                \n"
+"                name = format_string(record[0])\n"
+"                surname = format_string(record[1])\n"
+"                cost = format_float(record[2])\n"
+"                \n"
+"                employee_ids = employee_pool.search(cr, uid, [\n"
+"                    '|',\n"
+"                    ('name', '=', \"%s %s\" % (name, surname)),\n"
+"                    ('name', '=', \"%s %s\" % (surname, name)),\n"
+"                    ], context=context)\n"
+"                if len(employee_ids) == 1:\n"
+"                    employee_id = employee_ids[0]\n"
+"                    if employee_id in item_ids:\n"
+"                        _logger.error('Double in CSV file: %s %s' % (\n"
+"                            surname, name))\n"
+"                    else:\n"
+"                        item_ids.append(employee_id)\n"
+"                        force_cost[employee_id] = cost # save cost\n"
+"                elif len(employee_ids) > 1:\n"
+"                    _logger.error('Fount more employee: %s %s' % (\n"
+"                        surname, name))                   \n"
+"                else:\n"
+"                    _logger.error('Employee not found: %s %s' % (\n"
+"                        surname, name))\n"
+"                \n"
+"            domain.append(('id', 'in', item_ids))\n"
+"        else:\n"
+"            # -----------------------------------------------------------------\n"
+"            #                   Load from wizard filter\n"
+"            # -----------------------------------------------------------------\n"
+"            if wiz_proxy.department_id:\n"
+"                domain.append(\n"
+"                    ('department_id', '=', wiz_proxy.department_id.id))\n"
+"        self.pool.get('hr.employee.hour.cost"
 
 #. module: contract_manage_employee
 #: model:ir.model,name:contract_manage_employee.model_contract_employee_timesheet_tipology_line
