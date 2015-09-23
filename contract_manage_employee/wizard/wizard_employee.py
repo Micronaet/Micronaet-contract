@@ -57,6 +57,7 @@ class hr_employee_force_hour(osv.osv_memory):
                     isfile(join(path, filename)) and filename.startswith(bof) 
                     and len(filename) == (len(bof) + 8)]
 
+        cost_file.sort() # for have last price correct
         _logger.info("Start auto import of file cost")
         for filename in cost_file:
             try:
