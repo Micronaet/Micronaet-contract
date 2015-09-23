@@ -59,11 +59,10 @@ class hr_employee_force_hour(osv.osv_memory):
 
         cost_file.sort() # for have last price correct
         _logger.info("Start auto import of file cost")
-        error = {}
-        for filename in cost_file:
+        for filename in cost_file:        
             try:
                 _logger.info("Load and import file %s" % filename)
-                            
+                error = {}                                    
                 # -------------------------------------------------------------
                 #                             Load
                 # -------------------------------------------------------------
@@ -178,6 +177,11 @@ class hr_employee_force_hour(osv.osv_memory):
                 cost = format_float(record[3])
                 total = format_float(record[4])
                 
+                if not cost:
+                    error[i] = _('Error no hour cost')
+                    _logger.error(error[i])
+                    continue
+                    
                 # TODO search first for code
                 employee_ids = employee_pool.search(cr, uid, [
                     '|',

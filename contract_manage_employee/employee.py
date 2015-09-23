@@ -354,7 +354,7 @@ class hr_employee_force_log(osv.osv):
                 'Forced costs from date: %s') % from_date,
             'from_date': from_date,
             'note': note,
-            'error': error_text,
+            'error': error_text or False, # for view
             }, context=context)        
         
     _columns = {
