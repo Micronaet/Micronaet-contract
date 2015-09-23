@@ -46,17 +46,28 @@ class hr_employee_force_hour(osv.osv_memory):
             bof='cost', separator=';', context=None):
         ''' Loop on cost folder searching file that start with bof
         '''
-        
-        return True
-        
-    # Button events:
-    def load_button(self, cr, uid, ids, context=None):
-        ''' Load all active employee and his product, create if not present
-            After open view with the list
-        '''
         from os import listdir
         from os.path import isfile, join
 
+        cost_file = [
+            filename for filename in listdir(path) if 
+                    isfile(join(path, filename)) and filename.startswith(bof)]
+
+        for filename in cost_file:
+            # Load:
+            self.load_one_cost(cr, uid, path, filename, separator, 
+                context=context)
+                
+            # Import:
+                
+    
+        return True
+
+    # Utility:        
+    def load_one_cost(self, cr, uid, path, filename, separator, context=None):
+        ''' Import one file 
+        '''
+        # Utility: function for procedure:
         def format_string(value, default=''):
             try:
                 return value.strip() or default
@@ -73,91 +84,97 @@ class hr_employee_force_hour(osv.osv_memory):
             except:
                 return 0.0
 
+        join(os.path.expanduser(path), filename)
+        return True
+    
+    # def import_one_cost(self, cr, uid, context=None):    
+    
+
+    # Button events:
+    def load_button(self, cr, uid, ids, context=None):
+        ''' Load all active employee and his product, create if not present
+            After open view with the list
+        '''
         # ---------------------------------------------------------------------
         # Import file parameters (TODO parametrize):
         # ---------------------------------------------------------------------
-        filepath = '~/etl/servizi/employee/'
+        path = '~/etl/servizi/employee/'
         separator = ';'
         bof = 'costi' # begin of file
         tot_col = 5
+
+        self.load_one_cost(cr, uid, path, filename, separator, context=context)
         
 
-        wiz_proxy = self.browse(cr, uid, ids)[0]
-
+        #wiz_proxy = self.browse(cr, uid, ids)[0]
         domain = [] # Domain depend on mode
         force_cost = {}
-        if wiz_proxy.mode == 'file':
-            # -----------------------------------------------------------------
-            #                   Load from file costiMMAA.csv
-            # -----------------------------------------------------------------
-            i = 0
-            
-            # Loop on all file in folder (that start with bof):
-            cost_file = [
-                join(os.path.expanduser(filepath), f)
-                    for f in listdir(filepath) if 
-                        isfile(join(filepath, f)) and f.startswith(bof)]
 
-            for filename in cost_file:
-                try:
-                    # Load from file employee:
-                    employee_pool = self.pool.get('hr.employee')            
-                    item_ids = [] # employee list
-                    # check file present?
-                    try: 
-                        f = open(os.path.expanduser(filename), 'rb')
-                    except:
-                        raise osv.except_osv(
-                            _('Error!'), 
-                            _('No file found for import: %s' % filename))
+        # -----------------------------------------------------------------
+        #                   Load from file bofMMAA.csv
+        # -----------------------------------------------------------------
+        i = 0
+        
+        # Loop on all file in folder (that start with bof):
+        cost_file = [
+            join(os.path.expanduser(filepath), f)
+                for f in listdir(filepath) if 
+                    isfile(join(filepath, f)) and f.startswith(bof)]
+
+        for filename in cost_file:
+            try:
+                # Load from file employee:
+                employee_pool = self.pool.get('hr.employee')            
+                item_ids = [] # employee list
+                # check file present?
+                try: 
+                    f = open(os.path.expanduser(filename), 'rb')
+                except:
+                    raise osv.except_osv(
+                        _('Error!'), 
+                        _('No file found for import: %s' % filename))
+                
+
+                for line in f:
+                    i += 1
+                    line = line.strip()
+                    if not line:
+                        _logger.warning('Empty line (jumped): %s' % i)
+                        continue
+                    record = line.split(separator)
+                    if len(record) != tot_col:
+                        _logger.error('Record different format: %s (col.: %s)' % (
+                            tot_col))
+                        continue
                     
-
-                    for line in f:
-                        i += 1
-                        line = line.strip()
-                        if not line:
-                            _logger.warning('Empty line (jumped): %s' % i)
-                            continue
-                        record = line.split(separator)
-                        if len(record) != tot_col:
-                            _logger.error('Record different format: %s (col.: %s)' % (
-                                tot_col))
-                            continue
-                        
-                        code = format_string(record[0], False)
-                        name = format_string(record[1]).title()
-                        surname = format_string(record[2]).title()
-                        cost = format_float(record[3])
-                        total = format_float(record[4])
-                        
-                        employee_ids = employee_pool.search(cr, uid, [
-                            '|',
-                            ('name', '=', "%s %s" % (name, surname)),
-                            ('name', '=', "%s %s" % (surname, name)),
-                            ], context=context)
-                        if len(employee_ids) == 1:
-                            employee_id = employee_ids[0]
-                            if employee_id in item_ids:
-                                _logger.error('Double in CSV file: %s %s' % (
-                                    surname, name))
-                            else:
-                                item_ids.append(employee_id)
-                                force_cost[employee_id] = cost # save cost
-                        elif len(employee_ids) > 1:
-                            _logger.error('Fount more employee: %s %s' % (
-                                surname, name))                   
-                        else:
-                            _logger.error('Employee not found: %s %s' % (
+                    code = format_string(record[0], False)
+                    name = format_string(record[1]).title()
+                    surname = format_string(record[2]).title()
+                    cost = format_float(record[3])
+                    total = format_float(record[4])
+                    
+                    employee_ids = employee_pool.search(cr, uid, [
+                        '|',
+                        ('name', '=', "%s %s" % (name, surname)),
+                        ('name', '=', "%s %s" % (surname, name)),
+                        ], context=context)
+                    if len(employee_ids) == 1:
+                        employee_id = employee_ids[0]
+                        if employee_id in item_ids:
+                            _logger.error('Double in CSV file: %s %s' % (
                                 surname, name))
-                        
-                    domain.append(('id', 'in', item_ids))
-        else:
-            # -----------------------------------------------------------------
-            #                   Load from wizard filter
-            # -----------------------------------------------------------------
-            if wiz_proxy.department_id:
-                domain.append(
-                    ('department_id', '=', wiz_proxy.department_id.id))
+                        else:
+                            item_ids.append(employee_id)
+                            force_cost[employee_id] = cost # save cost
+                    elif len(employee_ids) > 1:
+                        _logger.error('Fount more employee: %s %s' % (
+                            surname, name))                   
+                    else:
+                        _logger.error('Employee not found: %s %s' % (
+                            surname, name))
+                    
+                domain.append(('id', 'in', item_ids))
+
         self.pool.get('hr.employee.hour.cost').load_all_employee(
             cr, uid, domain, force_cost, context=context)
             
