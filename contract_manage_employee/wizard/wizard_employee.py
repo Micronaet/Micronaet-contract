@@ -51,6 +51,7 @@ class hr_employee_force_hour(osv.osv_memory):
         from os import listdir
         from os.path import isfile, join
 
+        import pdb; pdb.set_trace()
         path = os.path.expanduser(path)
         cost_file = [
             filename for filename in listdir(path) if 
@@ -64,12 +65,11 @@ class hr_employee_force_hour(osv.osv_memory):
                     
                 # Import:
                 # parse date
-                filename. 
                 file_date = os.path.splitext(filename)[-4:]
                 from_month = file_date[:2]
                 from_year = file_date[2:]
                 # Next value
-                if from_month = '12':
+                if from_month == '12':
                     next_month = '01'
                     next_year = '%02d' % int(from_year) + 1
                 else:    
@@ -112,7 +112,7 @@ class hr_employee_force_hour(osv.osv_memory):
                 return 0.0
 
         tot_col = 5 # TODO change if file will be extended
-        fullname = join(os.path.expanduser(path), filename)
+        fullname = os.path.join(os.path.expanduser(path), filename)
         domain = []
         force_cost = {}
        
@@ -129,45 +129,51 @@ class hr_employee_force_hour(osv.osv_memory):
 
         i = 0
         for line in f:
-            i += 1
-            line = line.strip()
-            if not line:
-                _logger.warning('Empty line (jumped): %s' % i)
-                continue
-            record = line.split(separator)
-            if len(record) != tot_col:
-                _logger.error('Record different format: %s (col.: %s)' % (
-                    tot_col))
-                continue
-            
-            code = format_string(record[0], False)
-            name = format_string(record[1]).title()
-            surname = format_string(record[2]).title()
-            cost = format_float(record[3])
-            total = format_float(record[4])
-            
-            # TODO search first for code
-            employee_ids = employee_pool.search(cr, uid, [
-                '|',
-                ('name', '=', "%s %s" % (name, surname)),
-                ('name', '=', "%s %s" % (surname, name)),
-                ], context=context)
+            try:
+                i += 1
+                line = line.strip()
+                if not line:
+                    _logger.warning('Empty line (jumped): %s' % i)
+                    continue
+                record = line.split(separator)
+                if len(record) != tot_col:
+                    _logger.error('Record different format: %s (col.: %s)' % (
+                        tot_col),
+                        len(record),
+                        )
+                    continue
+                
+                code = format_string(record[0], False)
+                name = format_string(record[1]).title()
+                surname = format_string(record[2]).title()
+                cost = format_float(record[3])
+                total = format_float(record[4])
+                
+                # TODO search first for code
+                employee_ids = employee_pool.search(cr, uid, [
+                    '|',
+                    ('name', '=', "%s %s" % (name, surname)),
+                    ('name', '=', "%s %s" % (surname, name)),
+                    ], context=context)
 
-            # TODO update code if found only one    
-            if len(employee_ids) == 1:
-                employee_id = employee_ids[0]
-                if employee_id in item_ids:
-                    _logger.error('Double in CSV file: %s %s' % (
-                        surname, name))
+                # TODO update code if found only one    
+                if len(employee_ids) == 1:
+                    employee_id = employee_ids[0]
+                    if employee_id in item_ids:
+                        _logger.error('Double in CSV file: %s %s' % (
+                            surname, name))
+                    else:
+                        item_ids.append(employee_id)
+                        force_cost[employee_id] = cost # save cost
+                elif len(employee_ids) > 1:
+                    _logger.error('Fount more employee: %s %s' % (
+                        surname, name))                   
                 else:
-                    item_ids.append(employee_id)
-                    force_cost[employee_id] = cost # save cost
-            elif len(employee_ids) > 1:
-                _logger.error('Fount more employee: %s %s' % (
-                    surname, name))                   
-            else:
-                _logger.error('Employee not found: %s %s' % (
-                    surname, name))
+                    _logger.error('Employee not found: %s %s' % (
+                        surname, name))
+            except:
+                _logger.error('Error import line %s' % i)
+                _logger.error((sys.exc_info(), ))                
             
         domain.append(('id', 'in', item_ids))
                 
