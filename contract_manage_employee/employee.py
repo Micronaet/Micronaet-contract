@@ -175,7 +175,6 @@ class hr_employee_extra(osv.osv):
             if employee.user_id and employee.department_id:                
                 update = user_pool.write(cr, uid, employee.user_id.id, {
                     'context_department_id': employee.department_id.id})
-                
         return True
         
     _columns = {
@@ -184,7 +183,6 @@ class hr_employee_extra(osv.osv):
             help="Working time for this employee, tipically a contract tipology, like: full time, part time etc. (for manage hour and presence)"),
     }
 hr_employee_extra()
-
 
 # -----------------------------------------------------------------------------
 # Add importation hour cost for employee:
@@ -202,8 +200,7 @@ class product_product(osv.osv):
         }
     _defaults = {
         'product_employee_id': lambda *x: False,
-        }    
-     
+        }
 product_product()        
 
 class hr_employee_hour_cost(osv.osv):

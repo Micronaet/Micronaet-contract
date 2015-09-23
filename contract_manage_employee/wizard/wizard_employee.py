@@ -233,19 +233,21 @@ class hr_employee_force_hour(osv.osv_memory):
         current_ids = cost_pool.search(cr, uid, [], context=context)
         for cost in cost_pool.browse(cr, uid, cost_ids, context=context):
             try:
-                # ---------------------------------------------
+                standard_price = cost.hour_cost_new # new standard price
+                
+                # ----------------------------------------------
                 # Force product to employee (for new creations):
-                # ---------------------------------------------
+                # ----------------------------------------------
                 # TODO optimize for create update only new product
                 employee_pool.write(cr, uid, cost.employee_id.id, {
                     'product_id': cost.product_id.id,
-                    }, context=context)            
+                    }, context=context)
 
                 # -----------------------------
                 # Force new product hour costs:
                 # -----------------------------        
                 product_pool.write(cr, uid, cost.product_id.id, {
-                    'standard_price': cost.hour_cost_new
+                    'standard_price': standard_price,
                     }, context=context)
                 
                 # ------------------------------------------------
@@ -259,15 +261,14 @@ class hr_employee_force_hour(osv.osv_memory):
                 if to_date: # for schedule update only
                     domain.append(
                         ('date', '<', to_date),
-                        )    
+                        )
                 line_ids = line_pool.search(cr, uid, domain, context=context)
                     
                 # loop for total calculation:
                 for line in line_pool.browse(
                         cr, uid, line_ids, context=context):    
                     line_pool.write(cr, uid, line.id, {
-                        'amount': -(
-                            cost.product_id.standard_price * line.unit_amount),
+                        'amount': -(standard_price * line.unit_amount),
                         'update_log_id': update_log_id,
                         'product_id': cost.product_id.id, 
                         }, context=context)
