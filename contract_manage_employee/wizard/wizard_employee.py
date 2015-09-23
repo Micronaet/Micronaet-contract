@@ -97,11 +97,14 @@ class hr_employee_force_hour(osv.osv_memory):
                 # History of file:
                 os.rename(
                     os.path.join(path, filename),
-                    os.path.join(path, 'history', filename),
+                    os.path.join(path, 'history', '%s.%s' % (
+                        datetime.now().strftime('%Y%m%d.%H%M'),
+                        filename, )),
                     )
                     
             except:
                 _logger.error('No correct file format: %s' % filename)
+                _logger.error((sys.exc_info(), ))
         _logger.info("End auto import of file cost")
         return True
 
@@ -191,7 +194,8 @@ class hr_employee_force_hour(osv.osv_memory):
             except:
                 _logger.error('Error import line %s' % i)
                 _logger.error((sys.exc_info(), ))                
-            
+
+        f.close() # for rename
         domain.append(('id', 'in', item_ids))
                 
         # Load in object for check:

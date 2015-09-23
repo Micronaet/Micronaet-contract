@@ -293,16 +293,16 @@
       <!--Force costs-->
       <menuitem id="contract_report_force_root_menuitem" 
                 sequence="20"
-                name="Force costs"
+                name="Hour cost"
                 parent="contract_manage.menu_hr_root"
                 groups="analytic.group_analytic_accounting"
                 icon="STOCK_EXECUTE" />
                 
-          <menuitem action="action_hr_employee_hour_cost" 
+          <!--<menuitem action="action_hr_employee_hour_cost" 
                     id="hr_employee_hour_cost_menuitem" 
                     sequence="50"
                     parent="contract_report_force_root_menuitem"
-                    icon="STOCK_EXECUTE" />
+                    icon="STOCK_EXECUTE" />-->
           <menuitem action="action_hr_employee_force_log" 
                     id="hr_employee_force_log_menuitem" 
                     sequence="60"
