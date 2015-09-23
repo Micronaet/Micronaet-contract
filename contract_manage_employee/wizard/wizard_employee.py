@@ -63,15 +63,15 @@ class hr_employee_force_hour(osv.osv_memory):
             try:
                 _logger.info("Load and import file %s" % filename)
                             
-                # -----
-                # Load:
-                # -----
+                # -------------------------------------------------------------
+                #                             Load
+                # -------------------------------------------------------------
                 self.load_one_cost(cr, uid, path, filename, separator, 
                     context=context)
                     
-                # -------
-                # Import:
-                # -------                
+                # -------------------------------------------------------------
+                #                            Import
+                # -------------------------------------------------------------
                 # Parse date
                 file_date = os.path.splitext(filename)[0][-4:]
                 from_year = int(file_date[:2])
@@ -94,7 +94,7 @@ class hr_employee_force_hour(osv.osv_memory):
                 self.import_one_cost(cr, uid, name=name, from_date=from_date, 
                     to_date=to_date, context=context)
                 
-                # History of file:
+                # History file:
                 os.rename(
                     os.path.join(path, filename),
                     os.path.join(path, 'history', '%s.%s' % (
