@@ -98,10 +98,10 @@ class hr_employee_force_hour(osv.osv_memory):
                 os.rename(
                     os.path.join(path, filename),
                     os.path.join(path, 'history', '%s.%s' % (
-                        datetime.now().strftime('%Y%m%d.%H%M'),
+                        datetime.now().strftime('%Y%m%d.%H%M%S'),
                         filename, )),
                     )
-                    
+
             except:
                 _logger.error('No correct file format: %s' % filename)
                 _logger.error((sys.exc_info(), ))
