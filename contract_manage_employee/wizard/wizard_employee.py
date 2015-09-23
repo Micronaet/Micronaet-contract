@@ -28,6 +28,7 @@
 import os
 import sys
 import logging
+from os import listdir
 from tools.translate import _
 from osv import osv, fields
 from datetime import datetime, timedelta
@@ -48,7 +49,6 @@ class hr_employee_force_hour(osv.osv_memory):
             bof='cost', separator=';', context=None):
         ''' Loop on cost folder searching file that start with bof
         '''
-        from os import listdir
         from os.path import isfile, join
 
         path = os.path.expanduser(path)
@@ -59,6 +59,7 @@ class hr_employee_force_hour(osv.osv_memory):
 
         cost_file.sort() # for have last price correct
         _logger.info("Start auto import of file cost")
+        error = {}
         for filename in cost_file:
             try:
                 _logger.info("Load and import file %s" % filename)
@@ -66,7 +67,7 @@ class hr_employee_force_hour(osv.osv_memory):
                 # -------------------------------------------------------------
                 #                             Load
                 # -------------------------------------------------------------
-                self.load_one_cost(cr, uid, path, filename, separator, 
+                self.load_one_cost(cr, uid, path, filename, separator, error,
                     context=context)
                     
                 # -------------------------------------------------------------
@@ -92,7 +93,7 @@ class hr_employee_force_hour(osv.osv_memory):
                     from_month, from_year)
 
                 self.import_one_cost(cr, uid, name=name, from_date=from_date, 
-                    to_date=to_date, context=context)
+                    to_date=to_date, error=error, context=context)
                 
                 # History file:
                 os.rename(
@@ -111,8 +112,8 @@ class hr_employee_force_hour(osv.osv_memory):
     # --------
     # Utility:        
     # --------
-    def load_one_cost(self, cr, uid, path, filename, separator, 
-            from_wizard=False, context=None):
+    def load_one_cost(self, cr, uid, path, filename, separator,
+            from_wizard=False, error=None, context=None):
         ''' Import one file 
         '''
         # Utility: function for procedure:
@@ -133,6 +134,9 @@ class hr_employee_force_hour(osv.osv_memory):
                 return 0.0
 
         tot_col = 5 # TODO change if file will be extended
+        if error is None:
+            error = {}
+
         fullname = os.path.join(os.path.expanduser(path), filename)
         domain = []
         force_cost = {}
@@ -145,22 +149,27 @@ class hr_employee_force_hour(osv.osv_memory):
         try: 
             f = open(os.path.expanduser(fullname), 'rb')
         except:
-            _logger.error('No file found for import: %s' % fullname)
+            error[0] = _('No file found for import: %s') % fullname
+            _logger.error(error[0])
 
         i = 0
         for line in f:
             try:
                 i += 1
+                
                 line = line.strip()
                 if not line:
-                    _logger.warning('Empty line (jumped): %s' % i)
+                    error[i] = _('Empty line (jumped): %s') % i
+                    _logger.warning(error[i])
                     continue
                 record = line.split(separator)
+                
                 if len(record) != tot_col:
-                    _logger.error('Record different format: %s (col.: %s)' % (
+                    error[i] = _('Record different format: %s (col.: %s)') % (
                         tot_col,
                         len(record),
-                        ))
+                        )
+                    _logger.error(error[i])
                     continue
                 
                 code = format_string(record[0], False)
@@ -180,20 +189,25 @@ class hr_employee_force_hour(osv.osv_memory):
                 if len(employee_ids) == 1:
                     employee_id = employee_ids[0]
                     if employee_id in item_ids:
-                        _logger.error('Double in CSV file: %s %s' % (
-                            surname, name))
+                        error[i] = _('Double in CSV file: %s %s') % (
+                            surname, name)
+                        _logger.error(error[i])
                     else:
                         item_ids.append(employee_id)
                         force_cost[employee_id] = cost # save cost
                 elif len(employee_ids) > 1:
-                    _logger.error('Fount more employee: %s %s' % (
-                        surname, name))                   
+                    error[i] = _('Fount more employee: %s %s') % (
+                        surname, name)
+                    _logger.error(error[i])                   
                 else:
-                    _logger.error('Employee not found: %s %s' % (
-                        surname, name))
+                    error[i] = _('Employee not found: %s %s') % (
+                        surname, name)
+                    _logger.error(error[i])
+
             except:
-                _logger.error('Error import line %s' % i)
-                _logger.error((sys.exc_info(), ))                
+                error[i] = "%" % (sys.exc_info(), )
+                _logger.error('Generic error line %s' % i)
+                _logger.error(error[i])
 
         f.close() # for rename
         domain.append(('id', 'in', item_ids))
@@ -207,7 +221,7 @@ class hr_employee_force_hour(osv.osv_memory):
             return {
                 'view_type': 'form',
                 'view_mode': 'tree,form',
-                'res_model': 'hr.employee.hour.cost', # object linked to the view
+                'res_model': 'hr.employee.hour.cost', # obj linked to the view
                 #'views': [(view_id, 'form')],
                 'view_id': False,
                 'type': 'ir.actions.act_window',
@@ -218,7 +232,7 @@ class hr_employee_force_hour(osv.osv_memory):
             return True
     
     def import_one_cost(self, cr, uid, name='', from_date=False, to_date=False,
-            from_wizard=False, context=None):
+            from_wizard=False, error=None, context=None):
         ''' Import previous loaded list of employee costs
             name: for log description
             from_date: from date update analytic line
@@ -230,13 +244,13 @@ class hr_employee_force_hour(osv.osv_memory):
         employee_pool = self.pool.get('hr.employee')
         line_pool = self.pool.get('account.analytic.line')
         log_pool = self.pool.get('hr.employee.force.log')
-
+        
         # ---------------
         # Log operations:
         # ---------------
         # Note: Logged before for get ID
         update_log_id = log_pool.log_operation(
-            cr, uid, name, from_date, context=context)
+            cr, uid, name, from_date, error, context=context)
 
         cost_ids = cost_pool.search(cr, uid, [], context=context)
 

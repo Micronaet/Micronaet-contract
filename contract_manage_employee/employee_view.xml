@@ -219,10 +219,11 @@
         <field name="model">hr.employee.force.log</field>
         <field name="type">tree</field>
         <field name="arch" type="xml">
-           <tree string="Change log costs">
+           <tree string="Change log costs" colors="red:error!=False">
                 <field name="name"/>
                 <field name="date"/>
                 <field name="from_date"/>
+                <field name="error" invisible="1"/>
             </tree>
        </field>
     </record>
@@ -243,6 +244,10 @@
                     <page string="Analytic line">
                         <separator string="Update lines" colspan="4" />
                         <field name="line_ids" colspan="4" nolabel="1" readonly="1"/> 
+                    </page>
+                    <page string="Error" attrs="{'invisible':[('error', '=', False)]}">
+                        <separator string="Error" colspan="4" />
+                        <field name="error" colspan="4" nolabel="1" readonly="1"/>                    
                     </page>
                 </notebook>
             </form>

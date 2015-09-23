@@ -47,7 +47,7 @@ class contract_employee_timesheet_tipology(osv.osv):
     
     _columns = {
         'name': fields.char('Description', size=64),
-    }
+        }
 contract_employee_timesheet_tipology()
 
 class contract_employee_timesheet_tipology_line(osv.osv):
@@ -63,7 +63,7 @@ class contract_employee_timesheet_tipology_line(osv.osv):
         'contract_tipology_id':fields.many2one(
             'contract.employee.timesheet.tipology', 'Contract tipology', 
             required=True, ondelete='cascade'),
-    }
+        }
 contract_employee_timesheet_tipology_line()
 
 class contract_employee_timesheet_tipology(osv.osv):
@@ -76,7 +76,7 @@ class contract_employee_timesheet_tipology(osv.osv):
         'line_ids': fields.one2many(
             'contract.employee.timesheet.tipology.line', 
             'contract_tipology_id', 'Lines'),
-    }
+        }
 contract_employee_timesheet_tipology()
 
 class contract_employee_festivity(osv.osv):
@@ -180,7 +180,7 @@ class hr_employee_extra(osv.osv):
         'contract_tipology_id':fields.many2one(
             'contract.employee.timesheet.tipology', 'Work time', 
             help="Working time for this employee, tipically a contract tipology, like: full time, part time etc. (for manage hour and presence)"),
-    }
+        }
 hr_employee_extra()
 
 # -----------------------------------------------------------------------------
@@ -324,14 +324,24 @@ class hr_employee_force_log(osv.osv):
     _description = 'Employee force log'
     _rec_name = 'name'
 
-    def log_operation(self, cr, uid, name, from_date, context=None):    
+    def log_operation(self, cr, uid, name, from_date, error=None, 
+            context=None):    
         ''' Create new record with log of new price se for employee and date
             of intervent update (in analytic lines)
-            Return line (to save in analytic modification)
+            dict for error (key = lines)
+            Return line (to save in analytic modification)            
         '''
+        if error in None:
+            error = {}
+
         cost_pool = self.pool.get('hr.employee.hour.cost')
         cost_ids = cost_pool.search(cr, uid, [], context=context)
         note = ''
+        error_text = ''
+        if error:
+            for key, value in error.iteritems():
+                error_text += '%s. %s' % (key, value)
+            
         for cost in cost_pool.browse(cr, uid, cost_ids, context=context):
             note += _('%s hour cost %s >> %s\n') % (
                 cost.employee_id.name,
@@ -344,6 +354,7 @@ class hr_employee_force_log(osv.osv):
                 'Forced costs from date: %s') % from_date,
             'from_date': from_date,
             'note': note,
+            'error': error_text,
             }, context=context)        
         
     _columns = {
@@ -352,6 +363,7 @@ class hr_employee_force_log(osv.osv):
         'from_date': fields.date('From date',
             help='All intervent from this date will use new value'),
         'note': fields.text('Note'),
+        'error': fields.text('Error'),
         }
 
     _defaults = {
@@ -362,8 +374,7 @@ hr_employee_force_log()
 
 class account_analytic_line(osv.osv):
     """ Auto update record (save element for get list)
-    """    
-    
+    """
     _inherit = 'account.analytic.line'
 
     _columns = {
