@@ -51,11 +51,11 @@ class hr_employee_force_hour(osv.osv_memory):
         from os import listdir
         from os.path import isfile, join
 
-        import pdb; pdb.set_trace()
         path = os.path.expanduser(path)
         cost_file = [
             filename for filename in listdir(path) if 
-                    isfile(join(path, filename)) and filename.startswith(bof)]
+                    isfile(join(path, filename)) and filename.startswith(bof) 
+                    and len(filename) == (len(bof) + 8)]
 
         for filename in cost_file:
             try:
@@ -65,19 +65,20 @@ class hr_employee_force_hour(osv.osv_memory):
                     
                 # Import:
                 # parse date
-                file_date = os.path.splitext(filename)[-4:]
-                from_month = file_date[:2]
-                from_year = file_date[2:]
+                file_date = os.path.splitext(filename)[0][-4:]
+                from_month = int(file_date[:2])
+                from_year = int(file_date[2:])
                 # Next value
-                if from_month == '12':
-                    next_month = '01'
-                    next_year = '%02d' % int(from_year) + 1
+                if from_month == 12:
+                    next_month = 1
+                    next_year = from_year + 1
                 else:    
-                    next_month = '%02d' % int(from_month) + 1
+                    next_month = from_month + 1
                     next_year = from_year
 
-                from_date = '01-%02d-%02d' % (from_month, from_year)
-                to_date = '01-%02d-%02d' % (to_month, to_year)
+                import pdb; pdb.set_trace()
+                from_date = '20%02d-%02d-01' % (from_year, from_month)
+                to_date = '20%02d-%02d-01' % (next_year, next_month)
 
                 self.import_one_cost(cr, uid, from_date=from_date, 
                     to_date=to_date, context=context)
@@ -138,9 +139,9 @@ class hr_employee_force_hour(osv.osv_memory):
                 record = line.split(separator)
                 if len(record) != tot_col:
                     _logger.error('Record different format: %s (col.: %s)' % (
-                        tot_col),
+                        tot_col,
                         len(record),
-                        )
+                        ))
                     continue
                 
                 code = format_string(record[0], False)
