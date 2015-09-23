@@ -302,6 +302,7 @@ class hr_employee_force_hour(osv.osv_memory):
     # --------------
     # Button events:
     # --------------
+    # TODO Remove wizard? vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
     def load_button(self, cr, uid, ids, context=None):
         ''' Load all active employee and his product, create if not present
             After open view with the list
@@ -325,6 +326,7 @@ class hr_employee_force_hour(osv.osv_memory):
         # NOTE: no to_date from wizard:
         return self.import_one_cost(cr, uid, wiz_proxy.name, 
             wiz_proxy.from_date, False, from_wizard=True, context=context)
+    # TODO Remove wizard? ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     _columns = {
         'name': fields.char('Description', size=80),
