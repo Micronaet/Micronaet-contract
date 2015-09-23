@@ -127,7 +127,6 @@ class contract_employee_festivity(osv.osv):
             ])
         if date_ids:
             return True
-        
         return False
     
     _columns = {
