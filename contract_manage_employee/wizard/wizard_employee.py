@@ -67,8 +67,8 @@ class hr_employee_force_hour(osv.osv_memory):
                 # -------------------------------------------------------------
                 #                             Load
                 # -------------------------------------------------------------
-                self.load_one_cost(cr, uid, path, filename, separator, error,
-                    context=context)
+                self.load_one_cost(cr, uid, path=path, filename=filename, 
+                    separator=separator, error=error, context=context)
                     
                 # -------------------------------------------------------------
                 #                            Import

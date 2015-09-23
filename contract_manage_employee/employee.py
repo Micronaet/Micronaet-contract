@@ -331,7 +331,7 @@ class hr_employee_force_log(osv.osv):
             dict for error (key = lines)
             Return line (to save in analytic modification)            
         '''
-        if error in None:
+        if error is None:
             error = {}
 
         cost_pool = self.pool.get('hr.employee.hour.cost')
@@ -340,7 +340,7 @@ class hr_employee_force_log(osv.osv):
         error_text = ''
         if error:
             for key, value in error.iteritems():
-                error_text += '%s. %s' % (key, value)
+                error_text += '%s. %s\n' % (key, value)
             
         for cost in cost_pool.browse(cr, uid, cost_ids, context=context):
             note += _('%s hour cost %s >> %s\n') % (
