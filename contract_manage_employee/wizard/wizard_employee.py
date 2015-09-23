@@ -57,17 +57,25 @@ class hr_employee_force_hour(osv.osv_memory):
                     isfile(join(path, filename)) and filename.startswith(bof) 
                     and len(filename) == (len(bof) + 8)]
 
+        _logger.info("Start auto import of file cost")
         for filename in cost_file:
             try:
+                _logger.info("Load and import file %s" % filename)
+                            
+                # -----
                 # Load:
+                # -----
                 self.load_one_cost(cr, uid, path, filename, separator, 
                     context=context)
                     
+                # -------
                 # Import:
-                # parse date
+                # -------                
+                # Parse date
                 file_date = os.path.splitext(filename)[0][-4:]
-                from_month = int(file_date[:2])
-                from_year = int(file_date[2:])
+                from_year = int(file_date[:2])
+                from_month = int(file_date[2:])
+                
                 # Next value
                 if from_month == 12:
                     next_month = 1
@@ -76,16 +84,17 @@ class hr_employee_force_hour(osv.osv_memory):
                     next_month = from_month + 1
                     next_year = from_year
 
-                import pdb; pdb.set_trace()
                 from_date = '20%02d-%02d-01' % (from_year, from_month)
                 to_date = '20%02d-%02d-01' % (next_year, next_month)
 
-                self.import_one_cost(cr, uid, from_date=from_date, 
+                name = _('Auto import [month: %s-%s]') % (
+                    from_month, from_year)
+
+                self.import_one_cost(cr, uid, name=name, from_date=from_date, 
                     to_date=to_date, context=context)
             except:
-                #raise osv.except_osv(
-                #    _('Error!'), _('No file found for import: %s' % fullname))
                 _logger.error('No correct file format: %s' % filename)
+        _logger.info("End auto import of file cost")
         return True
 
     # --------
@@ -125,8 +134,7 @@ class hr_employee_force_hour(osv.osv_memory):
         try: 
             f = open(os.path.expanduser(fullname), 'rb')
         except:
-            raise osv.except_osv(
-                _('Error!'), _('No file found for import: %s' % fullname))
+            _logger.error('No file found for import: %s' % fullname)
 
         i = 0
         for line in f:

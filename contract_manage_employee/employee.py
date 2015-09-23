@@ -353,7 +353,7 @@ class hr_employee_force_log(osv.osv):
     _columns = {
         'name': fields.char('Description', size=80),
         'date': fields.datetime('Date operation'),
-        'from_date': fields.date('From date', 
+        'from_date': fields.date('From date',
             help='All intervent from this date will use new value'),
         'note': fields.text('Note'),
         }
@@ -372,7 +372,7 @@ class account_analytic_line(osv.osv):
 
     _columns = {
         'update_log_id': fields.many2one(
-            'hr.employee.force.log', 'Auto update'),        
+            'hr.employee.force.log', 'Auto update', ondelete='set null'),        
         }
 account_analytic_line()
 
