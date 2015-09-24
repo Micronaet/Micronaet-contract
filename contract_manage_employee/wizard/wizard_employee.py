@@ -1,11 +1,11 @@
 # -*- encoding: utf-8 -*-
-##############################################################################
+###############################################################################
 #
 #    OpenERP module
 #    Copyright (C) 2010 Micronaet srl (<http://www.micronaet.it>) and the
 #    Italian OpenERP Community (<http://www.openerp-italia.com>)
 #
-#    ########################################################################
+#    ##########################################################################
 #    OpenERP, Open Source Management Solution	
 #    Copyright (C) 2004-2008 Tiny SPRL (<http://tiny.be>). All Rights Reserved
 #    $Id$
@@ -23,7 +23,7 @@
 #    You should have received a copy of the GNU General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
-##############################################################################
+###############################################################################
 
 import os
 import sys
@@ -158,28 +158,30 @@ class hr_employee_force_hour(osv.osv_memory):
                 
                 line = line.strip()
                 if not line:
-                    error.append(_('Empty line (jumped): %s') % i)
+                    error.append(_('%s. Empty line (jumped)') % i)
                     _logger.warning(error[-1])
                     continue
                 record = line.split(separator)
                 
                 if len(record) != tot_col:
-                    error.append(_('Record different format: %s (col.: %s)') % (
-                        tot_col,
-                        len(record),
-                        ))
+                    error.append(_(
+                        '%s. Record different format: %s (col.: %s)') % (
+                            i, 
+                            tot_col,
+                            len(record),
+                            ))
                     _logger.error(error[-1])
                     continue
-                
+
                 code = format_string(record[0], False)
                 name = format_string(record[1]).title()
                 surname = format_string(record[2]).title()
                 cost = format_float(record[3])
                 total = format_float(record[4])
-                
+
                 if not cost:
-                    error.append(_('Error no hour cost: %s %s') % (
-                        name, surname))
+                    error.append(_('%s. Error no hour cost: %s %s') % (
+                        i, name, surname))
                     _logger.error(error[-1])
                     continue
                     
@@ -194,24 +196,24 @@ class hr_employee_force_hour(osv.osv_memory):
                 if len(employee_ids) == 1:
                     employee_id = employee_ids[0]
                     if employee_id in item_ids:
-                        error.append(_('Double in CSV file: %s %s') % (
-                            surname, name))
+                        error.append(_('%s. Double in CSV file: %s %s') % (
+                            i, surname, name))
                         _logger.error(error[-1])
                     else:
                         item_ids.append(employee_id)
                         force_cost[employee_id] = cost # save cost
                 elif len(employee_ids) > 1:
-                    error.append(_('Fount more employee: %s %s') % (
-                        surname, name))
+                    error.append(_('%s. Fount more employee: %s %s') % (
+                        i, surname, name))
                     _logger.error(error[-1])                   
                 else:
-                    error.append(_('Employee not found: %s %s') % (
-                        surname, name))
+                    error.append(_('%s. Employee not found: %s %s') % (
+                        i, surname, name))
                     _logger.error(error[-1])
 
             except:
                 error.append("%" % (sys.exc_info(), ))
-                _logger.error('Generic error line %s' % i)
+                _logger.error('%s. Generic error line:' % i)
                 _logger.error(error[-1])
 
         f.close() # for rename
