@@ -180,35 +180,47 @@ class hr_employee_force_hour(osv.osv_memory):
                 total = format_float(record[4])
 
                 if not cost:
-                    error.append(_('%s. Error no hour cost: %s %s') % (
-                        i, name, surname))
+                    error.append(_('%s. Error no hour cost: %s %s [%s]') % (
+                        i, name, surname, code))
                     _logger.error(error[-1])
                     continue
                     
-                # TODO search first for code
-                employee_ids = employee_pool.search(cr, uid, [
-                    '|',
-                    ('name', '=', "%s %s" % (name, surname)),
-                    ('name', '=', "%s %s" % (surname, name)),
-                    ], context=context)
+                # Search first for code
+                employee_ids = [] # TODO not necessary
+                update_code = False
+                if code:
+                    employee_ids = employee_pool.search(cr, uid, [
+                        ('identification_id', '=', code),
+                        ], context=context)
+                        
+                if not employee_ids:
+                    update_code = True
+                    employee_ids = employee_pool.search(cr, uid, [
+                        '|',
+                        ('name', '=', "%s %s" % (name, surname)),
+                        ('name', '=', "%s %s" % (surname, name)),
+                        ], context=context)
 
-                # TODO update code if found only one    
                 if len(employee_ids) == 1:
+                    if update_code: # Save code for next use
+                        employee_pool.write(cr, uid, employee_ids, {
+                            'identification_id': code,
+                            }, context=context)
                     employee_id = employee_ids[0]
                     if employee_id in item_ids:
-                        error.append(_('%s. Double in CSV file: %s %s') % (
-                            i, surname, name))
+                        error.append(_('%s. Double in CSV file: %s %s [%s]') % (
+                            i, surname, name, code))
                         _logger.error(error[-1])
                     else:
                         item_ids.append(employee_id)
                         force_cost[employee_id] = cost # save cost
                 elif len(employee_ids) > 1:
-                    error.append(_('%s. Fount more employee: %s %s') % (
-                        i, surname, name))
+                    error.append(_('%s. Fount more employee: %s %s [%s]') % (
+                        i, surname, name, code))
                     _logger.error(error[-1])                   
                 else:
-                    error.append(_('%s. Employee not found: %s %s') % (
-                        i, surname, name))
+                    error.append(_('%s. Employee not found: %s %s [%s]') % (
+                        i, surname, name, code))
                     _logger.error(error[-1])
 
             except:
