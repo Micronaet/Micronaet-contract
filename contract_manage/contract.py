@@ -361,6 +361,7 @@ class account_analytic_expense(osv.osv):
                 self.unlink(cr, uid, entry.id, context=context)
                 continue
                 
+            # Split only if not in contract:    
             if entry.split_type in ('all', 'department'):
                 name_mask = _('Ref. %s/%s:%s [#%s] (autom.)')
                 # Compute all active contract and split amount                
