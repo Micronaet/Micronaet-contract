@@ -360,58 +360,77 @@ class account_analytic_expense(osv.osv):
             if entry.id not in entry_contract: # all record + sub-contract
                 self.unlink(cr, uid, entry.id, context=context)
                 continue
-                
-            # Split only if not in contract:    
+            
+            # -----------------------------------------------------------------
+            #                   Split only if not in contract:    
+            # -----------------------------------------------------------------
             if entry.split_type in ('all', 'department'):
-                name_mask = _('Ref. %s/%s:%s [#%s] (autom.)')
-                # Compute all active contract and split amount                
-                domain = [
-                    ('date_start', '>=', '2015/01/01'), # TODO param.
-                    ('state', '>=', 'cancelled'),                    
-                    ] 
-                if entry.split_type == 'department': # add extra filter
-                    domain.append(
-                        ('department_id', '=', entry.department_id.id))
-                        
-                open_contract_ids = contract_pool.search(
-                    cr, uid, domain, context=context)
-                
-                # Split cost in all contract (not directly depend on amount):
-                if not open_contract_ids:
-                    _logger.info('Error jump, no list of contracts in %s' % (
-                        entry.name))
-                    continue
+                # -----------------
+                # Voucher expenses:
+                # -----------------
+                if entry:
+                    # TODO 
+                    pass
                     
-                if average_method == 'number': # TODO change me    
-                    contract_new = dict.fromkeys(
-                        open_contract_ids, 
-                        entry.amount / len(open_contract_ids))
-                elif average_method == 'amount':
-                    contract_new = {}
-                    tot = 0.0
-                    for contract_item in contract_pool.browse(
-                            cr, uid, open_contract_ids, context=context):
-                        if contract_item.total_amount > 0.0:
-                            tot += contract_item.total_amount
-                            contract_new[
-                                contract_item.id] = contract_item.total_amount
-                        else:
-                            _logger.error(
-                                'Contract %s amount not found (or negat.)!' % \
-                                    contract_item.code) 
-                                    
-                    # Calculate average depend on amount / amount total                
-                    if not tot:
-                        _logger.error('All contract has 0 amount')
-                        continue # next movement!
-                        
-                    rate = entry.amount / tot 
-                    for contract_id in contract_new:
-                        contract_new[contract_id] *= rate
-                else: # error
-                    _logger.error('Average method error: %s' % average_method)
-                    return False # exit import procedure
+                # -----------------
+                # Generic expences:
+                # -----------------
+                else:
+                    name_mask = _('Ref. %s/%s:%s [#%s] (autom.)')
+                    # Compute all active contract and split amount                
+                    domain = [
+                        ('date_start', '>=', '2015/01/01'), # TODO param.
+                        ('state', '>=', 'cancelled'),                    
+                        ] 
+                    if entry.split_type == 'department': # add extra filter
+                        domain.append(
+                            ('department_id', '=', entry.department_id.id))
                             
+                    open_contract_ids = contract_pool.search(
+                        cr, uid, domain, context=context)
+                    
+                    # Split cost in all contract (not directly depend on amount):
+                    if not open_contract_ids:
+                        _logger.info('Error jump, no list of contracts in %s' % (
+                            entry.name))
+                        continue
+                    
+                    # ---------------------------------------------------
+                    # Split method (number of contr., average on amount):
+                    # ---------------------------------------------------
+                    if average_method == 'number': # TODO change me    
+                        contract_new = dict.fromkeys(
+                            open_contract_ids, 
+                            entry.amount / len(open_contract_ids))
+                    elif average_method == 'amount':
+                        contract_new = {}
+                        tot = 0.0
+                        for contract_item in contract_pool.browse(
+                                cr, uid, open_contract_ids, context=context):
+                            if contract_item.total_amount > 0.0:
+                                tot += contract_item.total_amount
+                                contract_new[
+                                    contract_item.id] = contract_item.total_amount
+                            else:
+                                _logger.error(
+                                    'Contract %s amount not found (or negat.)!' % \
+                                        contract_item.code) 
+                                        
+                        # Calculate average depend on amount / amount total                
+                        if not tot:
+                            _logger.error('All contract has 0 amount')
+                            continue # next movement!
+                            
+                        rate = entry.amount / tot 
+                        for contract_id in contract_new:
+                            contract_new[contract_id] *= rate
+                    else: # error
+                        _logger.error('Average method error: %s' % average_method)
+                        return False # exit import procedure
+                    
+            # -----------------------------------------------------------------
+            #                     Split as is (contract type):
+            # -----------------------------------------------------------------
             elif entry.split_type == 'contract': # use dict record
                 name_mask = _('Ref. %s/%s:%s [#%s]')
                 contract_new = entry_contract[entry.id]
@@ -455,6 +474,9 @@ class account_analytic_expense(osv.osv):
             unlink_line_ids.extend([
                 contract_old[k] for k in contract_old]) 
             
+        # --------------------------------------
+        # Remove all lines not yet present once:    
+        # --------------------------------------
         line_pool.unlink(cr, uid, unlink_line_ids, context=context)
         _logger.info('End entry import!')
         return True
