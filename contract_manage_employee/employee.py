@@ -196,7 +196,9 @@ class product_product(osv.osv):
         'product_employee_id': fields.many2one(
             'hr.employee', 'Employee linked', 
             help='Product as hour cost for selected employee'),
+        'update_price_date': fields.date('Update price'),
         }
+        
     _defaults = {
         'product_employee_id': lambda *x: False,
         }

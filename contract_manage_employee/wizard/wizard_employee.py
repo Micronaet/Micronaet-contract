@@ -260,9 +260,6 @@ class hr_employee_force_hour(osv.osv_memory):
             cr, uid, name, from_date, error, context=context)
 
         cost_ids = cost_pool.search(cr, uid, [], context=context)
-
-        # TODO filter new = old?
-        current_ids = cost_pool.search(cr, uid, [], context=context)
         for cost in cost_pool.browse(cr, uid, cost_ids, context=context):
             try:
                 standard_price = cost.hour_cost_new # new standard price
@@ -278,14 +275,17 @@ class hr_employee_force_hour(osv.osv_memory):
                 # -----------------------------
                 # Force new product hour costs:
                 # -----------------------------        
-                product_pool.write(cr, uid, cost.product_id.id, {
-                    'standard_price': standard_price,
-                    }, context=context)
-                
+                # test if the update date is greater than:
+                current_date = cost.product_id.update_price_date
+                if not current_date or from_date > current_date:                
+                    product_pool.write(cr, uid, cost.product_id.id, {
+                        'standard_price': standard_price,
+                        'update_price_date': from_date, 
+                        }, context=context)
+                    
                 # ------------------------------------------------
                 # Update analytic lines save log operation parent:
                 # ------------------------------------------------
-                #if abs(cost.hour_cost - cost.hour_cost_new) >= 0.01: # approx
                 domain = [
                     ('user_id', '=', cost.employee_id.user_id.id),
                     ('date', '>=', from_date),
@@ -307,14 +307,8 @@ class hr_employee_force_hour(osv.osv_memory):
             except:
                 _logger.error('Employee update: %s' % cost.employee_id.name)
                 _logger.error(sys.exc_info(), )
-                # TODO log error for reinsert (not remove)
-                #current_ids.remove(cost.id) # not update (remain)
                 continue
 
-        # -------------------------------------
-        # Remove all record (update correctly):
-        # -------------------------------------
-        cost_pool.unlink(cr, uid, current_ids, context=context)
         if from_wizard:
             return {'type': 'ir.actions.act_window_close'}
         else:    
