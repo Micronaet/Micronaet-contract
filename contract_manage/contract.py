@@ -113,6 +113,19 @@ class account_analytic_expense_account(osv.osv):
         }
 account_analytic_expense_account()
 
+
+class hr_employee(osv.osv):
+    ''' Add field for manage voucher analytic calculate
+    '''
+
+    _inherit = 'hr.employee'
+    
+    _columns = {
+        'has_voucher': fields.boolean('Has voucher'),
+        }
+
+hr_employee()    
+
 class account_analytic_expense(osv.osv):
     ''' List of account expenses (imported)
         All this record will be distributed on account.analytic.account
@@ -122,6 +135,72 @@ class account_analytic_expense(osv.osv):
     _name = 'account.analytic.expense'
     _description = 'Analytic expense'
 
+    def get_voucher_splittet_account(
+            self, cr, uid, amount, from_date, to_date, limit, context=None):
+        ''' Load a database in a dict for manage split of vouchers 
+            amount: total to split
+            from_date: filter intervent
+            to_date: filter intervent
+            limit: hour for consider employee use voucher
+            
+            All employee are filtered if they use voucher (set on form)            
+        '''    
+        data = {}
+        intervent_pool = self.pool.get('hr.analytic.intervent')
+        employee_pool = self.pool.get('hr.employee')
+        
+        # List of user that has voucher:
+        employee_ids = users_pool.search(cr, uid, [
+            ('has_voucher', '=', True),
+            ], context=context)
+        voucher_user_ids = [
+            item.user_id.id for item in employee_pool.browse(
+                cr, uid, employee_ids, context=context) if item.user_id]
+
+        # List of intervent in period for user that has voucher:    
+        intervent_ids = intervent_pool.search(cr, uid, [
+            ('date', '>=', from_date), 
+            ('date', '<', to_date), 
+            ('user_id', 'in', voucher_user_ids),
+            ]
+            
+        # Load database for populate limit elements and account + hours    
+        for intervent in intervent_pool.browse(
+                cr, uid, intervent_ids, context=context):
+            key = (intervent.date, intervent.user_id.id)
+            if key not in data:
+                data[key] = [0, {}] # day hours, dict of ID int: hour
+            
+            data[key][0] += intervent.duration # update duration
+            if itervent.account_id in data[key][1]:
+                data[key][1][intervent.account_id] += intervent.duration
+            else:    
+                redatas[key][1][intervent.account_id] = intervent.duration
+        
+        # Loop for clean database (test limit):
+        res = {}
+        
+        total = 0.0
+        for item in data:
+            if data[item][0] < limit:
+                continue # jump, no dinner
+            for account_id in data[item][1]:
+                if account_id not in res:
+                    res[account_id] = 0
+                    
+                res[account_id] += data[item][1][account_id] # total hours
+                total += data[item][1][account_id]
+        
+        # Update with amount splitted (rate):
+        if not total:
+            # TODO error:
+            return {}
+            
+        rate = amount / total
+        for item in res:
+            res[item] *= rate
+        return res
+         
     # Scheduler event:
     def schedule_csv_accounting_movement_import(self, cr, uid, csv_file,
             delimiter, header, verbose=100, department_code_all=None, 
@@ -377,6 +456,7 @@ class account_analytic_expense(osv.osv):
                         _logger.error(
                             _('Voucher need to period from / to: [%s]') % \
                                 line) 
+                        continue        
                         
                     # Create database for user/intervents/hour for period:
                     intervent_database = self.get_intervent_database(
