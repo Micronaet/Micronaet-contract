@@ -141,10 +141,10 @@ class account_analytic_expense(osv.osv):
         '''
         _logger.info('Start import accounting movement, file: %s' % csv_file)
 
-        # TODO  manage split method!!!
-        # ------------------
-        # Startup parameters        
-        # ------------------
+        # =====================================================================
+        #                           Startup parameters        
+        # =====================================================================
+
         # pools used:
         partner_pool = self.pool.get('res.partner')
         account_pool = self.pool.get('account.account')
@@ -178,9 +178,9 @@ class account_analytic_expense(osv.osv):
             _logger.error('Cannot get purchase journal!')
             return False
 
-        # -------------------
-        # Load from CSV file:
-        # -------------------
+        # =====================================================================
+        #                           Load from CSV file
+        # =====================================================================        
         entry_contract = {} # Contract for accounting record (key=entry key)
         tot_col = 0
         counter = -header
@@ -348,15 +348,17 @@ class account_analytic_expense(osv.osv):
                 _logger.error(line, )
                 continue
                 
-        # --------------------------------------
-        # Read all lines and sync contract state
-        # --------------------------------------        
+        # =====================================================================
+        #               Read all lines and sync contract state
+        # =====================================================================
+        # TODO choose a period for not reload every time all records?
         _logger.info('Assign contract to entry:')
         unlink_line_ids = [] # element not found during this sync (to delete)
         record_ids = self.search(cr, uid, [], context=context)
         
         # Loop on all accounting lines:
         for entry in self.browse(cr, uid, record_ids, context=context): 
+            code_type = 'general'
             if entry.id not in entry_contract: # all record + sub-contract
                 self.unlink(cr, uid, entry.id, context=context)
                 continue
@@ -368,8 +370,9 @@ class account_analytic_expense(osv.osv):
                 # -----------------
                 # Voucher expenses:
                 # -----------------
-                if entry.code_id.code in voucher_list:
-                    # TODO 
+                if entry.code_id.code in voucher_list:                    
+                    continue # TODO 
+                    code_type = 'voucher'
                     import pdb; pdb.set_trace()
                     
                 # -----------------
