@@ -339,7 +339,7 @@ class hr_employee_force_log(osv.osv):
         note = ''
         error_text = ''
         for value in error:
-            error_text += value
+            error_text += "%s\n" % value
             
         for cost in cost_pool.browse(cr, uid, cost_ids, context=context):
             note += _('%s hour cost %s >> %s\n') % (
