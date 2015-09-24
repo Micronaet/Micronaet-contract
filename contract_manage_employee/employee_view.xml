@@ -35,6 +35,7 @@
             <field name="type">tree</field>
             <field name="arch" type="xml">
                  <field name="department_id" position="after">
+                     <field name="identification_id" />
                      <field name="contract_tipology_id" />
                  </field>
             </field>
