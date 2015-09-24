@@ -368,9 +368,9 @@ class account_analytic_expense(osv.osv):
                 # -----------------
                 # Voucher expenses:
                 # -----------------
-                if entry:
+                if entry.code_id.code in voucher_list:
                     # TODO 
-                    pass
+                    import pdb; pdb.set_trace()
                     
                 # -----------------
                 # Generic expences:
@@ -389,10 +389,11 @@ class account_analytic_expense(osv.osv):
                     open_contract_ids = contract_pool.search(
                         cr, uid, domain, context=context)
                     
-                    # Split cost in all contract (not directly depend on amount):
+                    # Split cost in all contract (not directly but on amount):
                     if not open_contract_ids:
-                        _logger.info('Error jump, no list of contracts in %s' % (
-                            entry.name))
+                        _logger.info(
+                            'Error jump, no list of contracts in %s' % (
+                                entry.name))
                         continue
                     
                     # ---------------------------------------------------
@@ -409,11 +410,11 @@ class account_analytic_expense(osv.osv):
                                 cr, uid, open_contract_ids, context=context):
                             if contract_item.total_amount > 0.0:
                                 tot += contract_item.total_amount
-                                contract_new[
-                                    contract_item.id] = contract_item.total_amount
+                                contract_new[contract_item.id] = \
+                                    contract_item.total_amount
                             else:
                                 _logger.error(
-                                    'Contract %s amount not found (or negat.)!' % \
+                                    'Contract %s amount not found (or <0)!' % \
                                         contract_item.code) 
                                         
                         # Calculate average depend on amount / amount total                
@@ -425,7 +426,8 @@ class account_analytic_expense(osv.osv):
                         for contract_id in contract_new:
                             contract_new[contract_id] *= rate
                     else: # error
-                        _logger.error('Average method error: %s' % average_method)
+                        _logger.error(
+                            'Average method error: %s' % average_method)
                         return False # exit import procedure
                     
             # -----------------------------------------------------------------
@@ -435,7 +437,9 @@ class account_analytic_expense(osv.osv):
                 name_mask = _('Ref. %s/%s:%s [#%s]')
                 contract_new = entry_contract[entry.id]
 
-            # Load contract-line for current write operation
+            # -----------------------------------------------------------------
+            #          Load contract-line for current write operation
+            # -----------------------------------------------------------------
             contract_old = {} # yet present on record
             for line in entry.analytic_line_ids:
                 contract_old[
