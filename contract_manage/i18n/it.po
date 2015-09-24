@@ -1,14 +1,13 @@
 # Translation of OpenERP Server.
 # This file contains the translation of the following modules:
 # 	* contract_manage
-# <> <>, 2013.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: OpenERP Server 6.0.4\n"
 "Report-Msgid-Bugs-To: support@openerp.com\n"
-"POT-Creation-Date: 2013-03-11 17:45+0000\n"
-"PO-Revision-Date: 2015-07-14 17:31+0100\n"
+"POT-Creation-Date: 2015-09-24 16:17+0000\n"
+"PO-Revision-Date: 2015-09-24 18:44+0100\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -32,6 +31,11 @@ msgstr "Se è per un utente solamente (non per tutti)"
 #: view:board.board:0
 msgid "Deadline contract (deadline<today)"
 msgstr "Scadenze contratti (scadenza < oggi)"
+
+#. module: contract_manage
+#: field:account.analytic.expense,name:0
+msgid "Protocol #"
+msgstr "Protocollo #"
 
 #. module: contract_manage
 #: constraint:hr.department:0
@@ -58,7 +62,7 @@ msgid "User without department"
 msgstr "Utente senza dipartimento"
 
 #. module: contract_manage
-#: code:addons/contract_manage/contract.py:370
+#: code:addons/contract_manage/contract.py:1078
 #, python-format
 msgid "Operation Not Permitted !"
 msgstr "Operazione non permessa!"
@@ -75,6 +79,20 @@ msgid "Not grouped"
 msgstr "Non raggruppato"
 
 #. module: contract_manage
+#: help:account.analytic.superintervent,user_id:0
+#: help:account.analytic.superintervent.group,user_id:0
+msgid "Must have an employee linket and a product"
+msgstr "Deve avere un impiegato collegato al prodotto"
+
+#. module: contract_manage
+#: field:hr.analytic.timesheet,amount_operation_etl:0
+msgid "amount operation ETL"
+msgstr "Importo operazione ETL"
+
+#. module: contract_manage
+#: view:account.analytic.expense:0
+#: field:account.analytic.expense,department_id:0
+#: selection:account.analytic.expense,split_type:0
 #: field:account.analytic.intervent.activity,department_id:0
 #: field:account.analytic.intervent.wizard,department_id:0
 #: field:account.analytic.superintervent,department_id:0
@@ -83,7 +101,7 @@ msgstr "Non raggruppato"
 #: field:hr.analytic.timesheet,department_id:0
 #: model:ir.ui.menu,name:contract_manage.menu_configuration_department
 msgid "Department"
-msgstr "Dipartimento"
+msgstr "Department"
 
 #. module: contract_manage
 #: field:account.analytic.intervent.wizard,mail_raccomanded:0
@@ -96,9 +114,9 @@ msgid "Ricavi"
 msgstr "Ricavi"
 
 #. module: contract_manage
-#: view:account.analytic.account:0
-msgid "Location city for daily cost"
-msgstr "Luogo o città per costo orario"
+#: field:account.analytic.expense,number:0
+msgid "Document"
+msgstr "Documento"
 
 #. module: contract_manage
 #: field:account.analytic.superintervent,group_id:0
@@ -121,9 +139,19 @@ msgid "% Commercial rate"
 msgstr "% Spese commerciali"
 
 #. module: contract_manage
+#: view:account.analytic.expense:0
+msgid "Expcense"
+msgstr "Expcense"
+
+#. module: contract_manage
 #: view:hr.analytic.timesheet:0
 msgid "Q. op. ETL"
 msgstr "Q. op. ETL"
+
+#. module: contract_manage
+#: model:ir.model,name:contract_manage.model_account_analytic_journal
+msgid "Analytic Journal"
+msgstr "Giornale Analitico"
 
 #. module: contract_manage
 #: view:board.board:0
@@ -136,14 +164,19 @@ msgid "Description of group"
 msgstr "Descrizione del gruppo"
 
 #. module: contract_manage
+#: field:account.analytic.expense,date:0
+msgid "Ref. date"
+msgstr "Ref. date"
+
+#. module: contract_manage
 #: view:hr.analytic.timesheet:0
 msgid "Oper."
 msgstr "Oper."
 
 #. module: contract_manage
-#: view:hr.analytic.timesheet:0
-msgid "Timesheet"
-msgstr "Foglio ore"
+#: model:ir.actions.act_window,name:contract_manage.act_hr_timesheet_intervent_stat_2_intervent
+msgid "Open intervents"
+msgstr "Open intervents"
 
 #. module: contract_manage
 #: model:ir.actions.act_window,help:contract_manage.action_hr_timesheet_intervent_short
@@ -172,17 +205,33 @@ msgid "Employee (per dept.)"
 msgstr "Impiegato (per dipart.)"
 
 #. module: contract_manage
-#: view:account.analytic.intervent.wizard:0
-msgid "Extra costi"
-msgstr "Extra costi"
-
-#. module: contract_manage
 #: help:account.analytic.superintervent.group,superintervent_ids:0
 msgid "List of interven that generate this entry"
 msgstr "Lista interventi che hanno generato questo gruppo"
 
 #. module: contract_manage
-#: model:ir.module.module,shortdesc:contract_manage.module_meta_information
+#: code:addons/contract_manage/contract.py:538
+#, python-format
+msgid "Average method error: %s"
+msgstr "Errore (metodo media): %s"
+
+#. module: contract_manage
+#: view:account.analytic.intervent.wizard:0
+msgid "Extra costi"
+msgstr "Extra costi"
+
+#. module: contract_manage
+#: field:account.analytic.expense.account,name:0
+#: model:ir.model,name:contract_manage.model_account_account
+msgid "Account"
+msgstr "Conto"
+
+#. module: contract_manage
+#: model:ir.model,name:contract_manage.model_account_analytic_superintervent_group
+msgid "Intervent on department grouped"
+msgstr "Interventi su dipartimento raggruppato"
+
+#. module: contract_manage
 #: model:ir.ui.menu,name:contract_manage.menu_contract_manage_root
 msgid "Contract Manage"
 msgstr "Gestione contratti"
@@ -193,9 +242,17 @@ msgid "Car"
 msgstr "Macchina"
 
 #. module: contract_manage
-#: view:account.analytic.intervent.wizard:0 view:hr.analytic.timesheet:0
-msgid "Extra products"
-msgstr "Prodotti extra"
+#: selection:account.analytic.intervent.wizard,trip_type:0
+msgid "Tour only"
+msgstr "Giro solo"
+
+#. module: contract_manage
+#: constraint:hr.employee:0
+msgid ""
+"Error ! You cannot select a department for which the employee is the manager."
+msgstr ""
+"Errore ! Non è possibile selezionare un reparto del quale l'impiegato è "
+"manager."
 
 #. module: contract_manage
 #: view:account.analytic.intervent.wizard:0
@@ -209,23 +266,21 @@ msgid "Location of intervent"
 msgstr "Località intervento (cantiere)"
 
 #. module: contract_manage
-#: help:account.analytic.superintervent,user_id:0
-#: help:account.analytic.superintervent.group,user_id:0
-msgid "Must have an employee linket and a product"
-msgstr "Deve avere un impiegato collegato al prodotto"
+#: view:account.analytic.superintervent:0
+msgid "Super intervent (green=not grouped, black=extra dep., grey=with dep.)"
+msgstr ""
+"Super intervento (verde=non raggruppato, nero=extra dipart., grigia=con "
+"dipartimento)"
 
 #. module: contract_manage
-#: model:ir.module.module,description:contract_manage.module_meta_information
-msgid ""
-"Manage contract using analitic account withour parent_id\n"
-"                       Use TS to create values in analitic line with extra \n"
-"                       analytic lines added inserting hours\n"
-"                    "
-msgstr ""
-"Manage contract using analitic account withour parent_id\n"
-"                       Use TS to create values in analitic line with extra \n"
-"                       analytic lines added inserting hours\n"
-"                    "
+#: field:account.analytic.expense,amount:0
+msgid "Amount"
+msgstr "Importo"
+
+#. module: contract_manage
+#: view:account.analytic.account:0
+msgid "Specific data for contract"
+msgstr "Dati specifici per contratto"
 
 #. module: contract_manage
 #: field:account.analytic.account,has_subcontract:0
@@ -253,9 +308,9 @@ msgid "Emplyoee presence (date)"
 msgstr "Presenza impiegato (data)"
 
 #. module: contract_manage
-#: model:ir.model,name:contract_manage.model_account_analytic_superintervent_group
-msgid "Intervent on department grouped"
-msgstr "Interventi su dipartimento raggruppato"
+#: help:account.analytic.expense,analytic_line_ids:0
+msgid "Analytic line child of this expense"
+msgstr "Righe analitiche figlio (spesa attuale)"
 
 #. module: contract_manage
 #: view:hr.analytic.timesheet:0
@@ -263,14 +318,25 @@ msgid "Q. op."
 msgstr "Q. op."
 
 #. module: contract_manage
-#: view:account.analytic.account:0
-msgid "Specific data for contract"
-msgstr "Dati specifici per contratto"
+#: code:addons/contract_manage/contract.py:355
+#, python-format
+msgid "%s. Department code (%s) not found: %s"
+msgstr "%s. Codice dipartimento (%s) non trovato: %s"
 
 #. module: contract_manage
-#: view:hr.analytic.timesheet:0
+#: constraint:account.account:0
+msgid "Error ! You can not create recursive accounts."
+msgstr "Errore! Non puoi creare conti ricorsivi"
+
+#. module: contract_manage
+#: view:account.analytic.expense:0 view:hr.analytic.timesheet:0
 msgid "Group By..."
 msgstr "Raggruppa per..."
+
+#. module: contract_manage
+#: model:ir.model,name:contract_manage.model_hr_analytic_timesheet_stat
+msgid "HR analytic stat"
+msgstr "HR statistiche analitiche"
 
 #. module: contract_manage
 #: field:res.city,trip_km:0 field:res.city.relation,trip_km:0
@@ -288,9 +354,10 @@ msgid "Analytic Account"
 msgstr "Contabilità Analitica"
 
 #. module: contract_manage
-#: selection:account.analytic.intervent.wizard,trip_type:0
-msgid "Tour only"
-msgstr "Giro solo"
+#: code:addons/contract_manage/contract.py:416
+#, python-format
+msgid "%s. Contract amount not found [%s-%s-%s]: %s"
+msgstr "%s. Importo contratto non trovato [%s-%s-%s]: %s"
 
 #. module: contract_manage
 #: model:ir.actions.act_window,name:contract_manage.account_analytic_superintervent_wizard_action
@@ -299,14 +366,15 @@ msgid "Assign cost grouping superintervent"
 msgstr "Assegnare costi raggruppando interventi sovradip."
 
 #. module: contract_manage
+#: field:account.analytic.expense,date_from:0
 #: field:account.analytic.superintervent.wizard,from_date:0
 msgid "From date"
 msgstr "Dalla data"
 
 #. module: contract_manage
-#: view:account.analytic.intervent.wizard:0
-msgid "Extra product"
-msgstr "Prodotti extra"
+#: view:hr.analytic.timesheet:0
+msgid "Contracts total (department)"
+msgstr "Totale contratti (dipartimento)"
 
 #. module: contract_manage
 #: view:account.analytic.superintervent.wizard:0
@@ -332,6 +400,11 @@ msgstr "Errore! Non è possibile creare conti analitici ricorsivi."
 #: view:account.analytic.superintervent.wizard:0
 msgid "Group super intervent and create analytic entries"
 msgstr "Raggruppa gli interventi sovradip. e crea le voci analitiche"
+
+#. module: contract_manage
+#: view:account.analytic.expense:0 field:account.analytic.expense,causal:0
+msgid "Causal"
+msgstr "Causale"
 
 #. module: contract_manage
 #: model:ir.ui.menu,name:contract_manage.menu_rubrica_root
@@ -376,7 +449,12 @@ msgid "Department:"
 msgstr "Dipartimento:"
 
 #. module: contract_manage
-#: code:addons/contract_manage/contract.py:370
+#: field:account.analytic.expense,code_id:0 field:hr.department,code:0
+msgid "Account code"
+msgstr "Codice conto"
+
+#. module: contract_manage
+#: code:addons/contract_manage/contract.py:1079
 #, python-format
 msgid ""
 "You can not delete a superintervent that is yet grouped. I suggest to delete "
@@ -407,29 +485,38 @@ msgid "Analytic account"
 msgstr "Conto analitico"
 
 #. module: contract_manage
+#: field:res.city,tour_km:0 field:res.city.relation,tour_km:0
+msgid "Tour km (average)"
+msgstr "Giro km (media)"
+
+#. module: contract_manage
 #: field:account.analytic.intervent.wizard,location_site:0
 #: field:hr.analytic.timesheet,location_site:0
 msgid "Location"
 msgstr "Cantiere"
 
 #. module: contract_manage
-#: field:account.analytic.intervent.wizard,like_last:0
-msgid "Like last"
-msgstr "Come ultimo inserito"
+#: view:board.board:0
+msgid "Intervent check:"
+msgstr "Controllo intervento:"
+
+#. module: contract_manage
+#: model:ir.actions.act_window,help:contract_manage.action_account_analytic_expense
+msgid "Expense list "
+msgstr "Lista spese"
 
 #. module: contract_manage
 #: field:account.analytic.superintervent.group,employee_id:0
 #: view:hr.analytic.timesheet:0
+#: model:ir.model,name:contract_manage.model_hr_employee
 #: model:ir.ui.menu,name:contract_manage.menu_hr_employee
 msgid "Employee"
 msgstr "Impiegato"
 
 #. module: contract_manage
-#: view:account.analytic.account:0
-msgid "Tip: use code + partner + department, ex.: 2012001 Mr BLack Read"
-msgstr ""
-"Consiglio: Usare il codice + nome cliente + dipartimento, es.: 2012001 Sig. "
-"Rossi Letture"
+#: help:account.analytic.superintervent.wizard,department_id:0
+msgid "Only this department"
+msgstr "Solo per questo dipartimento"
 
 #. module: contract_manage
 #: view:account.analytic.account:0
@@ -444,15 +531,16 @@ msgid "Manage control:"
 msgstr "Controllo di gestione:"
 
 #. module: contract_manage
-#: field:account.analytic.extra.wizard,type:0
-#: field:account.analytic.intervent.type,name:0
-msgid "Type"
-msgstr "Tipo"
+#: code:addons/contract_manage/contract.py:297
+#, python-format
+msgid "Total column %s"
+msgstr "Totale colonne %s"
 
 #. module: contract_manage
-#: view:account.analytic.superintervent.group:0
-msgid "Super intervent group"
-msgstr "Gruppo interventi sovradipart."
+#: code:addons/contract_manage/contract.py:364
+#, python-format
+msgid "%s. General ledge code not found: %s"
+msgstr "%s. Codice conto contabile non trovato: %s"
 
 #. module: contract_manage
 #: field:account.analytic.extra.wizard,uom_id:0
@@ -465,16 +553,24 @@ msgid "Total amount operation"
 msgstr "Importo totale (operazione)"
 
 #. module: contract_manage
-#: view:account.analytic.intervent.wizard:0
-#: model:ir.actions.act_window,name:contract_manage.account_analytic_intervent_wizard_action
-#: model:ir.actions.act_window,name:contract_manage.account_analytic_intervent_wizard_admin_action
-msgid "Insert intervent"
-msgstr "Nuovo intervento"
+#: selection:account.analytic.expense,code_type:0
+msgid "Generic expense"
+msgstr "Spesa generica"
+
+#. module: contract_manage
+#: field:account.analytic.expense,code_type:0
+msgid "Expense type"
+msgstr "Tipo spesa"
 
 #. module: contract_manage
 #: view:account.analytic.intervent.type:0
 msgid "Type of Journal (for Intervent)"
 msgstr "Tipo di giornale (per intervento)"
+
+#. module: contract_manage
+#: view:account.analytic.expense:0
+msgid "total"
+msgstr "totale"
 
 #. module: contract_manage
 #: model:ir.ui.menu,name:contract_manage.account_analytic_account_chart
@@ -498,12 +594,29 @@ msgid "Employee unactive"
 msgstr "Dipendenti disattivati"
 
 #. module: contract_manage
+#: help:account.analytic.intervent.wizard,range_vacancy:0
+msgid "If cheched added a 'to' date for vacancy period"
+msgstr "Se spuntato aggiunge una 'data a' al periodo di vacanza"
+
+#. module: contract_manage
+#: model:ir.actions.act_window,name:contract_manage.action_account_analytic_expense
+#: model:ir.ui.menu,name:contract_manage.menu_action_account_analytic_expense
+msgid "Expense list"
+msgstr "Lista spese"
+
+#. module: contract_manage
 #: help:account.analytic.superintervent,extra_department:0
 msgid ""
 "If super intervent is extra department the cost is divided on all contract"
 msgstr ""
 "Se il super-intervento è extra dipartimentale, il costo è diviso su tutti i "
 "contratti"
+
+#. module: contract_manage
+#: code:addons/contract_manage/contract.py:411
+#, python-format
+msgid "%s. Contract code not found [%s-%s-%s]: %s"
+msgstr "%s. Codice contratto non trovato [%s-%s-%s]: %s"
 
 #. module: contract_manage
 #: selection:account.analytic.intervent.wizard,trip_type:0
@@ -541,9 +654,20 @@ msgid "Total amount"
 msgstr "Importo totale"
 
 #. module: contract_manage
+#: view:account.analytic.line:0
+msgid "Equipment cost linked to intervent"
+msgstr "Costo equipaggiamento collegato all'intervento"
+
+#. module: contract_manage
 #: view:account.analytic.account:0
 msgid "Contract data:"
 msgstr "Data contratto:"
+
+#. module: contract_manage
+#: code:addons/contract_manage/contract.py:270
+#, python-format
+msgid "Cannot create analytic line, no ledge!"
+msgstr "Non possibile creare riga analitica, conto mancante!"
 
 #. module: contract_manage
 #: help:hr.department,for_extra_department:0
@@ -555,9 +679,9 @@ msgstr ""
 "conto analitico di questo dipartimento"
 
 #. module: contract_manage
-#: view:hr.analytic.timesheet:0
-msgid "Contracts total (department)"
-msgstr "Totale contratti (dipartimento)"
+#: view:account.analytic.intervent.wizard:0
+msgid "Extra product"
+msgstr "Prodotti extra"
 
 #. module: contract_manage
 #: view:account.analytic.account:0
@@ -581,14 +705,23 @@ msgstr ""
 "per progetto, ogni giorno."
 
 #. module: contract_manage
-#: field:account.analytic.line,import_type:0
-msgid "Import type"
-msgstr "Tipo di importazione"
+#: help:account.analytic.expense,code_id:0
+msgid "Accounting code from external program"
+msgstr "Codice contro per programma esterno"
 
 #. module: contract_manage
 #: model:ir.ui.menu,name:contract_manage.menu_hr_timesheet_line_evry1_all_formmenu_hr_working_hours
 msgid "Intervent list"
 msgstr "Lista interventi"
+
+#. module: contract_manage
+#: view:account.analytic.superintervent:0
+#: field:account.analytic.superintervent.group,superintervent_ids:0
+#: model:ir.actions.act_window,name:contract_manage.action_account_analytic_superintervent
+#: model:ir.ui.menu,name:contract_manage.menu_action_account_analytic_superintervent
+#: model:ir.ui.menu,name:contract_manage.menu_action_account_analytic_superintervent_root
+msgid "Super intervent"
+msgstr "Super intervento"
 
 #. module: contract_manage
 #: view:account.analytic.account:0
@@ -601,14 +734,25 @@ msgid "New contract (minimal)"
 msgstr "Nuovo contratto (minimale)"
 
 #. module: contract_manage
-#: field:account.analytic.intervent.wizard,trip_type:0
-msgid "Trip type"
-msgstr "Tipo di viaggio"
+#: field:account.analytic.line,import_type:0
+msgid "Import type"
+msgstr "Tipo di importazione"
 
 #. module: contract_manage
 #: help:account.analytic.account,commercial_rate:0
 msgid "% of invoice value for commercial value"
 msgstr "% del valore commerciale calcolato sull'import fatturato"
+
+#. module: contract_manage
+#: constraint:account.account:0
+msgid ""
+"Configuration Error! \n"
+"You cannot define children to an account with internal type different of "
+"\"View\"! "
+msgstr ""
+"Errore configurazione! \n"
+"Non è possibile creare un conto figlio per un contro con tipo differente da "
+"Vista! "
 
 #. module: contract_manage
 #: model:ir.actions.act_window,name:contract_manage.action_hr_timesheet_department
@@ -631,9 +775,9 @@ msgid "total hour of period"
 msgstr "totale ora del periodo"
 
 #. module: contract_manage
-#: view:hr.analytic.timesheet:0
-msgid "Total cost"
-msgstr "Costo Totale"
+#: view:hr.employee:0
+msgid "Employee (green = has voucher)"
+msgstr "Impiegati (verde = usa buoni pasto)"
 
 #. module: contract_manage
 #: help:account.analytic.line,import_type:0
@@ -643,9 +787,9 @@ msgstr ""
 "riga"
 
 #. module: contract_manage
-#: field:res.city,tour_km:0 field:res.city.relation,tour_km:0
-msgid "Tour km (average)"
-msgstr "Giro km (media)"
+#: help:account.analytic.expense,name:0
+msgid "ID in accounting for link the record of OpenERP"
+msgstr "ID in contabilità per collegare il record a OpenERP"
 
 #. module: contract_manage
 #: view:hr.employee:0
@@ -658,15 +802,21 @@ msgid "Extra"
 msgstr "Extra"
 
 #. module: contract_manage
-#: field:account.analytic.superintervent,name:0
-msgid "Short description"
-msgstr "Descrizione breve"
+#: model:ir.model,name:contract_manage.model_account_analytic_expense
+msgid "Analytic expense"
+msgstr "Spese analitiche"
 
 #. module: contract_manage
 #: model:ir.actions.act_window,name:contract_manage.action_account_analytic_superintervent_group
 #: model:ir.ui.menu,name:contract_manage.menu_action_account_analytic_superintervent_group
 msgid "Super intervent grouped"
 msgstr "Gruppo di inverventi sovradipart."
+
+#. module: contract_manage
+#: code:addons/contract_manage/contract.py:454
+#, python-format
+msgid "Assign contract to entry:"
+msgstr "Assegna contratto alla voce"
 
 #. module: contract_manage
 #: view:board.board:0
@@ -678,6 +828,21 @@ msgstr "Impiegati senza dipartimento"
 #: field:account.analytic.account,not_working:0
 msgid "Not working"
 msgstr "Non lavorativo"
+
+#. module: contract_manage
+#: view:account.analytic.expense:0 field:account.analytic.extra.wizard,type:0
+#: field:account.analytic.intervent.type,name:0
+msgid "Type"
+msgstr "Tipo"
+
+#. module: contract_manage
+#: field:account.analytic.intervent.wizard,user_id:0
+#: field:account.analytic.superintervent,user_id:0
+#: field:account.analytic.superintervent.group,user_id:0
+#: field:account.analytic.superintervent.wizard,user_id:0
+#: field:hr.analytic.timesheet.stat,user_id:0
+msgid "User"
+msgstr "Utente"
 
 #. module: contract_manage
 #: model:ir.ui.menu,name:contract_manage.account_analytic_account
@@ -692,7 +857,7 @@ msgstr "Generalità"
 #. module: contract_manage
 #: model:ir.actions.act_window,name:contract_manage.action_hr_timesheet_less_today
 msgid "Employee less presence today"
-msgstr "Impiegato con presenza minore (odierna)"
+msgstr "Impiegato con minore presenza oggi"
 
 #. module: contract_manage
 #: view:account.analytic.account:0
@@ -728,6 +893,12 @@ msgid "Mailing"
 msgstr "Consegna posta"
 
 #. module: contract_manage
+#: code:addons/contract_manage/contract.py:474
+#, python-format
+msgid "Voucher need to period from / to: [%s]"
+msgstr "La gestione voucher richiede periodo (da/a): [%s]"
+
+#. module: contract_manage
 #: view:hr.analytic.timesheet:0
 msgid "Information"
 msgstr "Informazioni"
@@ -749,9 +920,19 @@ msgid "Today-4"
 msgstr "Oggi-4"
 
 #. module: contract_manage
+#: view:hr.analytic.timesheet:0
+msgid "Timesheet"
+msgstr "Foglio ore"
+
+#. module: contract_manage
 #: view:board.board:0
 msgid "Dashboard support"
 msgstr "Dashboard supporto"
+
+#. module: contract_manage
+#: field:account.analytic.intervent.wizard,to_date:0
+msgid "To Date"
+msgstr "Alla data"
 
 #. module: contract_manage
 #: model:ir.actions.act_window,name:contract_manage.action_hr_timesheet_intervent_short
@@ -790,6 +971,11 @@ msgid "Employee timesheet situation"
 msgstr "Situazione interventi"
 
 #. module: contract_manage
+#: field:hr.employee,has_voucher:0
+msgid "Has voucher"
+msgstr "Ha buoni pasto"
+
+#. module: contract_manage
 #: model:ir.ui.menu,name:contract_manage.menu_contract_analysis_dashboard_default
 msgid "Dashboard (default)"
 msgstr "Dashboard (standard)"
@@ -798,6 +984,11 @@ msgstr "Dashboard (standard)"
 #: model:ir.model,name:contract_manage.model_account_analytic_line
 msgid "Analytic Line"
 msgstr "Linea conto analitico"
+
+#. module: contract_manage
+#: view:account.analytic.account:0
+msgid "Analytic Accounts child"
+msgstr "Conti analitici figli"
 
 #. module: contract_manage
 #: model:ir.ui.menu,name:contract_manage.menu_account_analytic_contract
@@ -811,14 +1002,60 @@ msgid "Check if this account is a master contract (or subvoice)"
 msgstr "Controlla se questo conto è padre per il contratto (o una sottovoce)"
 
 #. module: contract_manage
+#: code:addons/contract_manage/contract.py:545
+#, python-format
+msgid "Ref. %s/%s:%s [#%s]"
+msgstr "Rif. %s/%s:%s [#%s]"
+
+#. module: contract_manage
 #: view:board.board:0
 msgid "Employee intervent today:"
 msgstr "Interventi impiegati odierni:"
 
 #. module: contract_manage
+#: code:addons/contract_manage/contract.py:302
+#, python-format
+msgid "Line: %s Empty line / col different [%s!=%s]"
+msgstr "Riga: %s Riga vuota o colonne differenti [%s!=%s]"
+
+#. module: contract_manage
+#: model:ir.model,name:contract_manage.model_account_analytic_superintervent_wizard
+msgid "account.analytic.superintervent.wizard"
+msgstr "Wizard superintervento"
+
+#. module: contract_manage
 #: model:ir.model,name:contract_manage.model_account_analytic_superintervent
 msgid "Intervent on department"
 msgstr "Intervento su dipartimento"
+
+#. module: contract_manage
+#: help:account.analytic.account,is_recover:0
+msgid ""
+"Check this if the contract is a recovery for extra hour worked (used in "
+"report timesheet for calculate recover hour for next month)"
+msgstr ""
+"Spunta questo se il contratto è un recupero per lavoro extra (utilizzato nei "
+"report timesheet per calcolare le ore recupero per il prossimo mese)"
+
+#. module: contract_manage
+#: code:addons/contract_manage/contract.py:427
+#, python-format
+msgid "Key down: prot-ledge-dept!"
+msgstr "Errore chiave: protocollo-conto-dipartimento"
+
+#. module: contract_manage
+#: model:ir.model,name:contract_manage.model_account_analytic_intervent_wizard
+msgid "account.analytic.intervent.wizard"
+msgstr "Wizard interventi"
+
+#. module: contract_manage
+#: view:account.analytic.expense:0
+#: field:account.analytic.intervent.wizard,date:0
+#: field:account.analytic.superintervent,date:0
+#: field:account.analytic.superintervent.group,date:0
+#: view:hr.analytic.timesheet:0 field:hr.analytic.timesheet.stat,date:0
+msgid "Date"
+msgstr "Date"
 
 #. module: contract_manage
 #: help:account.analytic.intervent.wizard,mail_raccomanded:0
@@ -827,40 +1064,14 @@ msgid "Mail is a raccomanded"
 msgstr "La consegna è di tipo raccomandata"
 
 #. module: contract_manage
-#: field:account.analytic.intervent.wizard,user_id:0
-#: field:account.analytic.superintervent,user_id:0
-#: field:account.analytic.superintervent.group,user_id:0
-#: field:account.analytic.superintervent.wizard,user_id:0
-msgid "User"
-msgstr "Utente"
-
-#. module: contract_manage
-#: model:ir.model,name:contract_manage.model_account_analytic_intervent_wizard
-msgid "account.analytic.intervent.wizard"
-msgstr "Wizard interventi"
-
-#. module: contract_manage
-#: field:account.analytic.intervent.wizard,date:0
-#: field:account.analytic.superintervent,date:0
-#: field:account.analytic.superintervent.group,date:0
-#: view:hr.analytic.timesheet:0
-msgid "Date"
-msgstr "Data"
-
-#. module: contract_manage
-#: help:account.analytic.account,filter_city_ids:0
-#: help:account.analytic.account,filtered_city_ids:0
-#: help:res.city.relation,name:0
-msgid ""
-"When city filtered is enabled this field contains list of cities available"
-msgstr ""
-"Quando il filtro sulle città è attivo questo campo contiene la lista delle "
-"città disponibili"
-
-#. module: contract_manage
 #: view:account.analytic.intervent.wizard:0
 msgid "Location and trip"
 msgstr "Luogo e viaggio"
+
+#. module: contract_manage
+#: view:hr.analytic.timesheet:0
+msgid "Total cost"
+msgstr "Costo Totale"
 
 #. module: contract_manage
 #: help:account.analytic.superintervent.wizard,extra_department:0
@@ -892,6 +1103,7 @@ msgid "Km average for headquarter"
 msgstr "Km medi di distanza dalla sede della Vostra società"
 
 #. module: contract_manage
+#: field:account.analytic.expense,note:0
 #: view:account.analytic.intervent.wizard:0
 #: field:account.analytic.intervent.wizard,intervent_annotation:0
 #: view:account.analytic.superintervent:0
@@ -903,30 +1115,54 @@ msgid "Note"
 msgstr "Note"
 
 #. module: contract_manage
+#: sql_constraint:account.account:0
+msgid "The code of the account must be unique per company !"
+msgstr "Il codice del conto deve essere unico per ogni azienda!"
+
+#. module: contract_manage
 #: field:hr.analytic.timesheet,error_etl:0
 msgid "Error ETL"
 msgstr "Errore importazione ETL"
 
 #. module: contract_manage
+#: view:account.analytic.expense:0 field:account.analytic.expense,year:0
+msgid "Year"
+msgstr "Anno"
+
+#. module: contract_manage
+#: field:account.analytic.expense,date_to:0
 #: field:account.analytic.superintervent.wizard,to_date:0
 msgid "To date"
 msgstr "Alla data"
 
 #. module: contract_manage
-#: view:hr.analytic.timesheet:0
-msgid "Users"
-msgstr "Utenti"
+#: field:account.analytic.intervent.wizard,trip_type:0
+msgid "Trip type"
+msgstr "Tipo di viaggio"
 
 #. module: contract_manage
+#: view:board.board:0
+#: model:ir.actions.act_window,name:contract_manage.action_hr_timesheet_intervent_stat
+msgid "Intervent check"
+msgstr "Controllo interventi"
+
+#. module: contract_manage
+#: selection:account.analytic.expense,split_type:0
 #: field:account.analytic.intervent.wizard,account_analytic_id:0
 #: field:res.city.relation,contract_id:0
 msgid "Contract"
-msgstr "Contratti"
+msgstr "Contratto"
 
 #. module: contract_manage
 #: model:ir.model,name:contract_manage.model_account_analytic_extra_wizard
 msgid "account.analytic.extra.wizard"
 msgstr "Wizard contratti"
+
+#. module: contract_manage
+#: field:account.analytic.intervent.wizard,city_id:0
+#: field:hr.analytic.timesheet,city_id:0
+msgid "Località"
+msgstr "Località"
 
 #. module: contract_manage
 #: help:account.analytic.account,location_filtered:0
@@ -953,6 +1189,12 @@ msgid "City filtered"
 msgstr "Città filtrate"
 
 #. module: contract_manage
+#: code:addons/contract_manage/contract.py:504
+#, python-format
+msgid "Error jump, no list of contracts in %s"
+msgstr "Errore saltata, nessuna lista di contratti in: %s"
+
+#. module: contract_manage
 #: field:account.analytic.extra.wizard,quantity:0
 #: field:account.analytic.intervent.wizard,quantity:0
 #: field:account.analytic.superintervent,quantity:0
@@ -961,16 +1203,24 @@ msgid "Quantity"
 msgstr "Quantità"
 
 #. module: contract_manage
+#: view:account.analytic.intervent.wizard:0 view:hr.analytic.timesheet:0
+msgid "Extra products"
+msgstr "Prodotti extra"
+
+#. module: contract_manage
+#: field:account.analytic.expense.account,code:0
+msgid "Code"
+msgstr "Codice"
+
+#. module: contract_manage
 #: view:account.analytic.superintervent.group:0
 msgid "Intervent list grouped"
 msgstr "Intervento raggruppato"
 
 #. module: contract_manage
-#: view:account.analytic.superintervent:0
-msgid "Super intervent (green=not grouped, black=extra dep., grey=with dep.)"
-msgstr ""
-"Super intervento (verde=non raggruppato, nero=extra dipart., grigia=con "
-"dipartimento)"
+#: constraint:hr.employee:0
+msgid "Error ! You cannot create recursive Hierarchy of Employees."
+msgstr "Errore ! Non è possibile creare gerarchie ricorsive di impiegati."
 
 #. module: contract_manage
 #: field:hr.department,inactive:0
@@ -987,6 +1237,21 @@ msgstr ""
 "un gruppo cancellerà tutte le linee analitiche create"
 
 #. module: contract_manage
+#: selection:account.analytic.expense,code_type:0
+msgid "Voucher"
+msgstr "Buoni pasto"
+
+#. module: contract_manage
+#: view:hr.analytic.timesheet:0
+msgid "Users"
+msgstr "Utenti"
+
+#. module: contract_manage
+#: field:account.analytic.superintervent,name:0
+msgid "Short description"
+msgstr "Descrizione breve"
+
+#. module: contract_manage
 #: view:account.analytic.intervent.wizard:0
 #: view:account.analytic.superintervent.wizard:0
 msgid "Cancel"
@@ -1001,7 +1266,7 @@ msgstr "Parziale (operazione)"
 #. module: contract_manage
 #: model:ir.model,name:contract_manage.model_hr_analytic_timesheet
 msgid "Timesheet Line"
-msgstr "Riga Foglio Orario"
+msgstr "Linea del Timesheet"
 
 #. module: contract_manage
 #: view:hr.analytic.timesheet:0
@@ -1014,12 +1279,23 @@ msgid "Registrazioni giornale analitico"
 msgstr "Registrazioni giornale analitico"
 
 #. module: contract_manage
+#: field:hr.analytic.timesheet.stat,unit_amount:0
+msgid "Tot. hour"
+msgstr "Tot. ore"
+
+#. module: contract_manage
 #: field:account.analytic.account,filtered_city_ids:0
 #: model:ir.model,name:contract_manage.model_res_city
 #: model:ir.ui.menu,name:contract_manage.menu_action_province
 #: field:res.city.relation,name:0
 msgid "City"
 msgstr "Città"
+
+#. module: contract_manage
+#: code:addons/contract_manage/contract.py:593
+#, python-format
+msgid "End entry import!"
+msgstr "Fine importazione spese!"
 
 #. module: contract_manage
 #: help:account.analytic.account,not_working:0
@@ -1041,9 +1317,10 @@ msgid "Importation comment"
 msgstr "Commento importazione"
 
 #. module: contract_manage
-#: view:account.analytic.account:0
-msgid "Analytic Accounts child"
-msgstr "Conti analitici figli"
+#: code:addons/contract_manage/contract.py:530
+#, python-format
+msgid "All contract has 0 amount"
+msgstr "Tutti i contratti hanno importo a zero"
 
 #. module: contract_manage
 #: field:account.analytic.account,general_rate:0
@@ -1061,9 +1338,9 @@ msgid "Wizard"
 msgstr "Wizard"
 
 #. module: contract_manage
-#: field:hr.analytic.timesheet,amount_operation_etl:0
-msgid "amount operation ETL"
-msgstr "Importo operazione ETL"
+#: help:account.analytic.expense,department_id:0
+msgid "Department if directly associated"
+msgstr "Dipartimento se direttamente associato"
 
 #. module: contract_manage
 #: selection:account.analytic.intervent.wizard,trip_type:0
@@ -1096,6 +1373,11 @@ msgstr "Impiegati senza dipartimento:"
 #: view:hr.analytic.timesheet:0
 msgid "Anlytic account"
 msgstr "Conto analitico"
+
+#. module: contract_manage
+#: selection:account.analytic.expense,code_type:0
+msgid "Fuel"
+msgstr "Pieno"
 
 #. module: contract_manage
 #: selection:account.analytic.account,default_operation:0
@@ -1160,6 +1442,13 @@ msgid "Total time"
 msgstr "Tempo totale"
 
 #. module: contract_manage
+#: view:account.analytic.account:0
+msgid "Tip: use code + partner + department, ex.: 2012001 Mr BLack Read"
+msgstr ""
+"Consiglio: Usare il codice + nome cliente + dipartimento, es.: 2012001 Sig. "
+"Rossi Letture"
+
+#. module: contract_manage
 #: view:account.analytic.superintervent:0
 #: field:account.analytic.superintervent.wizard,all_department:0
 msgid "All department"
@@ -1187,14 +1476,20 @@ msgid "Human Resource"
 msgstr "Risorse Umane"
 
 #. module: contract_manage
-#: constraint:account.analytic.intervent.wizard:0
-msgid "Quantity of intervent must be > 0"
-msgstr "La durata intervento deve essere > 0"
+#: code:addons/contract_manage/contract.py:276
+#, python-format
+msgid "Cannot get purchase journal!"
+msgstr "Non posso trovare giornale acquisti"
 
 #. module: contract_manage
 #: view:board.board:0
 msgid "User without department:"
 msgstr "Utente senza dipartimento:"
+
+#. module: contract_manage
+#: field:account.analytic.intervent.wizard,range_vacancy:0
+msgid "Vacancy (range)"
+msgstr "Ferie (range)"
 
 #. module: contract_manage
 #: view:account.analytic.intervent.wizard:0
@@ -1222,20 +1517,34 @@ msgid "Working Hours"
 msgstr "Ore lavorate"
 
 #. module: contract_manage
+#: field:account.analytic.account,is_recover:0
+msgid "Is recover"
+msgstr "E' recupero"
+
+#. module: contract_manage
 #: model:ir.ui.menu,name:contract_manage.menu_hr_intervent
 msgid "Intervents"
 msgstr "Interventi"
 
 #. module: contract_manage
-#: help:account.analytic.superintervent.wizard,department_id:0
-msgid "Only this department"
-msgstr "Solo per questo dipartimento"
+#: view:account.analytic.intervent.wizard:0
+#: model:ir.actions.act_window,name:contract_manage.account_analytic_intervent_wizard_action
+#: model:ir.actions.act_window,name:contract_manage.account_analytic_intervent_wizard_admin_action
+msgid "Insert intervent"
+msgstr "Nuovo intervento"
 
 #. module: contract_manage
-#: field:account.analytic.intervent.wizard,city_id:0
-#: field:hr.analytic.timesheet,city_id:0
-msgid "Località"
-msgstr "Località"
+#: view:account.analytic.expense:0
+#: field:account.analytic.expense,analytic_line_ids:0
+msgid "Analytic line"
+msgstr "Riga analitica"
+
+#. module: contract_manage
+#: code:addons/contract_manage/contract.py:439
+#, python-format
+msgid "Error multiple key elements found, jumped: %s!"
+msgstr ""
+"Errore chiavi multiple trovate (prot. - conto - dipartimento), saltata: %s!"
 
 #. module: contract_manage
 #: field:account.analytic.superintervent,extra_department:0
@@ -1254,14 +1563,34 @@ msgid "Employees"
 msgstr "Dipendenti"
 
 #. module: contract_manage
-#: model:ir.model,name:contract_manage.model_account_analytic_superintervent_wizard
-msgid "account.analytic.superintervent.wizard"
-msgstr "Wizard superintervento"
+#: help:account.analytic.account,filter_city_ids:0
+#: help:account.analytic.account,filtered_city_ids:0
+#: help:res.city.relation,name:0
+msgid ""
+"When city filtered is enabled this field contains list of cities available"
+msgstr ""
+"Quando il filtro sulle città è attivo questo campo contiene la lista delle "
+"città disponibili"
+
+#. module: contract_manage
+#: field:account.analytic.expense,split_type:0
+msgid "Split type"
+msgstr "Tipo ripartizione"
 
 #. module: contract_manage
 #: model:ir.actions.act_window,name:contract_manage.action_hr_timesheet_less_today2
 msgid "Employee presence "
 msgstr "Presenza impiegato"
+
+#. module: contract_manage
+#: view:account.analytic.account:0
+msgid "Sub account"
+msgstr "Sotto conto"
+
+#. module: contract_manage
+#: view:account.analytic.superintervent.group:0
+msgid "Super intervent group"
+msgstr "Gruppo interventi sovradipart."
 
 #. module: contract_manage
 #: view:hr.analytic.timesheet:0
@@ -1277,16 +1606,33 @@ msgid "Intervent activity"
 msgstr "Attività intervento"
 
 #. module: contract_manage
-#: view:hr.analytic.timesheet:0
+#: code:addons/contract_manage/contract.py:488
+#, python-format
+msgid "Ref. %s/%s:%s [#%s] (autom.)"
+msgstr "Rif. %s/%s:%s [#%s] (autom.)"
+
+#. module: contract_manage
+#: view:hr.analytic.timesheet:0 view:hr.analytic.timesheet.stat:0
 msgid "Intervent report"
 msgstr "Rapporto intervento"
 
 #. module: contract_manage
-#: field:account.analytic.intervent.activity,name:0
-#: field:account.analytic.intervent.wizard,activity_id:0
-#: field:account.analytic.line,activity_id:0
-msgid "Activity"
-msgstr "Attività"
+#: code:addons/contract_manage/contract.py:347
+#, python-format
+msgid "%s. Jump expense for dept. \"%s\": %s"
+msgstr "%s. Saltata spesa per dipartimento \"%s\": %s"
+
+#. module: contract_manage
+#: code:addons/contract_manage/contract.py:526
+#, python-format
+msgid "Contract %s amount not found (or <0)!"
+msgstr "Contratto %s importo non trovato (o minore di zero)!"
+
+#. module: contract_manage
+#: view:account.analytic.expense:0 field:account.analytic.line,expense_id:0
+#: model:ir.ui.menu,name:contract_manage.menu_analytic_expense
+msgid "Expense"
+msgstr "Spese"
 
 #. module: contract_manage
 #: view:account.analytic.superintervent.group:0
@@ -1299,18 +1645,36 @@ msgid "General info"
 msgstr "Informazioni generali"
 
 #. module: contract_manage
+#: selection:account.analytic.expense,split_type:0
+msgid "All"
+msgstr "Tutti"
+
+#. module: contract_manage
 #: field:account.analytic.superintervent.group,timesheet_ids:0
 msgid "Timesheet line created"
 msgstr "Linea foglio presenza creata"
 
 #. module: contract_manage
-#: view:account.analytic.superintervent:0
-#: field:account.analytic.superintervent.group,superintervent_ids:0
-#: model:ir.actions.act_window,name:contract_manage.action_account_analytic_superintervent
-#: model:ir.ui.menu,name:contract_manage.menu_action_account_analytic_superintervent
-#: model:ir.ui.menu,name:contract_manage.menu_action_account_analytic_superintervent_root
-msgid "Super intervent"
-msgstr "Super intervento"
+#: view:account.analytic.account:0
+msgid "Location city for daily cost"
+msgstr "Luogo o città per costo orario"
+
+#. module: contract_manage
+#: field:account.analytic.intervent.activity,name:0
+#: field:account.analytic.intervent.wizard,activity_id:0
+#: field:account.analytic.line,activity_id:0
+msgid "Activity"
+msgstr "Attività"
+
+#. module: contract_manage
+#: field:account.analytic.intervent.wizard,like_last:0
+msgid "Like last"
+msgstr "Come ultimo inserito"
+
+#. module: contract_manage
+#: field:account.analytic.expense,series:0
+msgid "Series"
+msgstr "Serie"
 
 #. module: contract_manage
 #: model:ir.actions.act_window,name:contract_manage.action_account_analytic_contract_list_to_close
@@ -1350,14 +1714,20 @@ msgid "Price per operation"
 msgstr "Ricavo unitario operazione"
 
 #. module: contract_manage
+#: code:addons/contract_manage/contract.py:83
+#, python-format
+msgid "Purchase"
+msgstr "Acquisti"
+
+#. module: contract_manage
 #: view:account.analytic.account:0
 msgid "4 number for year + 3 number for count, ex.: 2012001"
 msgstr "4 cifre per l'anno + 3 per il progressivo, es.: 2012001"
 
 #. module: contract_manage
-#: view:account.analytic.account:0
-msgid "Sub account"
-msgstr "Sotto conto"
+#: model:ir.model,name:contract_manage.model_account_analytic_expense_account
+msgid "Analytic expense account"
+msgstr "Conto spese analitiche"
 
 #. module: contract_manage
 #: view:hr.analytic.timesheet:0
@@ -1366,6 +1736,7 @@ msgstr "Contabilità"
 
 #. module: contract_manage
 #: view:account.analytic.superintervent:0 view:hr.analytic.timesheet:0
+#: field:hr.analytic.timesheet.stat,total:0
 msgid "Total"
 msgstr "Totale"
 

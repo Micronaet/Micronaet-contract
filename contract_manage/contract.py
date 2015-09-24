@@ -147,7 +147,8 @@ class account_analytic_expense(osv.osv):
             limit: hour for consider employee use voucher
             
             All employee are filtered if they use voucher (set on form)            
-        '''    
+        '''
+        import pdb; pdb.set_trace()
         data = {}
         intervent_pool = self.pool.get('hr.analytic.intervent')
         employee_pool = self.pool.get('hr.employee')
