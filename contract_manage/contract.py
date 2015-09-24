@@ -517,7 +517,16 @@ class account_analytic_expense(osv.osv):
         'code_id': fields.many2one(
             'account.analytic.expense.account', 'Account code',
             help="Accounting code from external program"),
+        'code_type': fields.selection([
+            ('generic', 'Generic expense'),
+            ('voucher', 'Voucher'),
+            ('fuel', 'Fuel'),
+            ], 'Expense type'),            
         }
+        
+    _defaults = {
+        'code_type': lambda *x: 'generic',
+        }    
 account_analytic_expense()
 
 class account_analytic_intervent_activity(osv.osv):
