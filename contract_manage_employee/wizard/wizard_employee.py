@@ -186,6 +186,7 @@ class hr_employee_force_hour(osv.osv_memory):
                     continue
                     
                 # Search first for code
+                # TODO search also in deactivated users?
                 employee_ids = [] # TODO not necessary
                 update_code = False
                 if code:

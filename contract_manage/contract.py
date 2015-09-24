@@ -126,7 +126,7 @@ class account_analytic_expense(osv.osv):
     def schedule_csv_accounting_movement_import(self, cr, uid, csv_file,
             delimiter, header, verbose=100, department_code_all=None, 
             department_code_jump=None, general_code = '410100', 
-            average_method='number', voucher_list=None,
+            average_method='number', voucher_list=None, log_warning=False,
             context=None):
         ''' Import movement sync with record in OpenERP
             csv_file: full path of file to import  (use ~ for home)
@@ -138,6 +138,7 @@ class account_analytic_expense(osv.osv):
             general_code: account for analytic line
             average_method: 'number', 'amount' (average depend on) 
             voucher_list: List of account used as voucher (different split)
+            log_warning: For OpenERP log file
         '''
         _logger.info('Start import accounting movement, file: %s' % csv_file)
 
@@ -199,9 +200,10 @@ class account_analytic_expense(osv.osv):
                    _logger.info('Total column %s' % tot_col)
                    
                 if not(len(line) and (tot_col == len(line))):
-                    _logger.warning(
-                        'Riga: %s Empty line of col different [%s!=%s]' % (
-                            counter, tot_col, len(line)))
+                    if log_warning:
+                        _logger.warning(
+                            'Riga: %s Empty line of col different [%s!=%s]' % (
+                                counter, tot_col, len(line)))
                     continue
 
                 # --------------------------
@@ -251,9 +253,10 @@ class account_analytic_expense(osv.osv):
 
                 # Test if is department to jump:
                 if department_code in department_code_jump:
-                    _logger.warning(
-                        '%s. Jump expense for dept. "%s": %s' % (
-                            counter, department_code, line))
+                    if log_warning:
+                        _logger.warning(
+                            '%s. Jump expense for dept. "%s": %s' % (
+                                counter, department_code, line))
                     continue
                 
                 # Test if is a general department:
