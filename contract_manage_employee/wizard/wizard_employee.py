@@ -62,7 +62,7 @@ class hr_employee_force_hour(osv.osv_memory):
         for filename in cost_file:        
             try:
                 _logger.info("Load and import file %s" % filename)
-                error = {}                                    
+                error = []                             
                 # -------------------------------------------------------------
                 #                             Load
                 # -------------------------------------------------------------
@@ -134,7 +134,7 @@ class hr_employee_force_hour(osv.osv_memory):
 
         tot_col = 5 # TODO change if file will be extended
         if error is None:
-            error = {}
+            error = []
 
         fullname = os.path.join(os.path.expanduser(path), filename)
         domain = []
@@ -148,8 +148,8 @@ class hr_employee_force_hour(osv.osv_memory):
         try: 
             f = open(os.path.expanduser(fullname), 'rb')
         except:
-            error[0] = _('No file found for import: %s') % fullname
-            _logger.error(error[0])
+            error.append(_('No file found for import: %s') % fullname)
+            _logger.error(error[-1])
 
         i = 0
         for line in f:
@@ -158,17 +158,17 @@ class hr_employee_force_hour(osv.osv_memory):
                 
                 line = line.strip()
                 if not line:
-                    error[i] = _('Empty line (jumped): %s') % i
-                    _logger.warning(error[i])
+                    error.append(_('Empty line (jumped): %s') % i)
+                    _logger.warning(error[-1])
                     continue
                 record = line.split(separator)
                 
                 if len(record) != tot_col:
-                    error[i] = _('Record different format: %s (col.: %s)') % (
+                    error.append(_('Record different format: %s (col.: %s)') % (
                         tot_col,
                         len(record),
-                        )
-                    _logger.error(error[i])
+                        ))
+                    _logger.error(error[-1])
                     continue
                 
                 code = format_string(record[0], False)
@@ -178,8 +178,9 @@ class hr_employee_force_hour(osv.osv_memory):
                 total = format_float(record[4])
                 
                 if not cost:
-                    error[i] = _('Error no hour cost: %s %s' % (name, surname))
-                    _logger.error(error[i])
+                    error.append(_('Error no hour cost: %s %s') % (
+                        name, surname))
+                    _logger.error(error[-1])
                     continue
                     
                 # TODO search first for code
@@ -193,25 +194,25 @@ class hr_employee_force_hour(osv.osv_memory):
                 if len(employee_ids) == 1:
                     employee_id = employee_ids[0]
                     if employee_id in item_ids:
-                        error[i] = _('Double in CSV file: %s %s') % (
-                            surname, name)
-                        _logger.error(error[i])
+                        error.append(_('Double in CSV file: %s %s') % (
+                            surname, name))
+                        _logger.error(error[-1])
                     else:
                         item_ids.append(employee_id)
                         force_cost[employee_id] = cost # save cost
                 elif len(employee_ids) > 1:
-                    error[i] = _('Fount more employee: %s %s') % (
-                        surname, name)
-                    _logger.error(error[i])                   
+                    error.append(_('Fount more employee: %s %s') % (
+                        surname, name))
+                    _logger.error(error[-1])                   
                 else:
-                    error[i] = _('Employee not found: %s %s') % (
-                        surname, name)
-                    _logger.error(error[i])
+                    error.append(_('Employee not found: %s %s') % (
+                        surname, name))
+                    _logger.error(error[-1])
 
             except:
-                error[i] = "%" % (sys.exc_info(), )
+                error.append("%" % (sys.exc_info(), ))
                 _logger.error('Generic error line %s' % i)
-                _logger.error(error[i])
+                _logger.error(error[-1])
 
         f.close() # for rename
         domain.append(('id', 'in', item_ids))

@@ -1,19 +1,21 @@
 # Translation of OpenERP Server.
 # This file contains the translation of the following modules:
-#	* contract_manage_employee
+# 	* contract_manage_employee
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: OpenERP Server 6.0.4\n"
 "Report-Msgid-Bugs-To: support@openerp.com\n"
-"POT-Creation-Date: 2015-09-24 06:32+0000\n"
-"PO-Revision-Date: 2015-09-24 06:32+0000\n"
+"POT-Creation-Date: 2015-09-24 06:38+0000\n"
+"PO-Revision-Date: 2015-09-24 08:24+0100\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: \n"
+"Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: \n"
+"Language: it\n"
+"X-Generator: Poedit 1.6.10\n"
 
 #. module: contract_manage_employee
 #: model:ir.model,name:contract_manage_employee.model_hr_employee_force_log
@@ -27,19 +29,27 @@ msgstr "Nuovo prodotto"
 
 #. module: contract_manage_employee
 #: help:contract.employee.festivity,periodic:0
-msgid "Festivity is only for a from-to period (ex.: Patronal festivity but for a period because of changing city)"
-msgstr "Festitivà solo per un determinato periodo [da-a] (es.: Festa patronale vincolata ad un periodo per cambio sede legale successiva)"
+msgid ""
+"Festivity is only for a from-to period (ex.: Patronal festivity but for a "
+"period because of changing city)"
+msgstr ""
+"Festitivà solo per un determinato periodo [da-a] (es.: Festa patronale "
+"vincolata ad un periodo per cambio sede legale successiva)"
 
 #. module: contract_manage_employee
 #: code:addons/contract_manage_employee/wizard/wizard_employee.py:203
 #, python-format
 msgid "Fount more employee: %s %s"
-msgstr "Fount more employee: %s %s"
+msgstr "Trovate più ricorrenze impiegato: %s %s"
 
 #. module: contract_manage_employee
 #: help:contract.employee.festivity,static:0
-msgid "It means that every year this festivity is the same day (ex. Christmas = 25 of dec.), if not it's dynamic (ex. Easter monday)"
-msgstr "Significa che ogni anno questa festa è lo stesso giorno (es. Nalale = 25 dic.), altimenti è considerata dinamica (es. Lunedì dell'angelo)"
+msgid ""
+"It means that every year this festivity is the same day (ex. Christmas = 25 "
+"of dec.), if not it's dynamic (ex. Easter monday)"
+msgstr ""
+"Significa che ogni anno questa festa è lo stesso giorno (es. Nalale = 25 "
+"dic.), altimenti è considerata dinamica (es. Lunedì dell'angelo)"
 
 #. module: contract_manage_employee
 #: selection:contract.employee.timesheet.tipology.line,week_day:0
@@ -59,7 +69,7 @@ msgstr "Prodotto attuale"
 #. module: contract_manage_employee
 #: field:hr.employee.force.hour.wizard,department_id:0
 msgid "Department"
-msgstr "Department"
+msgstr "Dipartimento"
 
 #. module: contract_manage_employee
 #: view:hr.employee.force.log:0
@@ -108,13 +118,18 @@ msgstr "Festività (dinamica)"
 
 #. module: contract_manage_employee
 #: constraint:hr.employee:0
-msgid "Error ! You cannot select a department for which the employee is the manager."
-msgstr "Errore ! Non è possibile selezionare un reparto del quale l'impiegato è manager."
+msgid ""
+"Error ! You cannot select a department for which the employee is the manager."
+msgstr ""
+"Errore ! Non è possibile selezionare un reparto del quale l'impiegato è "
+"manager."
 
 #. module: contract_manage_employee
 #: help:hr.employee.force.hour.wizard,from_date:0
 msgid "Choose the date, every intervent from that date take costs"
-msgstr "Scegli la data, ogni intervento con data >= di quella impostata prende il nuovo costo"
+msgstr ""
+"Scegli la data, ogni intervento con data >= di quella impostata prende il "
+"nuovo costo"
 
 #. module: contract_manage_employee
 #: model:ir.model,name:contract_manage_employee.model_hr_employee_hour_cost
@@ -176,6 +191,12 @@ msgid "Employee"
 msgstr "Impiegato"
 
 #. module: contract_manage_employee
+#: code:addons/contract_manage_employee/wizard/wizard_employee.py:181
+#, python-format
+msgid "Error no hour cost: %s %s"
+msgstr "Nessun costo orario: %s %s"
+
+#. module: contract_manage_employee
 #: model:ir.model,name:contract_manage_employee.model_contract_employee_timesheet_tipology
 msgid "Timesheet tipology"
 msgstr "Tipologia di foglio presenze"
@@ -194,7 +215,7 @@ msgstr "Nuovo costo orario"
 #: code:addons/contract_manage_employee/wizard/wizard_employee.py:91
 #, python-format
 msgid "Auto import [month: %s-%s]"
-msgstr "Auto import [month: %s-%s]"
+msgstr "Auto importazione [mese: %s-%s]"
 
 #. module: contract_manage_employee
 #: field:product.product,product_employee_id:0
@@ -215,7 +236,7 @@ msgstr "Forza costo orario impiegato"
 #: code:addons/contract_manage_employee/wizard/wizard_employee.py:167
 #, python-format
 msgid "Record different format: %s (col.: %s)"
-msgstr "Record different format: %s (col.: %s)"
+msgstr "Riga CSV con colonne diverse: %s (col.: %s)"
 
 #. module: contract_manage_employee
 #: selection:contract.employee.timesheet.tipology.line,week_day:0
@@ -236,13 +257,13 @@ msgstr "Martedì"
 #: code:addons/contract_manage_employee/wizard/wizard_employee.py:151
 #, python-format
 msgid "No file found for import: %s"
-msgstr "No file found for import: %s"
+msgstr "File CSV non trovato: %s"
 
 #. module: contract_manage_employee
 #: code:addons/contract_manage_employee/wizard/wizard_employee.py:207
 #, python-format
 msgid "Employee not found: %s %s"
-msgstr "Employee not found: %s %s"
+msgstr "Impiegato non trovato (o non più attivo): %s %s"
 
 #. module: contract_manage_employee
 #: model:ir.ui.menu,name:contract_manage_employee.menu_configuration_contract_festivity_static
@@ -258,13 +279,10 @@ msgstr "Mese statico"
 #: code:addons/contract_manage_employee/employee.py:346
 #, python-format
 msgid "%s hour cost %s >> %s\n"
-""
 msgstr "%s costo orario %s >> %s\n"
-""
 
 #. module: contract_manage_employee
-#: view:hr.employee.force.log:0
-#: field:hr.employee.force.log,note:0
+#: view:hr.employee.force.log:0 field:hr.employee.force.log,note:0
 msgid "Note"
 msgstr "Note"
 
@@ -280,8 +298,12 @@ msgstr "Forza costo orario"
 
 #. module: contract_manage_employee
 #: help:hr.employee,contract_tipology_id:0
-msgid "Working time for this employee, tipically a contract tipology, like: full time, part time etc. (for manage hour and presence)"
-msgstr "Orario lavorativo per dipendente, tipicamente per tipologia di contratto, come: part time, full time, ecc. (per gestire le ore di presenza)"
+msgid ""
+"Working time for this employee, tipically a contract tipology, like: full "
+"time, part time etc. (for manage hour and presence)"
+msgstr ""
+"Orario lavorativo per dipendente, tipicamente per tipologia di contratto, "
+"come: part time, full time, ecc. (per gestire le ore di presenza)"
 
 #. module: contract_manage_employee
 #: model:ir.model,name:contract_manage_employee.model_account_analytic_line
@@ -320,10 +342,9 @@ msgid "Wednesday"
 msgstr "Mercoledì"
 
 #. module: contract_manage_employee
-#: view:hr.employee.force.log:0
-#: field:hr.employee.force.log,error:0
+#: view:hr.employee.force.log:0 field:hr.employee.force.log,error:0
 msgid "Error"
-msgstr "Error"
+msgstr "Errore"
 
 #. module: contract_manage_employee
 #: view:hr.employee.force.hour.wizard:0
@@ -348,7 +369,7 @@ msgstr "Data operatione"
 #. module: contract_manage_employee
 #: selection:hr.employee.force.hour.wizard,mode:0
 msgid "From employee list"
-msgstr "From employee list"
+msgstr "Dalla lista impiegati"
 
 #. module: contract_manage_employee
 #: model:ir.model,name:contract_manage_employee.model_contract_employee_festivity
@@ -396,45 +417,15 @@ msgid "Description"
 msgstr "Descrizione"
 
 #. module: contract_manage_employee
-#: code:addons/contract_manage_employee/wizard/wizard_employee.py:181
-#, python-format
-msgid "Error no hour cost: %s %s' % (name, surname))\n"
-"                    _logger.error(error[i])\n"
-"                    continue\n"
-"                    \n"
-"                # TODO search first for code\n"
-"                employee_ids = employee_pool.search(cr, uid, [\n"
-"                    '|',\n"
-"                    ('name', '=', \"%s %s\" % (name, surname)),\n"
-"                    ('name', '=', \"%s %s\" % (surname, name)),\n"
-"                    ], context=context)\n"
-"\n"
-"                # TODO update code if found only one    \n"
-"                if len(employee_ids) == 1:\n"
-"                    employee_id = employee_ids[0]\n"
-"                    if employee_id in item_ids:\n"
-"                        error[i] = _('Double in CSV file: %s %s"
-msgstr "Error no hour cost: %s %s' % (name, surname))\n"
-"                    _logger.error(error[i])\n"
-"                    continue\n"
-"                    \n"
-"                # TODO search first for code\n"
-"                employee_ids = employee_pool.search(cr, uid, [\n"
-"                    '|',\n"
-"                    ('name', '=', \"%s %s\" % (name, surname)),\n"
-"                    ('name', '=', \"%s %s\" % (surname, name)),\n"
-"                    ], context=context)\n"
-"\n"
-"                # TODO update code if found only one    \n"
-"                if len(employee_ids) == 1:\n"
-"                    employee_id = employee_ids[0]\n"
-"                    if employee_id in item_ids:\n"
-"                        error[i] = _('Double in CSV file: %s %s"
-
-#. module: contract_manage_employee
 #: field:hr.employee.force.log,line_ids:0
 msgid "Line update from this log"
 msgstr "Righe analitiche aggiornate da questa operazione"
+
+#. module: contract_manage_employee
+#: code:addons/contract_manage_employee/wizard/wizard_employee.py:196
+#, python-format
+msgid "Double in CSV file: %s %s"
+msgstr "Duplicato nel file CSV: %s %s"
 
 #. module: contract_manage_employee
 #: field:hr.employee,contract_tipology_id:0
@@ -450,7 +441,7 @@ msgstr "Righe analitiche"
 #: code:addons/contract_manage_employee/wizard/wizard_employee.py:161
 #, python-format
 msgid "Empty line (jumped): %s"
-msgstr "Empty line (jumped): %s"
+msgstr "Riga vuota (saltata): %s"
 
 #. module: contract_manage_employee
 #: model:ir.actions.act_window,name:contract_manage_employee.action_view_contract_employee_festivity
@@ -501,4 +492,3 @@ msgstr "Sabato"
 #: model:ir.model,name:contract_manage_employee.model_contract_employee_timesheet_tipology_line
 msgid "Timesheet tipology line"
 msgstr "linea tipo foglio ora"
-
