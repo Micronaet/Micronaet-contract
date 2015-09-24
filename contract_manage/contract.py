@@ -126,7 +126,8 @@ class account_analytic_expense(osv.osv):
     def schedule_csv_accounting_movement_import(self, cr, uid, csv_file,
             delimiter, header, verbose=100, department_code_all=None, 
             department_code_jump=None, general_code = '410100', 
-            average_method='number', context=None):
+            average_method='number', voucher_list=None,
+            context=None):
         ''' Import movement sync with record in OpenERP
             csv_file: full path of file to import  (use ~ for home)
             delimiter: for csv separation
@@ -136,11 +137,11 @@ class account_analytic_expense(osv.osv):
             department_code_jump: list of department code that will be jumper
             general_code: account for analytic line
             average_method: 'number', 'amount' (average depend on) 
+            voucher_list: List of account used as voucher (different split)
         '''
         _logger.info('Start import accounting movement, file: %s' % csv_file)
 
         # TODO  manage split method!!!
-
         # ------------------
         # Startup parameters        
         # ------------------
@@ -161,6 +162,9 @@ class account_analytic_expense(osv.osv):
 
         if department_code_jump is None:
             department_code_jump = [] 
+
+        if voucher_list is None:
+            voucher_list = []
 
         general_id = account_pool.get_account_id(
             cr, uid, general_code, context=context)
