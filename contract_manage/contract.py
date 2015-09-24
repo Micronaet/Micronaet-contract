@@ -272,6 +272,12 @@ class account_analytic_expense(osv.osv):
                         '%s. General ledge code not found: %s' % (
                             counter, line))
                     continue    
+
+                if account_code in voucher_list:
+                    code_type = 'voucher'
+                #elif: # TODO for fuel    
+                else:
+                    code_type = 'generic'
                 
                 # ------------------------
                 # Sync or create elements:        
@@ -283,6 +289,7 @@ class account_analytic_expense(osv.osv):
                     'series': series,
                     'number': number,
                     'code_id': code_id, 
+                    'code_type': code_type, 
                     'date': date,
                     'date_to': date_to,
                     'date_from': date_from,
@@ -358,7 +365,6 @@ class account_analytic_expense(osv.osv):
         
         # Loop on all accounting lines:
         for entry in self.browse(cr, uid, record_ids, context=context): 
-            code_type = 'general'
             if entry.id not in entry_contract: # all record + sub-contract
                 self.unlink(cr, uid, entry.id, context=context)
                 continue
@@ -367,18 +373,16 @@ class account_analytic_expense(osv.osv):
             #                   Split only if not in contract:    
             # -----------------------------------------------------------------
             if entry.split_type in ('all', 'department'):
-                # -----------------
-                # Voucher expenses:
-                # -----------------
                 if entry.code_id.code in voucher_list:                    
+                    # -----------------
+                    # Voucher expenses:
+                    # -----------------
                     continue # TODO 
-                    code_type = 'voucher'
-                    import pdb; pdb.set_trace()
                     
-                # -----------------
-                # Generic expences:
-                # -----------------
                 else:
+                    # -----------------
+                    # Generic expences:
+                    # -----------------
                     name_mask = _('Ref. %s/%s:%s [#%s] (autom.)')
                     # Compute all active contract and split amount                
                     domain = [
