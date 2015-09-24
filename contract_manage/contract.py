@@ -135,7 +135,10 @@ class account_analytic_expense(osv.osv):
     _name = 'account.analytic.expense'
     _description = 'Analytic expense'
 
-    def get_voucher_splittet_account(
+    # -------------------------------------------------------------------------
+    #                           Utility functions:
+    # -------------------------------------------------------------------------
+    def get_voucher_splitted_account(
             self, cr, uid, amount, from_date, to_date, limit, context=None):
         ''' Load a database in a dict for manage split of vouchers 
             amount: total to split
@@ -149,7 +152,9 @@ class account_analytic_expense(osv.osv):
         intervent_pool = self.pool.get('hr.analytic.intervent')
         employee_pool = self.pool.get('hr.employee')
         
+        # ------------------------------
         # List of user that has voucher:
+        # ------------------------------
         employee_ids = users_pool.search(cr, uid, [
             ('has_voucher', '=', True),
             ], context=context)
@@ -157,14 +162,18 @@ class account_analytic_expense(osv.osv):
             item.user_id.id for item in employee_pool.browse(
                 cr, uid, employee_ids, context=context) if item.user_id]
 
+        # ------------------------------------------------------
         # List of intervent in period for user that has voucher:    
+        # ------------------------------------------------------
         intervent_ids = intervent_pool.search(cr, uid, [
             ('date', '>=', from_date), 
             ('date', '<', to_date), 
             ('user_id', 'in', voucher_user_ids),
-            ]
+            ])
             
+        # -------------------------------------------------------------
         # Load database for populate limit elements and account + hours    
+        # -------------------------------------------------------------
         for intervent in intervent_pool.browse(
                 cr, uid, intervent_ids, context=context):
             key = (intervent.date, intervent.user_id.id)
@@ -177,7 +186,9 @@ class account_analytic_expense(osv.osv):
             else:    
                 redatas[key][1][intervent.account_id] = intervent.duration
         
+        # -------------------------------------
         # Loop for clean database (test limit):
+        # -------------------------------------
         res = {}
         
         total = 0.0
@@ -191,7 +202,9 @@ class account_analytic_expense(osv.osv):
                 res[account_id] += data[item][1][account_id] # total hours
                 total += data[item][1][account_id]
         
+        # -----------------------------------
         # Update with amount splitted (rate):
+        # -----------------------------------
         if not total:
             # TODO error:
             return {}
@@ -201,11 +214,14 @@ class account_analytic_expense(osv.osv):
             res[item] *= rate
         return res
          
-    # Scheduler event:
+    # -------------------------------------------------------------------------
+    #                           Scheduler event:
+    # -------------------------------------------------------------------------
     def schedule_csv_accounting_movement_import(self, cr, uid, csv_file,
             delimiter, header, verbose=100, department_code_all=None, 
             department_code_jump=None, general_code = '410100', 
-            average_method='number', voucher_list=None, log_warning=False,
+            average_method='number', voucher_list=None, voucher_limit=6,
+            log_warning=False,
             context=None):
         ''' Import movement sync with record in OpenERP
             csv_file: full path of file to import  (use ~ for home)
@@ -217,6 +233,7 @@ class account_analytic_expense(osv.osv):
             general_code: account for analytic line
             average_method: 'number', 'amount' (average depend on) 
             voucher_list: List of account used as voucher (different split)
+            voucher_limit: in hour for consider voucher used from an employee
             log_warning: For OpenERP log file
         '''
         _logger.info('Start import accounting movement, file: %s' % csv_file)
@@ -406,8 +423,7 @@ class account_analytic_expense(osv.osv):
                     ], context=context)
 
                 if entry_ids:
-                    assert len(entry_ids) == 1, 
-                        _('Key broken prot-ledge-dept!')
+                    assert len(entry_ids) == 1, _('Key down: prot-ledge-dept!')
                     entry_id = entry_ids[0]                    
                     self.write(cr, uid, entry_id, data, context=context)
                 else:
@@ -457,11 +473,12 @@ class account_analytic_expense(osv.osv):
                             _('Voucher need to period from / to: [%s]') % \
                                 line) 
                         continue        
-                        
+                    
                     # Create database for user/intervents/hour for period:
-                    intervent_database = self.get_intervent_database(
-                        cr, uid, context=context)
-                    continue # TODO 
+                    account_expense = self.get_voucher_splitted_account(
+                        cr, uid, entry.amount, from_date, to_date, 
+                        voucher_limit, context=context)
+                    # TODO    
                     
                 else:
                     # -----------------
@@ -576,6 +593,9 @@ class account_analytic_expense(osv.osv):
         _logger.info(_('End entry import!'))
         return True
 
+    # -------------------------------------------------------------------------
+    #                               TABLE:
+    # -------------------------------------------------------------------------
     _columns = {
         'name': fields.char('Protocol #', size=64, required=True,
             help='ID in accounting for link the record of OpenERP'), 
