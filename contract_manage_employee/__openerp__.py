@@ -36,6 +36,7 @@
     'depends': [
         'base',
         'base_import_fraternita',
+        'product',
         'contract_manage',
         'report_aeroo',
         'report_aeroo_ooo',

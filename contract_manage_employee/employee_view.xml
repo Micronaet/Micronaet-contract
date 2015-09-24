@@ -2,6 +2,19 @@
 <openerp>
 <data>
     <!-- INHERIT VIEWS -->  
+        <record id="product_normal_form_employee_view" model="ir.ui.view">
+            <field name="name">product.normal.form.employee</field>
+            <field name="model">product.product</field>
+            <field name="type">form</field>
+            <field name="inherit_id" ref="product.product_normal_form_view"/>
+            <field name="arch" type="xml">
+                <xpath expr="//notebook/page[@string='Information']/group/field[@name='standard_price']" position="after">
+                    <field name="update_price_date" attrs="{'invisible':[('update_price_date','=',False)]}"/>
+                    <field name="product_employee_id" readonly="1" attrs="{'invisible':[('product_employee_id','=',False)]}"/>
+                </xpath>
+            </field>
+        </record>
+
       <!-- hr.employee -->
         <record id="view_hr_employee_extra_fields" model="ir.ui.view">
             <field name="name">Employee work time</field>

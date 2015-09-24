@@ -186,7 +186,6 @@ hr_employee_extra()
 # -----------------------------------------------------------------------------
 # Add importation hour cost for employee:
 # -----------------------------------------------------------------------------
-
 class product_product(osv.osv):
     """ Add extra info to manage product linked to employee:
     """    
