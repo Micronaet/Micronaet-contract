@@ -471,7 +471,23 @@
             <field name="type">tree</field>
             <field name="arch" type="xml">
                  <field name="department_id" position="after">
+                     <field name="has_voucher" invisible="1"/>
                      <field name="product_id" />
+                 </field>
+                 <xpath expr="/tree" position="attributes">
+                     <attribute name="colors">green:has_voucher==True</attribute>
+                     <attribute name="string">Employee (green = has voucher)</attribute>
+                 </xpath>
+            </field>
+        </record>
+        <record id="view_hr_employee_form_voucher" model="ir.ui.view">
+            <field name="name">Employee voucher</field>
+            <field name="model">hr.employee</field>
+            <field name="inherit_id" ref="hr.view_employee_form"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+                 <field name="parent_id" position="after">
+                     <field name="has_voucher" />
                  </field>
             </field>
         </record>
