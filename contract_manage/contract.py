@@ -170,13 +170,13 @@ class account_analytic_expense(osv.osv):
         general_id = account_pool.get_account_id(
             cr, uid, general_code, context=context)
         if not general_id:
-            _logger.error('Cannot create analytic line, no ledge!')
+            _logger.error(_('Cannot create analytic line, no ledge!'))
             return False
 
         journal_id = journal_pool.get_journal_purchase(
             cr, uid, context=context)
         if not journal_id:
-            _logger.error('Cannot get purchase journal!')
+            _logger.error(_('Cannot get purchase journal!'))
             return False
 
         # =====================================================================
@@ -197,12 +197,12 @@ class account_analytic_expense(osv.osv):
 
                 if tot_col == 0: # the first time (for tot col)
                    tot_col = len(line)
-                   _logger.info('Total column %s' % tot_col)
+                   _logger.info(_('Total column %s') % tot_col)
                    
                 if not(len(line) and (tot_col == len(line))):
                     if log_warning:
-                        _logger.warning(
-                            'Riga: %s Empty line of col different [%s!=%s]' % (
+                        _logger.warning(_(
+                            'Line: %s Empty line / col different [%s!=%s]') % (
                                 counter, tot_col, len(line)))
                     continue
 
@@ -233,16 +233,8 @@ class account_analytic_expense(osv.osv):
                 # Get extra fields:
                 # -----------------
                 if period:
-                    date_from = "%s-%s-%s" % (
-                        '2015', # TODO calculate correct
-                        period[:2],
-                        period[2:4],
-                        )
-                    date_to = "%s-%s-%s" % (
-                        '2015', # TODO calculate correct
-                        period[4:6],
-                        period[6:8],
-                        )
+                    date_from = "%s-%s-01" % (period[:2], period[2:4])
+                    date_to = "%s-%s-01" % (period[4:6], period[6:8])
                 else:
                     date_from = False
                     date_to = False
@@ -254,25 +246,25 @@ class account_analytic_expense(osv.osv):
                 # Test if is department to jump:
                 if department_code in department_code_jump:
                     if log_warning:
-                        _logger.warning(
-                            '%s. Jump expense for dept. "%s": %s' % (
+                        _logger.warning(_(
+                            '%s. Jump expense for dept. "%s": %s') % (
                                 counter, department_code, line))
                     continue
                 
                 # Test if is a general department:
                 if not department_id and department_code not in \
                         department_code_all:
-                    _logger.error(
-                        '%s. Department code not found: %s' % (
-                            counter, line))
+                    _logger.error(_(
+                        '%s. Department code (%s) not found: %s') % (
+                            counter, department_code, line))
                     continue    
                 
                 # General account (always present):    
                 code_id = code_pool.get_create_code(
                     cr, uid, account_code, account_name, context=context)
                 if not code_id:
-                    _logger.error(
-                        '%s. General ledge code not found: %s' % (
+                    _logger.error(_(
+                        '%s. General ledge code not found: %s') % (
                             counter, line))
                     continue    
 
@@ -318,13 +310,13 @@ class account_analytic_expense(osv.osv):
                     cr, uid, contract_code, context=context)
                 # Check here for split_type test:    
                 if not account_id and split_type == 'contract':
-                    _logger.error(
-                        '%s. Contract code not found [%s-%s-%s]: %s' % (
+                    _logger.error(_(
+                        '%s. Contract code not found [%s-%s-%s]: %s') % (
                             counter, causal, series, number, line))
                     continue
                 if not amount and split_type == 'contract':
-                    _logger.error(
-                        '%s. Contract amount not found [%s-%s-%s]: %s' % (
+                    _logger.error(_(
+                        '%s. Contract amount not found [%s-%s-%s]: %s') % (
                             counter, causal, series, number, line))
                     continue
 
@@ -335,7 +327,8 @@ class account_analytic_expense(osv.osv):
                     ], context=context)
 
                 if entry_ids:
-                    assert len(entry_ids) == 1, 'Key broken prot-ledge-dept!'
+                    assert len(entry_ids) == 1, 
+                        _('Key broken prot-ledge-dept!')
                     entry_id = entry_ids[0]                    
                     self.write(cr, uid, entry_id, data, context=context)
                 else:
@@ -346,8 +339,8 @@ class account_analytic_expense(osv.osv):
                 if entry_id not in entry_contract:
                     entry_contract[entry_id] = {}                  
                 elif data['split_type'] != 'contract':
-                    _logger.error(
-                        'Error multiple key elements found, jumped: %s!' % (
+                    _logger.error(_(
+                        'Error multiple key elements found, jumped: %s!') % (
                             line))
 
                 # Save in dict the contract: 
@@ -362,7 +355,7 @@ class account_analytic_expense(osv.osv):
         #               Read all lines and sync contract state
         # =====================================================================
         # TODO choose a period for not reload every time all records?
-        _logger.info('Assign contract to entry:')
+        _logger.info(_('Assign contract to entry:'))
         unlink_line_ids = [] # element not found during this sync (to delete)
         record_ids = self.search(cr, uid, [], context=context)
         
@@ -376,10 +369,18 @@ class account_analytic_expense(osv.osv):
             #                   Split only if not in contract:    
             # -----------------------------------------------------------------
             if entry.split_type in ('all', 'department'):
-                if entry.code_id.code in voucher_list:                    
+                if False and entry.code_id.code in voucher_list: # TODO
                     # -----------------
                     # Voucher expenses:
                     # -----------------
+                    if not date_from or not date_to:
+                        _logger.error(
+                            _('Voucher need to period from / to: [%s]') % \
+                                line) 
+                        
+                    # Create database for user/intervents/hour for period:
+                    intervent_database = self.get_intervent_database(
+                        cr, uid, context=context)
                     continue # TODO 
                     
                 else:
@@ -402,7 +403,7 @@ class account_analytic_expense(osv.osv):
                     # Split cost in all contract (not directly but on amount):
                     if not open_contract_ids:
                         _logger.info(
-                            'Error jump, no list of contracts in %s' % (
+                            _('Error jump, no list of contracts in %s') % (
                                 entry.name))
                         continue
                     
@@ -423,13 +424,13 @@ class account_analytic_expense(osv.osv):
                                 contract_new[contract_item.id] = \
                                     contract_item.total_amount
                             else:
-                                _logger.error(
-                                    'Contract %s amount not found (or <0)!' % \
-                                        contract_item.code) 
+                                _logger.error(_(
+                                    'Contract %s amount not found (or <0)!'
+                                        ) % contract_item.code) 
                                         
                         # Calculate average depend on amount / amount total                
                         if not tot:
-                            _logger.error('All contract has 0 amount')
+                            _logger.error(_('All contract has 0 amount'))
                             continue # next movement!
                             
                         rate = entry.amount / tot 
@@ -437,7 +438,7 @@ class account_analytic_expense(osv.osv):
                             contract_new[contract_id] *= rate
                     else: # error
                         _logger.error(
-                            'Average method error: %s' % average_method)
+                            _('Average method error: %s') % average_method)
                         return False # exit import procedure
                     
             # -----------------------------------------------------------------
@@ -492,7 +493,7 @@ class account_analytic_expense(osv.osv):
         # Remove all lines not yet present once:    
         # --------------------------------------
         line_pool.unlink(cr, uid, unlink_line_ids, context=context)
-        _logger.info('End entry import!')
+        _logger.info(_('End entry import!'))
         return True
 
     _columns = {
