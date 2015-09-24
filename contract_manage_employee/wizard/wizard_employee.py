@@ -178,7 +178,7 @@ class hr_employee_force_hour(osv.osv_memory):
                 total = format_float(record[4])
                 
                 if not cost:
-                    error[i] = _('Error no hour cost')
+                    error[i] = _('Error no hour cost: %s %s' % (name, surname))
                     _logger.error(error[i])
                     continue
                     
