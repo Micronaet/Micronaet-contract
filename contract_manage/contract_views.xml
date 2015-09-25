@@ -1020,6 +1020,8 @@
            <tree string="Expense" colors="blue:split_type=='department';green:split_type=='all'">
                 <field name="name"/>
                 <field name="date"/>
+                <field name="date_from"/>
+                <field name="date_to"/>
                 <field name="code_id"/>
                 <field name="code_type"/>
                 <field name="amount"/>
@@ -1027,8 +1029,6 @@
                 <field name="causal"/>
                 <field name="series"/>
                 <field name="number"/>
-                <field name="date_to"/>
-                <field name="date_from"/>
                 <field name="year"/>
                 <field name="split_type"/>
                 <field name="department_id"/>
@@ -1051,8 +1051,8 @@
                 <field name="number" readonly="1"/>
                 <field name="year" readonly="1"/>
                 
-                <field name="date_to" readonly="1"/>
                 <field name="date_from" readonly="1"/>
+                <field name="date_to" readonly="1"/>
                 
                 <field name="split_type" readonly="1"/>
                 <field name="department_id" widget="selection" readonly="1"/>
