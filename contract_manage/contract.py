@@ -378,9 +378,9 @@ class account_analytic_expense(osv.osv):
                         else:
                             month_from += 1                        
                         date_to = "%s-%s-01" % (year_from, month_from)
-                        
-                    date_from = False
-                    date_to = False
+                    else:                            
+                        date_from = False
+                        date_to = False
                         
                 # Department (always present):
                 department_id = dept_pool.get_department(
