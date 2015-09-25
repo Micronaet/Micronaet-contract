@@ -443,6 +443,8 @@ class account_analytic_expense(osv.osv):
                 else: # no contract so department
                     split_type = 'department'
                 
+                if split_type == 'contract': # TODO create sum of line
+                    amount = False
                 data.update({
                     'split_type': split_type,                    
                      # TODO calculate for contract:
