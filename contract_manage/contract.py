@@ -583,7 +583,10 @@ class account_analytic_expense(osv.osv):
             #                     Split as is (contract type):
             # -----------------------------------------------------------------
             elif entry.split_type == 'contract': # use dict record
-                name_mask = _('Ref. %s/%s:%s [#%s]')
+                extra_mask = _(
+                    '(manual voucher)') if code_type == 'voucher' else _(
+                         '(manual expense)')
+                name_mask = _('Ref. %s/%s:%s [#%s] ') + extra_mask                     
                 contract_new = entry_contract[entry.id]
 
             # -----------------------------------------------------------------
