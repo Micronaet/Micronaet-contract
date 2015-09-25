@@ -442,14 +442,11 @@ class account_analytic_expense(osv.osv):
                     split_type = 'contract'
                 else: # no contract so department
                     split_type = 'department'
-
-                if split_type != 'contract' and code_type != 'voucher':
-                    amount = False
-
+                
                 data.update({
                     'split_type': split_type,                    
                      # TODO calculate for contract:
-                     'amount': amount,
+                     'amount': amount,  # TODO zero?
                     'department_id': department_id,
                     })
 
@@ -612,6 +609,7 @@ class account_analytic_expense(osv.osv):
                     line.account_id.id if line.account_id else False] = line.id
                 
             for account_id, amount in contract_new.iteritems():
+                #if amount == 0: # TODO needed?
                 if account_id in contract_old: # contract present
                     # Update only certain fields (who can change):
                     line_pool.write(cr, uid, contract_old[account_id], {
