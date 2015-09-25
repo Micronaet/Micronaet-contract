@@ -241,7 +241,7 @@ class account_analytic_expense(osv.osv):
         #                           Startup parameters        
         # =====================================================================
         _logger.info('Start import accounting movement, file: %s' % csv_file)
-        import pdb; pdb.set_trace()
+
         # pools used:
         partner_pool = self.pool.get('res.partner')
         account_pool = self.pool.get('account.account')
@@ -283,6 +283,7 @@ class account_analytic_expense(osv.osv):
         entry_contract = {} # Contract for accounting record (key=entry key)
         tot_col = 0
         counter = -header
+        import pdb; pdb.set_trace()
         for line in csv.reader(open(os.path.expanduser(
                 csv_file), 'rb'), delimiter=delimiter):
             try:
@@ -331,8 +332,8 @@ class account_analytic_expense(osv.osv):
                 # Get extra fields:
                 # -----------------
                 if period:
-                    date_from = "%s-%s-01" % (period[:2], period[2:4])
-                    date_to = "%s-%s-01" % (period[4:6], period[6:8])
+                    date_from = "%s-%s-01" % (period[2:4], period[:2])
+                    date_to = "%s-%s-01" % (period[6:8], period[4:6])
                 else:
                     date_from = False
                     date_to = False
@@ -459,6 +460,7 @@ class account_analytic_expense(osv.osv):
         record_ids = self.search(cr, uid, [], context=context)
         
         # Loop on all accounting lines:
+        import pdb; pdb.set_trace()
         for entry in self.browse(cr, uid, record_ids, context=context): 
             if entry.id not in entry_contract: # all record + sub-contract
                 self.unlink(cr, uid, entry.id, context=context)
@@ -467,9 +469,8 @@ class account_analytic_expense(osv.osv):
             # -----------------------------------------------------------------
             #                   Split only if not in contract:    
             # -----------------------------------------------------------------
-            import pdb; pdb.set_trace()
             if entry.split_type in ('all', 'department'):
-                if False and entry.code_id.code in voucher_list: # TODO
+                if entry.code_id.code in voucher_list:
                     # -----------------
                     # Voucher expenses:
                     # -----------------
