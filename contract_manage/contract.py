@@ -139,24 +139,23 @@ class account_analytic_expense(osv.osv):
     #                           Utility functions:
     # -------------------------------------------------------------------------
     def get_voucher_splitted_account(
-            self, cr, uid, amount, from_date, to_date, limit, context=None):
+            self, cr, uid, amount, date_from, date_to, limit, context=None):
         ''' Load a database in a dict for manage split of vouchers 
             amount: total to split
-            from_date: filter intervent
-            to_date: filter intervent
+            date_from: filter intervent
+            date_to: filter intervent
             limit: hour for consider employee use voucher
             
             All employee are filtered if they use voucher (set on form)            
         '''
-        import pdb; pdb.set_trace()
         data = {}
-        intervent_pool = self.pool.get('hr.analytic.intervent')
+        intervent_pool = self.pool.get('hr.analytic.timesheet')
         employee_pool = self.pool.get('hr.employee')
         
         # ------------------------------
         # List of user that has voucher:
         # ------------------------------
-        employee_ids = users_pool.search(cr, uid, [
+        employee_ids = employee_pool.search(cr, uid, [
             ('has_voucher', '=', True),
             ], context=context)
         voucher_user_ids = [
@@ -167,26 +166,27 @@ class account_analytic_expense(osv.osv):
         # List of intervent in period for user that has voucher:    
         # ------------------------------------------------------
         intervent_ids = intervent_pool.search(cr, uid, [
-            ('date', '>=', from_date), 
-            ('date', '<', to_date), 
+            ('date', '>=', date_from), 
+            ('date', '<', date_to), 
             ('user_id', 'in', voucher_user_ids),
             ])
             
         # -------------------------------------------------------------
         # Load database for populate limit elements and account + hours    
         # -------------------------------------------------------------
+        import pdb; pdb.set_trace()
         for intervent in intervent_pool.browse(
                 cr, uid, intervent_ids, context=context):
             key = (intervent.date, intervent.user_id.id)
             if key not in data:
                 data[key] = [0, {}] # day hours, dict of ID int: hour
             
-            data[key][0] += intervent.duration # update duration
-            if itervent.account_id in data[key][1]:
-                data[key][1][intervent.account_id] += intervent.duration
+            data[key][0] += intervent.unit_amount # update duration
+            if intervent.account_id in data[key][1]:
+                data[key][1][intervent.account_id.id] += intervent.unit_amount
             else:    
-                redatas[key][1][intervent.account_id] = intervent.duration
-        
+                data[key][1][intervent.account_id.id] = intervent.unit_amount
+        import pdb; pdb.set_trace()
         # -------------------------------------
         # Loop for clean database (test limit):
         # -------------------------------------
@@ -330,9 +330,9 @@ class account_analytic_expense(osv.osv):
                 # -----------------
                 # Get extra fields:
                 # -----------------
-                if period:
-                    date_from = "%s-%s-01" % (period[2:4], period[:2])
-                    date_to = "%s-%s-01" % (period[6:8], period[4:6])
+                if period: # from >> MMAAMMAA << to
+                    date_from = "20%s-%s-01" % (period[2:4], period[:2])
+                    date_to = "20%s-%s-01" % (period[6:8], period[4:6])
                 else:
                     date_from = False
                     date_to = False
@@ -459,7 +459,6 @@ class account_analytic_expense(osv.osv):
         record_ids = self.search(cr, uid, [], context=context)
         
         # Loop on all accounting lines:
-        import pdb; pdb.set_trace()
         for entry in self.browse(cr, uid, record_ids, context=context): 
             if entry.id not in entry_contract: # all record + sub-contract
                 self.unlink(cr, uid, entry.id, context=context)
@@ -481,7 +480,7 @@ class account_analytic_expense(osv.osv):
                     
                     # Create database for user/intervents/hour for period:
                     account_expense = self.get_voucher_splitted_account(
-                        cr, uid, entry.amount, from_date, to_date, 
+                        cr, uid, entry.amount, entry.date_from, entry.date_to, 
                         voucher_limit, context=context)
                     # TODO    
                     
