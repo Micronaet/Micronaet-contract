@@ -283,7 +283,6 @@ class account_analytic_expense(osv.osv):
         entry_contract = {} # Contract for accounting record (key=entry key)
         tot_col = 0
         counter = -header
-        import pdb; pdb.set_trace()
         for line in csv.reader(open(os.path.expanduser(
                 csv_file), 'rb'), delimiter=delimiter):
             try:
@@ -474,7 +473,7 @@ class account_analytic_expense(osv.osv):
                     # -----------------
                     # Voucher expenses:
                     # -----------------
-                    if not date_from or not date_to:
+                    if not entry.date_from or not entry.date_to:
                         _logger.error(
                             _('Voucher need to period from / to: [%s]') % \
                                 line) 
