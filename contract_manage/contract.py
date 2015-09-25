@@ -113,7 +113,6 @@ class account_analytic_expense_account(osv.osv):
         }
 account_analytic_expense_account()
 
-
 class hr_employee(osv.osv):
     ''' Add field for manage voucher analytic calculate
     '''
@@ -153,6 +152,7 @@ class account_analytic_expense(osv.osv):
         data = {}
         intervent_pool = self.pool.get('hr.analytic.timesheet')
         employee_pool = self.pool.get('hr.employee')
+        account_pool = self.pool.get('account.analytic.account')
         
         if not department_id: # TODO all? 
             _logger.error(
@@ -168,6 +168,27 @@ class account_analytic_expense(osv.osv):
         voucher_user_ids = [
             item.user_id.id for item in employee_pool.browse(
                 cr, uid, employee_ids, context=context) if item.user_id]
+        if not voucher_user_ids: 
+            _logger.error(
+                _('Cannot find active user in dep. selected [%s:%s] (lim. %s)'
+                ) % (date_from, date_to, limit, limit)
+            return {}
+                    
+
+        # ------------------------------
+        # Account not cancel and :
+        # ------------------------------
+        account_ids = account_pool.search(cr, uid, [
+            ('state', 'not in', ('cancel')), # Active (or closed) # TODO check date?
+            ('not_working', '=', False), # Working account
+            ('is_recover', '=', False), # Not recover account
+            ('is_contract', '=', True), # Is contract
+            ], context=context)
+        if not account_ids: 
+            _logger.error(
+                _('Cannot find active account [%s:%s]') % (
+                    date_from, date_to, limit)
+            return {}
 
         # ------------------------------------------------------
         # List of intervent in period for user that has voucher:    
@@ -175,7 +196,8 @@ class account_analytic_expense(osv.osv):
         intervent_ids = intervent_pool.search(cr, uid, [
             ('date', '>=', date_from), 
             ('date', '<', date_to), 
-            ('user_id', 'in', voucher_user_ids),            
+            ('user_id', 'in', voucher_user_ids),       
+            ('account_id', 'in', account_ids)     
             ])
             
         # -------------------------------------------------------------
@@ -196,8 +218,7 @@ class account_analytic_expense(osv.osv):
         # -------------------------------------
         # Loop for clean database (test limit):
         # -------------------------------------
-        res = {}
-        
+        res = {}        
         total = 0.0
         for item in data:
             if data[item][0] < limit:
@@ -338,6 +359,7 @@ class account_analytic_expense(osv.osv):
                 # Get extra fields:
                 # -----------------
                 if period: # from >> MMAAMMAA << to
+                    year = year or "20%s" % period[2:4] # save also year
                     date_from = "20%s-%s-01" % (period[2:4], period[:2])
                     date_to = "20%s-%s-01" % (period[6:8], period[4:6])
                 else:
