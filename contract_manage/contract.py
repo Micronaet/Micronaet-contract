@@ -154,9 +154,9 @@ class account_analytic_expense(osv.osv):
         intervent_pool = self.pool.get('hr.analytic.timesheet')
         employee_pool = self.pool.get('hr.employee')
         
-        if not deparment_id: # TODO all? 
+        if not department_id: # TODO all? 
             _logger.error(
-                _('Cannot split voucher if deparment is not present!'))
+                _('Cannot split voucher if department is not present!'))
             
         # ------------------------------
         # List of user that has voucher:
@@ -216,10 +216,10 @@ class account_analytic_expense(osv.osv):
             _logger.error(_(
                 'Total = 0 cannot split voucher amount: %s!') % amount)
             return {}
-            
         rate = amount / total
         for item in res:
             res[item] *= rate
+        # TODO keep line with amount 0?    
         return res
          
     # -------------------------------------------------------------------------
@@ -471,6 +471,9 @@ class account_analytic_expense(osv.osv):
                 self.unlink(cr, uid, entry.id, context=context)
                 continue
             
+            # Note: Every split method generate contract_new dict:
+            #     key: ID account, value: amount splitted
+            #     name_mask, es. 'Ref. %s/%s:%s [#%s]' << used for event name
             # -----------------------------------------------------------------
             #                   Split only if not in contract:    
             # -----------------------------------------------------------------
@@ -486,10 +489,10 @@ class account_analytic_expense(osv.osv):
                         continue        
                     
                     # Create database for user/intervents/hour for period:
-                    account_expense = self.get_voucher_splitted_account(
+                    contract_new = self.get_voucher_splitted_account(
                         cr, uid, entry.amount, entry.date_from, entry.date_to, 
                         voucher_limit, entry.department_id.id, context=context)
-                    # TODO    
+                    name_mask = _('Ref. %s/%s:%s [#%s]')
                     
                 else:
                     # -----------------
@@ -1065,7 +1068,7 @@ class account_analytic_superintervent(osv.osv):
     ''' Intervent element that cannot assign to a particular account / contract
         This intervent are grouped by a wizard to get a total hour for
         department at the end of a period (ex. month) and after divider on
-        active contract of the deparment (as a hr.analytic.timesheet)
+        active contract of the department (as a hr.analytic.timesheet)
     '''
 
     _name = 'account.analytic.superintervent'
