@@ -443,12 +443,10 @@ class account_analytic_expense(osv.osv):
                 else: # no contract so department
                     split_type = 'department'
                 
-                if split_type == 'contract': # TODO create sum of line
-                    amount = False
                 data.update({
                     'split_type': split_type,                    
                      # TODO calculate for contract:
-                     'amount': amount,  # TODO zero?
+                     'amount': False if split_type == 'contract' else amount,
                     'department_id': department_id,
                     })
 
@@ -462,11 +460,11 @@ class account_analytic_expense(osv.osv):
                             counter, causal, series, number, line))
                     continue
                     
-                #if not amount and split_type == 'contract':
-                #    _logger.error(_(
-                #        '%s. Contract amount not found [%s-%s-%s]: %s') % (
-                #            counter, causal, series, number, line))
-                #    continue
+                if not amount and split_type == 'contract':
+                    _logger.error(_(
+                        '%s. Contract amount not found [%s-%s-%s]: %s') % (
+                            counter, causal, series, number, line))
+                    continue
 
                 entry_ids = self.search(cr, uid, [ # Key items:
                     ('name', '=', name),
