@@ -181,20 +181,10 @@ class account_analytic_expense(osv.osv):
         # TODO check date for closing ?
         account_ids = account_pool.search(cr, uid, [
             ('department_id', '=', department_id),
-            ('state', '!=', 'cancel'), # Active (or closed) # TODO check date
+            ('state', '!=', 'cancel'), # Active (or closed) # TODO necessary?
             ('not_working', '=', False), # Working account
             ('is_recover', '=', False), # Not recover account
             ('is_contract', '=', True), # Is contract
-            
-            # Date start <= date to # TODO now not splitted (so use date_to)
-            '|',
-            ('date_start', '=', False),
-            ('date_start', '<=', date_to),
-            
-            # Date end > date from # TODO now not splitted (so use date_from)
-            '|',
-            ('date', '=', False),
-            ('date', '>=', date_from),            
             ], context=context)
         if not account_ids: 
             _logger.error(
