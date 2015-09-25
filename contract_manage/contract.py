@@ -150,6 +150,7 @@ class account_analytic_expense(osv.osv):
             All employee are filtered if they use voucher (set on form)            
         '''
         data = {}
+
         intervent_pool = self.pool.get('hr.analytic.timesheet')
         employee_pool = self.pool.get('hr.employee')
         account_pool = self.pool.get('account.analytic.account')
@@ -171,15 +172,16 @@ class account_analytic_expense(osv.osv):
         if not voucher_user_ids: 
             _logger.error(
                 _('Cannot find active user in dep. selected [%s:%s] (lim. %s)'
-                ) % (date_from, date_to, limit, limit)
+                ) % (date_from, date_to, limit, limit))
             return {}
-                    
 
         # ------------------------------
         # Account not cancel and :
         # ------------------------------
+        # TODO check date for closing ?
         account_ids = account_pool.search(cr, uid, [
-            ('state', 'not in', ('cancel')), # Active (or closed) # TODO check date?
+            ('department_id', '=', department_id),
+            ('state', '!=', 'cancel'), # Active (or closed) # TODO check date
             ('not_working', '=', False), # Working account
             ('is_recover', '=', False), # Not recover account
             ('is_contract', '=', True), # Is contract
@@ -187,7 +189,7 @@ class account_analytic_expense(osv.osv):
         if not account_ids: 
             _logger.error(
                 _('Cannot find active account [%s:%s]') % (
-                    date_from, date_to, limit)
+                    date_from, date_to, limit))
             return {}
 
         # ------------------------------------------------------
