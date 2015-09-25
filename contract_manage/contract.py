@@ -439,10 +439,13 @@ class account_analytic_expense(osv.osv):
                 else: # no contract so department
                     split_type = 'department'
 
+                if split_type != 'contract' and code_type != 'voucher':
+                    amount = False
+
                 data.update({
-                    'split_type': split_type,
+                    'split_type': split_type,                    
                      # TODO calculate for contract:
-                    'amount': False if split_type == 'contract' else amount,
+                     'amount': amount,
                     'department_id': department_id,
                     })
 
@@ -526,16 +529,16 @@ class account_analytic_expense(osv.osv):
                     contract_new = self.get_voucher_splitted_account(
                         cr, uid, entry.amount, entry.date_from, entry.date_to, 
                         voucher_limit, entry.department_id.id, context=context)
-                    name_mask = _('Ref. %s/%s:%s [#%s]')
+                    name_mask = _('Ref. %s/%s:%s [#%s] (autom. voucher)')
                     
                 else:
                     # -----------------
                     # Generic expences:
                     # -----------------
-                    name_mask = _('Ref. %s/%s:%s [#%s] (autom.)')
+                    name_mask = _('Ref. %s/%s:%s [#%s] (autom. expense)')
                     # Compute all active contract and split amount                
                     domain = [
-                        ('date_start', '>=', '2015/01/01'), # TODO param.
+                        ('date_start', '>=', '2015-01-01'), # TODO param.
                         ('state', '>=', 'cancelled'),                    
                         ] 
                     if entry.split_type == 'department': # add extra filter
