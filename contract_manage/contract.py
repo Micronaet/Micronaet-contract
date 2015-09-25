@@ -365,6 +365,20 @@ class account_analytic_expense(osv.osv):
                     date_from = "20%s-%s-01" % (period[2:4], period[:2])
                     date_to = "20%s-%s-01" % (period[6:8], period[4:6])
                 else:
+                    # if ref. date is present create a period for that month
+                    if date:
+                        # From date: 
+                        month_from = int(date[5:7])
+                        year_from = int(date[0:4])
+                        date_from = "%s-%s-01" % (year_from, month_from)                        
+                        # Find 'to' date:
+                        if month_from == 12:
+                            month_from = 1
+                            year_from += 1
+                        else:
+                            month_from += 1                        
+                        date_to = "%s-%s-01" % (year_from, month_from)
+                        
                     date_from = False
                     date_to = False
                         
@@ -515,7 +529,7 @@ class account_analytic_expense(osv.osv):
                                 line) 
                         continue        
                     
-                    # Create database for user/intervents/hour for period:
+                    # Input data for write procedure:
                     contract_new = self.get_voucher_splitted_account(
                         cr, uid, entry.amount, entry.date_from, entry.date_to, 
                         voucher_limit, entry.department_id.id, context=context)
