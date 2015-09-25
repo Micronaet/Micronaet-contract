@@ -219,7 +219,7 @@ class account_analytic_expense(osv.osv):
     #                           Scheduler event:
     # -------------------------------------------------------------------------
     def schedule_csv_accounting_movement_import(self, cr, uid, csv_file,
-            delimiter, header, verbose=100, department_code_all=None, 
+            delimiter=';', header=0, verbose=100, department_code_all=None, 
             department_code_jump=None, general_code = '410100', 
             average_method='number', voucher_list=None, voucher_limit=6,
             log_warning=False,
@@ -237,12 +237,11 @@ class account_analytic_expense(osv.osv):
             voucher_limit: in hour for consider voucher used from an employee
             log_warning: For OpenERP log file
         '''
-        _logger.info('Start import accounting movement, file: %s' % csv_file)
-
         # =====================================================================
         #                           Startup parameters        
         # =====================================================================
-
+        _logger.info('Start import accounting movement, file: %s' % csv_file)
+        import pdb; pdb.set_trace()
         # pools used:
         partner_pool = self.pool.get('res.partner')
         account_pool = self.pool.get('account.account')
@@ -253,7 +252,7 @@ class account_analytic_expense(osv.osv):
         csv_pool = self.pool.get('csv.base')
         journal_pool = self.pool.get('account.analytic.journal')
 
-        # input parameter:
+        # Input parameter:
         if department_code_all is None:
             department_code_all = [] 
             # list of department that split in all contracts
@@ -264,12 +263,14 @@ class account_analytic_expense(osv.osv):
         if voucher_list is None:
             voucher_list = []
 
+        # Code for entry (ledger) operation:
         general_id = account_pool.get_account_id(
             cr, uid, general_code, context=context)
         if not general_id:
             _logger.error(_('Cannot create analytic line, no ledge!'))
             return False
 
+        # Purchase journal:
         journal_id = journal_pool.get_journal_purchase(
             cr, uid, context=context)
         if not journal_id:
@@ -340,8 +341,16 @@ class account_analytic_expense(osv.osv):
                 department_id = dept_pool.get_department(
                     cr, uid, department_code, context=context)
 
-                # Test if is department to jump:
-                if department_code in department_code_jump:
+                # Get split type:
+                if account_code in voucher_list:
+                    code_type = 'voucher'
+                #elif: # TODO for fuel    
+                else:
+                    code_type = 'generic'
+
+                # Test if is department to jump (only in generic operations):
+                if (code_type != 'voucher' and 
+                        department_code in department_code_jump):
                     if log_warning:
                         _logger.warning(_(
                             '%s. Jump expense for dept. "%s": %s') % (
@@ -365,12 +374,6 @@ class account_analytic_expense(osv.osv):
                             counter, line))
                     continue    
 
-                if account_code in voucher_list:
-                    code_type = 'voucher'
-                #elif: # TODO for fuel    
-                else:
-                    code_type = 'generic'
-                
                 # ------------------------
                 # Sync or create elements:        
                 # ------------------------
@@ -464,6 +467,7 @@ class account_analytic_expense(osv.osv):
             # -----------------------------------------------------------------
             #                   Split only if not in contract:    
             # -----------------------------------------------------------------
+            import pdb; pdb.set_trace()
             if entry.split_type in ('all', 'department'):
                 if False and entry.code_id.code in voucher_list: # TODO
                     # -----------------
