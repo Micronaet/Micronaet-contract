@@ -461,11 +461,12 @@ class account_analytic_expense(osv.osv):
                         '%s. Contract code not found [%s-%s-%s]: %s') % (
                             counter, causal, series, number, line))
                     continue
-                if not amount and split_type == 'contract':
-                    _logger.error(_(
-                        '%s. Contract amount not found [%s-%s-%s]: %s') % (
-                            counter, causal, series, number, line))
-                    continue
+                    
+                #if not amount and split_type == 'contract':
+                #    _logger.error(_(
+                #        '%s. Contract amount not found [%s-%s-%s]: %s') % (
+                #            counter, causal, series, number, line))
+                #    continue
 
                 entry_ids = self.search(cr, uid, [ # Key items:
                     ('name', '=', name),
