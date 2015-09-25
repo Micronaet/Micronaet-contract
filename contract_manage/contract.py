@@ -139,12 +139,14 @@ class account_analytic_expense(osv.osv):
     #                           Utility functions:
     # -------------------------------------------------------------------------
     def get_voucher_splitted_account(
-            self, cr, uid, amount, date_from, date_to, limit, context=None):
+            self, cr, uid, amount, date_from, date_to, limit=6.0, 
+            department_id=False, context=None):
         ''' Load a database in a dict for manage split of vouchers 
             amount: total to split
             date_from: filter intervent
             date_to: filter intervent
             limit: hour for consider employee use voucher
+            department_id: used for filter department 
             
             All employee are filtered if they use voucher (set on form)            
         '''
@@ -152,11 +154,16 @@ class account_analytic_expense(osv.osv):
         intervent_pool = self.pool.get('hr.analytic.timesheet')
         employee_pool = self.pool.get('hr.employee')
         
+        if not deparment_id: # TODO all? 
+            _logger.error(
+                _('Cannot split voucher if deparment is not present!'))
+            
         # ------------------------------
         # List of user that has voucher:
         # ------------------------------
         employee_ids = employee_pool.search(cr, uid, [
             ('has_voucher', '=', True),
+            ('department_id', '=', department_id),
             ], context=context)
         voucher_user_ids = [
             item.user_id.id for item in employee_pool.browse(
@@ -168,13 +175,12 @@ class account_analytic_expense(osv.osv):
         intervent_ids = intervent_pool.search(cr, uid, [
             ('date', '>=', date_from), 
             ('date', '<', date_to), 
-            ('user_id', 'in', voucher_user_ids),
+            ('user_id', 'in', voucher_user_ids),            
             ])
             
         # -------------------------------------------------------------
         # Load database for populate limit elements and account + hours    
         # -------------------------------------------------------------
-        import pdb; pdb.set_trace()
         for intervent in intervent_pool.browse(
                 cr, uid, intervent_ids, context=context):
             key = (intervent.date, intervent.user_id.id)
@@ -186,7 +192,7 @@ class account_analytic_expense(osv.osv):
                 data[key][1][intervent.account_id.id] += intervent.unit_amount
             else:    
                 data[key][1][intervent.account_id.id] = intervent.unit_amount
-        import pdb; pdb.set_trace()
+        
         # -------------------------------------
         # Loop for clean database (test limit):
         # -------------------------------------
@@ -207,7 +213,8 @@ class account_analytic_expense(osv.osv):
         # Update with amount splitted (rate):
         # -----------------------------------
         if not total:
-            # TODO error:
+            _logger.error(_(
+                'Total = 0 cannot split voucher amount: %s!') % amount)
             return {}
             
         rate = amount / total
@@ -481,7 +488,7 @@ class account_analytic_expense(osv.osv):
                     # Create database for user/intervents/hour for period:
                     account_expense = self.get_voucher_splitted_account(
                         cr, uid, entry.amount, entry.date_from, entry.date_to, 
-                        voucher_limit, context=context)
+                        voucher_limit, entry.department_id.id, context=context)
                     # TODO    
                     
                 else:
