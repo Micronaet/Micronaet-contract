@@ -16,6 +16,8 @@
                     </group>
                     <newline/>
                     <group expand="0" string="Group By...">
+                        <filter string="All" icon="terp-personal" domain="[]" context="{'group_by':'all'}"/>
+                        <separator orientation="vertical"/>
                         <filter string="Code" icon="terp-personal" domain="[]" context="{'group_by':'code'}"/>
                         <separator orientation="vertical"/>
                         <filter string="Code type" icon="terp-folder-green" domain="[]" context="{'group_by':'code_type'}"/>
@@ -29,23 +31,25 @@
             <field name="model">account.analytic.expense.account</field>
             <field name="type">tree</field>
             <field name="arch" type="xml">
-               <tree string="General ledger" colors="red:analytic==False">
-                   <field name="analytic"/>
-                   <field name="code"/>
-                   <field name="name"/>
-                   <field name="code_type"/>
+               <tree string="General ledger" colors="red:analytic==False" editable="bottom">
+                   <field name="all" />
+                   <field name="analytic" />
+                   <field name="code" readonly="1"/>
+                   <field name="name" readonly="1"/>
+                   <field name="code_type" />
                </tree>
            </field>
         </record>
         <record id="view_account_analytic_expense_account_form" model="ir.ui.view">
             <field name="name">Account ledger</field>
             <field name="model">account.analytic.expense.account</field>
-            <field name="type">tree</field>
+            <field name="type">form</field>
             <field name="arch" type="xml">
                <form string="General ledger">
-                   <field name="analytic"/>
-                   <field name="code"/>
                    <field name="name"/>
+                   <field name="code"/>
+                   <field name="analytic"/>
+                   <field name="all"/>
                    <field name="code_type"/>
                </form>
            </field>
@@ -56,7 +60,7 @@
             <field name="res_model">account.analytic.expense.account</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="view_id" ref="view_account_analytic_expense_account_tre"/>
+            <field name="view_id" ref="view_account_analytic_expense_account_tree"/>
             <field name="search_view_id" ref="view_account_analytic_expense_account_search"/>
         </record>
 
@@ -1325,6 +1329,11 @@
                  sequence="60"
                  parent="menu_configuration_root" />
 
+            <menuitem id="menu_action_account_ledger"
+                 name="Account ledger"
+                 action="action_account_analytic_expense_account" 
+                 sequence="70"
+                 parent="menu_configuration_root" />
                  
     <!-- DISABLE ALL MACRO AREA FOR ALL USER:-->                 
        <record id="base.menu_base_partner" model="ir.ui.menu">
@@ -1348,8 +1357,6 @@
        <record id="base.menu_administration" model="ir.ui.menu">
            <field name="groups_id" eval="[(6,0,[ref('contract_manage.group_contract_all_macro_group_manager')])]"/>
        </record>           
-       
-
 </data>
 </openerp>
 

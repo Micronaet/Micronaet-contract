@@ -118,8 +118,16 @@ class account_analytic_expense_account(osv.osv):
         'code': fields.char('Code', size=10, required=True),
         'analytic': fields.boolean('Analytic', 
             help='If true will be imported in analytic expense'),
+        'all': fields.boolean('All department', 
+            help='This account stand for all dept. so cost will be splitted in'
+                'all contract of all departments'),
         'code_type': fields.selection(code_type_list, 'Expense type'),            
         }
+
+    _defaults = {
+        'all': lambda *x: False,
+        'code_type': lambda *x: 'generic',
+        }    
 account_analytic_expense_account()
 
 class hr_employee(osv.osv):
