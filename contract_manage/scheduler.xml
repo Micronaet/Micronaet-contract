@@ -12,7 +12,7 @@
 			<field eval="0" name="doall"/>
 			<field eval="1" name="active"/>
 			<!--File; separator; header; verbose; general department; jump department; general account code; average method; voucher list-->
-			<field name="args">('~/etl/analitic.CMP', ';', 0, 100, [], ['40'], '410100', 'amount', [])</field>
+			<field name="args">('~/etl/analitic.CMP', ';', 0, 100, [], ['40'], '410100', 'amount', ['403.00007'], 6, ['1', '2', '3'], True)</field>
 			<field eval="1" name="interval_number"/>
 			<field eval="&quot;&quot;&quot;account.analytic.expense&quot;&quot;&quot;" name="model"/>
 		</record>

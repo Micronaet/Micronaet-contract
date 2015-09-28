@@ -320,7 +320,6 @@ class account_analytic_expense(osv.osv):
         counter = -header
         for line in csv.reader(open(os.path.expanduser(
                 csv_file), 'rb'), delimiter=delimiter):
-            import pdb; pdb.set_trace()    
             try:
                 # ----------------------------
                 # Starting test for row check:
