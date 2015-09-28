@@ -253,7 +253,7 @@ class account_analytic_expense(osv.osv):
             delimiter=';', header=0, verbose=100, department_code_all=None, 
             department_code_jump=None, general_code = '410100', 
             average_method='number', voucher_list=None, voucher_limit=6,
-            log_warning=False,
+            exclude_ledger_start=None, log_warning=False, 
             context=None):
         ''' Import movement sync with record in OpenERP
             csv_file: full path of file to import  (use ~ for home)
@@ -267,6 +267,7 @@ class account_analytic_expense(osv.osv):
             voucher_list: List of account used as voucher (different split)
             voucher_limit: in hour for consider voucher used from an employee
             log_warning: For OpenERP log file
+            exclude_ledger_start: list of fist char of account (list of patr.)
         '''
         # =====================================================================
         #                           Startup parameters        
@@ -293,6 +294,9 @@ class account_analytic_expense(osv.osv):
 
         if voucher_list is None:
             voucher_list = []
+
+        if exclude_ledger_start is None:
+            exclude_ledger_start = []
 
         # Code for entry (ledger) operation:
         general_id = account_pool.get_account_id(
@@ -360,7 +364,14 @@ class account_analytic_expense(osv.osv):
 
                 # -----------------
                 # Get extra fields:
-                # -----------------
+                # -----------------                 
+                if account_code[:1] in exclude_ledger_start:
+                    if log_warning:
+                        _logger.warning(_(
+                            '%s. Jump patrimonial ledger: %s') % (
+                                counter, account_code))
+                    continue                
+                
                 if period: # from >> MMAAMMAA << to
                     year = year or "20%s" % period[2:4] # save also year
                     date_from = "20%s-%s-01" % (period[2:4], period[:2])
