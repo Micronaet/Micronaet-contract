@@ -146,7 +146,7 @@ class account_analytic_expense(osv.osv):
             date_to: filter intervent
             limit: hour for consider employee use voucher
             department_id: used for filter department 
-            
+
             All employee are filtered if they use voucher (set on form)            
         '''
         data = {}
@@ -158,13 +158,14 @@ class account_analytic_expense(osv.osv):
         if not department_id: # TODO all? 
             _logger.error(
                 _('Cannot split voucher if department is not present!'))
-            
+
         # ------------------------------
         # List of user that has voucher:
         # ------------------------------
         employee_ids = employee_pool.search(cr, uid, [
             ('has_voucher', '=', True),
-            ('department_id', '=', department_id),
+            # TODO Note: employee should work for other account, so no filter:
+            #('department_id', '=', department_id), 
             ], context=context)
         voucher_user_ids = [
             item.user_id.id for item in employee_pool.browse(
@@ -201,7 +202,7 @@ class account_analytic_expense(osv.osv):
             ('user_id', 'in', voucher_user_ids),       
             ('account_id', 'in', account_ids)     
             ])
-            
+
         # -------------------------------------------------------------
         # Load database for populate limit elements and account + hours    
         # -------------------------------------------------------------
@@ -216,7 +217,7 @@ class account_analytic_expense(osv.osv):
                 data[key][1][intervent.account_id.id] += intervent.unit_amount
             else:    
                 data[key][1][intervent.account_id.id] = intervent.unit_amount
-        
+
         # -------------------------------------
         # Loop for clean database (test limit):
         # -------------------------------------
