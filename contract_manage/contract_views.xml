@@ -998,7 +998,11 @@
                 <group expand="0" string="Group By...">
                     <filter string="Department" icon="terp-personal" domain="[]" context="{'group_by':'department_id'}"/>
                     <separator orientation="vertical"/>
+                    <filter string="Causal" icon="terp-personal" domain="[]" context="{'group_by':'causal'}"/>
+                    <separator orientation="vertical"/>
                     <filter string="Type" icon="terp-personal" domain="[]" context="{'group_by':'split_type'}"/>
+                    <separator orientation="vertical"/>
+                    <filter string="Ledger" icon="terp-personal" domain="[]" context="{'group_by':'code_id'}"/>
                     <separator orientation="vertical"/>
                     <filter string="Code type" icon="terp-personal" domain="[]" context="{'group_by':'code_type'}"/>
                     <separator orientation="vertical"/>
