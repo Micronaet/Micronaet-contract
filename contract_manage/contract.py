@@ -49,6 +49,7 @@ code_type_list = [
     ('voucher', 'Voucher'),
     ('fuel', 'Fuel'),
     ]
+
 class account_account(osv.osv):
     ''' Extra function
     '''
@@ -61,8 +62,7 @@ class account_account(osv.osv):
         code_ids = self.search(cr, uid, [('code', '=', code)], context=context)
         if code_ids:
             return code_ids[0]
-        return False
-        
+        return False        
 account_account()        
 
 class account_analytic_journal(osv.osv):
@@ -118,14 +118,11 @@ class account_analytic_expense_account(osv.osv):
         'code': fields.char('Code', size=10, required=True),
         'analytic': fields.boolean('Analytic', 
             help='If true will be imported in analytic expense'),
-        'all': fields.boolean('All department', 
-            help='This account stand for all dept. so cost will be splitted in'
-                'all contract of all departments'),
-        'code_type': fields.selection(code_type_list, 'Expense type'),            
+        'code_type': fields.selection(code_type_list, 'Expense type', 
+            required=True),
         }
 
     _defaults = {
-        'all': lambda *x: False,
         'code_type': lambda *x: 'generic',
         }    
 account_analytic_expense_account()
@@ -139,7 +136,6 @@ class hr_employee(osv.osv):
     _columns = {
         'has_voucher': fields.boolean('Has voucher'),
         }
-
 hr_employee()    
 
 class account_analytic_expense(osv.osv):
@@ -267,21 +263,18 @@ class account_analytic_expense(osv.osv):
     #                           Scheduler event:
     # -------------------------------------------------------------------------
     def schedule_csv_accounting_movement_import(self, cr, uid, csv_file,
-            delimiter=';', header=0, verbose=100, department_code_all=None, 
-            department_code_jump=None, general_code = '410100', 
-            average_method='number', voucher_list=None, voucher_limit=6,
-            exclude_ledger_start=None, log_warning=False, 
-            context=None):
+            delimiter=';', header=0, verbose=100,
+            split_on_all=None, department_code_jump=None, 
+            general_code='410100', average_method='number', voucher_limit=6,
+            exclude_ledger_start=None, log_warning=False, context=None):
         ''' Import movement sync with record in OpenERP
             csv_file: full path of file to import  (use ~ for home)
             delimiter: for csv separation
             header: number of line for header (jumped)
             verbose: every X record print a log message (else nothing)
-            department_code_all: list of department code that split on all dep.
             department_code_jump: list of department code that will be jumper
             general_code: account for analytic line
             average_method: 'number', 'amount' (average depend on) 
-            voucher_list: List of account used as voucher (different split)
             voucher_limit: in hour for consider voucher used from an employee
             log_warning: For OpenERP log file
             exclude_ledger_start: list of fist char of account (list of patr.)
@@ -290,6 +283,7 @@ class account_analytic_expense(osv.osv):
         # =====================================================================
         #                           Startup parameters        
         # =====================================================================
+        import pdb; pdb.set_trace()
         _logger.info('Start import accounting movement, file: %s' % csv_file)
 
         # pools used:
@@ -302,19 +296,20 @@ class account_analytic_expense(osv.osv):
         csv_pool = self.pool.get('csv.base')
         journal_pool = self.pool.get('account.analytic.journal')
 
-        # Input parameter:
-        if department_code_all is None:
-            department_code_all = [] 
-            # list of department that split in all contracts
-
-        if department_code_jump is None:
-            department_code_jump = [] 
-
-        if voucher_list is None:
-            voucher_list = []
-
+        # -----------------
+        # Input parameters:
+        # -----------------
+        # Imprt only cost account ledger (first char test)
         if exclude_ledger_start is None:
             exclude_ledger_start = []
+
+        # Department not to be imported
+        if department_code_jump is None: 
+            department_code_jump = []
+
+        # Department that consider as to split in all contracts:
+        if split_on_all is None: 
+            split_on_all = []
 
         # Code for entry (ledger) operation:
         general_id = account_pool.get_account_id(
@@ -330,6 +325,28 @@ class account_analytic_expense(osv.osv):
             _logger.error(_('Cannot get purchase journal!'))
             return False
 
+        # -------------------------------------------------------------
+        # List that will be populated from accounting ledger setted up:
+        # -------------------------------------------------------------
+        exclude_ledger = []
+        
+        # Dynamically create the catalog:
+        code_catalog = {}
+        for key in code_type_list:
+            code_catalog[key] = []
+
+        ledger_ids = code_pool.search(cr, uid, [], context=context)
+        for ledger in code_pool.browse(cr, uid, ledger_ids, context=context):
+            # Ledger not do be imported:    
+            if not ledger.analytic:
+                exclude_ledger.append(ledger.code)
+
+            if ledger.code_type: # Catalog of the ledger: 
+                code_catalog[ledger.code_type].append(ledger.code)
+            else:
+                _logger.error(
+                    _('Account ledger without catalog: %s') % ledger.code)
+            
         # =====================================================================
         #                           Load from CSV file
         # =====================================================================        
@@ -427,11 +444,10 @@ class account_analytic_expense(osv.osv):
                     cr, uid, department_code, context=context)
 
                 # Get split type:
-                if account_code in voucher_list:
-                    code_type = 'voucher'
-                #elif: # TODO for fuel    
-                else:
-                    code_type = 'generic'
+                for key in code_catalog:
+                    if account_code in code_catalog[key]:
+                        code_type = key
+                        break
 
                 # Test if is department to jump (only in generic operations):
                 if (code_type != 'voucher' and 
@@ -444,7 +460,7 @@ class account_analytic_expense(osv.osv):
                 
                 # Test if is a general department:
                 if not department_id and department_code not in \
-                        department_code_all:
+                        split_on_all:
                     _logger.error(_(
                         '%s. Department code (%s) not found: %s') % (
                             counter, department_code, line))
@@ -476,7 +492,7 @@ class account_analytic_expense(osv.osv):
                     'year': year,
                     }
 
-                if department_code in department_code_all:
+                if department_code in split_on_all:
                     split_type = 'all'
                 elif contract_code: # Directly to contract
                     split_type = 'contract'
@@ -557,7 +573,7 @@ class account_analytic_expense(osv.osv):
             #                   Split only if not in contract:    
             # -----------------------------------------------------------------
             if entry.split_type in ('all', 'department'):
-                if entry.code_id.code in voucher_list:
+                if entry.code_id.code in code_catalog['voucher']:
                     # -----------------
                     # Voucher expenses:
                     # -----------------

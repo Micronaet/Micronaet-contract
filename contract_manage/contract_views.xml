@@ -32,7 +32,6 @@
             <field name="type">tree</field>
             <field name="arch" type="xml">
                <tree string="General ledger" colors="red:analytic==False" editable="bottom">
-                   <field name="all" />
                    <field name="analytic" />
                    <field name="code" readonly="1"/>
                    <field name="name" readonly="1"/>
@@ -49,7 +48,6 @@
                    <field name="name"/>
                    <field name="code"/>
                    <field name="analytic"/>
-                   <field name="all"/>
                    <field name="code_type"/>
                </form>
            </field>
