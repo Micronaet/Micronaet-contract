@@ -44,6 +44,11 @@ operation_type = [
     ('material', 'Material in EUR'),
     ]
 
+code_type_list = [
+    ('generic', 'Generic expense'),
+    ('voucher', 'Voucher'),
+    ('fuel', 'Fuel'),
+    ]
 class account_account(osv.osv):
     ''' Extra function
     '''
@@ -105,11 +110,15 @@ class account_analytic_expense_account(osv.osv):
         return self.create(cr, uid, {
             'code': code,
             'name': name,
+            'analytic': False, # TODO need to be enabled
             }, context=context)    
 
     _columns = {
         'name': fields.char('Account', size=60, required=True), 
         'code': fields.char('Code', size=10, required=True),
+        'analytic': fields.boolean('Analytic', 
+            help='If true will be imported in analytic expense'),
+        'code_type': fields.selection(code_type_list, 'Expense type'),            
         }
 account_analytic_expense_account()
 
@@ -268,6 +277,7 @@ class account_analytic_expense(osv.osv):
             voucher_limit: in hour for consider voucher used from an employee
             log_warning: For OpenERP log file
             exclude_ledger_start: list of fist char of account (list of patr.)
+                Used also for ledger to remove
         '''
         # =====================================================================
         #                           Startup parameters        
@@ -365,10 +375,20 @@ class account_analytic_expense(osv.osv):
                 # -----------------
                 # Get extra fields:
                 # -----------------                 
+                # No patrimonial (check with first char):
                 if account_code[:1] in exclude_ledger_start:
                     if log_warning:
                         _logger.warning(_(
                             '%s. Jump patrimonial ledger: %s') % (
+                                counter, account_code))
+                    continue                
+
+                # TODO use object (boolean)
+                # No ledger:
+                if account_code in exclude_ledger_start:
+                    if log_warning:
+                        _logger.warning(_(
+                            '%s. Jump ledger: %s') % (
                                 counter, account_code))
                     continue                
                 
@@ -697,11 +717,9 @@ class account_analytic_expense(osv.osv):
         'code_id': fields.many2one(
             'account.analytic.expense.account', 'Account code',
             help="Accounting code from external program"),
-        'code_type': fields.selection([
-            ('generic', 'Generic expense'),
-            ('voucher', 'Voucher'),
-            ('fuel', 'Fuel'),
-            ], 'Expense type'),            
+        'code_type': fields.related(
+            'code_id', 'code_type', type='selection', selection=code_type_list,      
+            string='Code type'),     
         }
         
     _defaults = {
