@@ -12,8 +12,8 @@
                        <field name="km_ids" nolabel="1">
                             <tree string="Km cost" editable="bottom">
                                 <field name="account_id" invisible="1" />
-                                <field name="code" readonly="1"/>
-                                <field name="km" readonly="1"/>
+                                <field name="month" readonly="1"/>
+                                <field name="km" />
                             </tree>
                        </field>
                    </page>

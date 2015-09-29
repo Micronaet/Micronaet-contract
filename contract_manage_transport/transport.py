@@ -293,5 +293,5 @@ class account_analytic_account(osv.osv):
         'km_ids': fields.one2many('account.analytic.expense.km', 'account_id',
             'Cost Km')
         }
-
+account_analytic_account()
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
