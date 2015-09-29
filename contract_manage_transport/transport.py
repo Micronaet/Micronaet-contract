@@ -89,9 +89,12 @@ class account_analytic_expense_km(osv.osv):
                 isfile(join(path, filename)) and filename.startswith(bof) 
                 and len(filename) == (len(bof) + 8)]
 
+        if not trans_file:
+            _logger.warning(_('File not found in transport folder: %s') % path)
+
         trans_file.sort() # for have last price correct
         _logger.info("Start auto import of file transport")
-
+            
         for filename in trans_file:        
             try:
                 _logger.info("Load and import file %s" % filename)
