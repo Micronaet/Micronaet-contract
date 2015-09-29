@@ -13,7 +13,7 @@
 			<field eval="1" name="active"/>
 			<field name="args">('~/etl/transport', ';', 0, 100, 'transport')</field>
 			<field eval="1" name="interval_number"/>
-			<field eval="&quot;&quot;&quot;account.analytic.expense&quot;&quot;&quot;" name="model"/>
+			<field eval="&quot;&quot;&quot;account.analytic.expense.km&quot;&quot;&quot;" name="model"/>
 		</record>
 	</data>
 </openerp>

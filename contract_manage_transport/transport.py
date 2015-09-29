@@ -43,16 +43,123 @@ class account_analytic_expense_km(osv.osv):
     _name = 'account.analytic.expense.km'
     _description = 'Monthly transport km'
     _rec_name = 'account_id'
+
+    # -------------------------------------------------------------------------
+    #                                 Scheduled
+    # -------------------------------------------------------------------------
+    def schedule_csv_accounting_transport_movement_import(
+            self, cr, iud, path='~/etl/transport', separator=';', header=0, 
+            verbose=100, bof='transport', context=None):
+        ''' Import function that read in:
+            path: folder where all transport Km file are
+            separator: csv file format have this column separator
+            header: and total line header passed
+            verbose: every x record log event of importation
+            bof: the input file must start with this string, after:
+                YYMM.csv for get also the ref. month
+            context: context for this function
+        '''
+        from os.path import isfile, join
+        account_pool = self.pool.get('account.analytic.account')
+
+        # --------------------------------
+        # Utility: function for procedure:
+        # --------------------------------
+        def format_string(value, default=''):
+            try:
+                return value.strip() or default
+            except:
+                return default
+
+        def format_date(value):
+            return value
+
+        def format_float(value):        
+            try:
+                value = value.replace(',', '.')
+                return float(value)
+            except:
+                return 0.0
+        
+        path = os.path.expanduser(path)
+        trans_file = [
+            filename for filename in listdir(path) if 
+                    isfile(join(path, filename)) and filename.startswith(bof) 
+                    and len(filename) == (len(bof) + 8)]
+
+        trans_file.sort() # for have last price correct
+        _logger.info("Start auto import of file transport")
+        for filename in trans_file:        
+            try:
+                _logger.info("Load and import file %s" % filename)
+                error = []
+                year_month = os.path.splitext(filename)[0][-4:]
+                
+                # --------------------------------
+                # Remove all line for that period:
+                # --------------------------------
+                item_ids = self.search(cr, uid, [
+                    ('month', '=', year_month),
+                    ], context=context)
+                self.unlink(cr, uid, item_ids, context=context)
+                
+                # ---------------
+                # Load from file:
+                # ---------------
+                i = -header
+                f = open(filename, 'rb')
+                for line in f:
+                    i += 1
+                    if i <= 0: # jump header line
+                        continue
+
+                    line = line.strip().split(separator)
+                    
+                    # Parse file:                    
+                    code = format_string(line[0])
+                    km = format_float(line[1])
+                    
+                    # Check contract:
+                    if not code or not km:
+                        _logger.warning(_('%s. Code or Km not found') % i)
+                        continue
+                    
+                    account_ids = account_pool.search(cr, uid, [
+                        ('code', '=', code)], context=context)
+
+                    if not account_ids:
+                        _logger.error(
+                            _('%s. Code not found on OpenERP: %s') % (i, code))
+                        continue
+                    elif len(account_ids) > 1:
+                        _logger.error(
+                            _('%s. More than one code found (%s): %s') % (
+                                i, len(account_ids), code))
+                        continue                    
+                f.close()
+                
+                # History file:
+                os.rename(
+                    os.path.join(path, filename),
+                    os.path.join(path, 'history', '%s.%s' % (
+                        datetime.now().strftime('%Y%m%d.%H%M%S'),
+                        filename, )),
+                    )
+
+            except:
+                _logger.error('No correct file format: %s' % filename)
+                _logger.error((sys.exc_info(), ))
+        _logger.info("End auto import of file transport")
+        return True
     
     _columns = {
          'account_id': fields.many2one('account.analytic.account', 'Account',
              required=True),
-         'km': fields.float('Km', digits=(16, 2)
+         'km': fields.float('Km', digits=(16, 2),
              required=True), 
-         'month': fields.char('Month', size=4, help='Format YYMM'
+         'month': fields.char('Month', size=4, help='Format YYMM',
              required=True), 
-         }
-    
+         }    
 account_analytic_expense_km()    
 
 class account_analytic_expense(osv.osv):
@@ -66,21 +173,6 @@ class account_analytic_expense(osv.osv):
         ''' Function to be written, for now is overrided with module
             contract_manage_transport for temporary phase 
             Costs will be calculated depend on Km for every contract
-        '''
-        return {}
-    
-    # Scheduled:
-    def schedule_csv_accounting_transport_movement_import(
-            self, cr, iud, path='~/etl/transport', separator=';', header=0, 
-            verbose=100, start='transport', context=None):
-        ''' Import function that read in:
-            path: folder where all transport Km file are
-            separator: csv file format have this column separator
-            header: and total line header passed
-            verbose: every x record log event of importation
-            start: the input file must start with this string, after:
-                YYMM.csv for get also the ref. month
-            context: context for this function
         '''
         # TODO change all:
         data = {}
@@ -179,6 +271,6 @@ class account_analytic_expense(osv.osv):
             res[item] *= rate
         # TODO keep line with amount 0?    
         return res
-
+        return {}
 account_analytic_expense()    
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
