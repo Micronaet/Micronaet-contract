@@ -50,12 +50,12 @@ class hr_employee_force_hour(osv.osv_memory):
         ''' Loop on cost folder searching file that start with bof
         '''
         from os.path import isfile, join
-
+        import pdb; pdb.set_trace()
         path = os.path.expanduser(path)
         cost_file = [
             filename for filename in listdir(path) if 
                     isfile(join(path, filename)) and filename.startswith(bof) 
-                    and len(filename) == (len(bof) + 8)]
+                    and len(filename) == (len(bof) + 8)] # YYAA.csv = 8 char
 
         cost_file.sort() # for have last price correct
         _logger.info("Start auto import of file cost")

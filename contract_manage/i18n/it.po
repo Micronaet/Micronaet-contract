@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: OpenERP Server 6.0.4\n"
 "Report-Msgid-Bugs-To: support@openerp.com\n"
 "POT-Creation-Date: 2015-09-29 09:21+0000\n"
-"PO-Revision-Date: 2015-09-29 11:09+0100\n"
+"PO-Revision-Date: 2015-09-29 14:33+0100\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -227,7 +227,7 @@ msgstr "Grafico totale (partiti quest'anno)"
 #: code:addons/contract_manage/contract.py:605
 #, python-format
 msgid "Ref. %s/%s:%s [#%s] (autom. transport)"
-msgstr "Rif. %s/%s:%s [#%s] (autom. transporti)"
+msgstr "Rif. %s/%s:%s [#%s] (autom. trasporti)"
 
 #. module: contract_manage
 #: model:ir.ui.menu,name:contract_manage.menu_contract_analysis_department
@@ -457,7 +457,7 @@ msgstr "Causale"
 #: selection:account.analytic.expense,code_type:0
 #: selection:account.analytic.expense.account,code_type:0
 msgid "Transport"
-msgstr "Transporto"
+msgstr "Trasporto"
 
 #. module: contract_manage
 #: model:ir.ui.menu,name:contract_manage.menu_rubrica_root
