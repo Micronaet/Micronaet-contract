@@ -1,0 +1,107 @@
+# Translation of OpenERP Server.
+# This file contains the translation of the following modules:
+# 	* contract_manage_transport
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenERP Server 6.0.4\n"
+"Report-Msgid-Bugs-To: support@openerp.com\n"
+"POT-Creation-Date: 2015-09-29 09:21+0000\n"
+"PO-Revision-Date: 2015-09-29 11:11+0100\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"Language: it\n"
+"X-Generator: Poedit 1.6.10\n"
+
+#. module: contract_manage_transport
+#: field:account.analytic.expense.km,account_id:0
+msgid "Account"
+msgstr "Contratto"
+
+#. module: contract_manage_transport
+#: help:account.analytic.expense.km,month:0
+msgid "Format YYMM"
+msgstr "Formato AAMM"
+
+#. module: contract_manage_transport
+#: code:addons/contract_manage_transport/transport.py:205
+#, python-format
+msgid "Sum of total Km is 0!"
+msgstr "La somma totale dei Km è zero!"
+
+#. module: contract_manage_transport
+#: view:account.analytic.account:0 field:account.analytic.account,km_ids:0
+msgid "Cost Km"
+msgstr "Costo kilom."
+
+#. module: contract_manage_transport
+#: code:addons/contract_manage_transport/transport.py:136
+#, python-format
+msgid "%s. Code not found on OpenERP: %s"
+msgstr "%s. Codice contratto non trovato in OpenERP: %s"
+
+#. module: contract_manage_transport
+#: model:ir.model,name:contract_manage_transport.model_account_analytic_expense_km
+msgid "Monthly transport km"
+msgstr "Trasporto mensile Km"
+
+#. module: contract_manage_transport
+#: view:account.analytic.account:0
+msgid "Km cost"
+msgstr "Costo Km."
+
+#. module: contract_manage_transport
+#: field:account.analytic.expense.km,km:0
+msgid "Km"
+msgstr "Km"
+
+#. module: contract_manage_transport
+#: field:account.analytic.expense.km,month:0
+msgid "Month"
+msgstr "Mese"
+
+#. module: contract_manage_transport
+#: model:ir.model,name:contract_manage_transport.model_account_analytic_account
+msgid "Analytic Account"
+msgstr "Contabilità Analitica"
+
+#. module: contract_manage_transport
+#: code:addons/contract_manage_transport/transport.py:190
+#, python-format
+msgid "Amount or month equal to zero!"
+msgstr "Importo o mese uguale a zero!"
+
+#. module: contract_manage_transport
+#: constraint:account.analytic.account:0
+msgid ""
+"Error! The currency has to be the same as the currency of the selected "
+"company"
+msgstr ""
+"Errore! La valuta deve essere uguale a quella impostata per l'azienda "
+"selezionata"
+
+#. module: contract_manage_transport
+#: code:addons/contract_manage_transport/transport.py:128
+#, python-format
+msgid "%s. Code or Km not found"
+msgstr "%s. Codice contratto o Km non trovati nel file"
+
+#. module: contract_manage_transport
+#: constraint:account.analytic.account:0
+msgid "Error! You can not create recursive analytic accounts."
+msgstr "Errore! Non è possibile creare conti analitici ricorsivi."
+
+#. module: contract_manage_transport
+#: model:ir.model,name:contract_manage_transport.model_account_analytic_expense
+msgid "Analytic expense"
+msgstr "Spese analitiche"
+
+#. module: contract_manage_transport
+#: code:addons/contract_manage_transport/transport.py:140
+#, python-format
+msgid "%s. More than one code found (%s): %s"
+msgstr "%s. Trovati più codici per il contratto (%s): %s"

@@ -136,6 +136,10 @@ class hr_employee(osv.osv):
     _columns = {
         'has_voucher': fields.boolean('Has voucher'),
         }
+        
+    _defaults = {
+        'has_voucher': lambda *x: True,
+        }    
 hr_employee()    
 
 class account_analytic_expense(osv.osv):
