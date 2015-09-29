@@ -16,10 +16,6 @@
                     </group>
                     <newline/>
                     <group expand="0" string="Group By...">
-                        <filter string="All" icon="terp-personal" domain="[]" context="{'group_by':'all'}"/>
-                        <separator orientation="vertical"/>
-                        <filter string="Code" icon="terp-personal" domain="[]" context="{'group_by':'code'}"/>
-                        <separator orientation="vertical"/>
                         <filter string="Code type" icon="terp-folder-green" domain="[]" context="{'group_by':'code_type'}"/>
                         <separator orientation="vertical"/>
                     </group>
