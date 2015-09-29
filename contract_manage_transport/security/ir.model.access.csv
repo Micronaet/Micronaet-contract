@@ -1,0 +1,3 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_account_analytic_expense_km_user","account.analytic.expense.km","model_account_analytic_expense_km","base.group_user",1,1,1,1
+

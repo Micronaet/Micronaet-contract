@@ -47,7 +47,7 @@ operation_type = [
 code_type_list = [
     ('generic', 'Generic expense'),
     ('voucher', 'Voucher'),
-    ('fuel', 'Fuel'),
+    ('transport', 'Transport'),
     ]
 
 class account_account(osv.osv):
@@ -150,6 +150,13 @@ class account_analytic_expense(osv.osv):
     # -------------------------------------------------------------------------
     #                           Utility functions:
     # -------------------------------------------------------------------------
+    def get_transport_splitted_account(self, cr, uid, context=None):
+        ''' Function to be written, for now is overrided with module
+            contract_manage_transport for temporary phase 
+            Costs will be calculated depend on Km for every contract
+        '''
+        return {}
+    
     def get_voucher_splitted_account(
             self, cr, uid, amount, date_from, date_to, limit=6.0, 
             department_id=False, context=None):
@@ -283,7 +290,6 @@ class account_analytic_expense(osv.osv):
         # =====================================================================
         #                           Startup parameters        
         # =====================================================================
-        import pdb; pdb.set_trace()
         _logger.info('Start import accounting movement, file: %s' % csv_file)
 
         # pools used:
@@ -333,7 +339,7 @@ class account_analytic_expense(osv.osv):
         # Dynamically create the catalog:
         code_catalog = {}
         for key in code_type_list:
-            code_catalog[key] = []
+            code_catalog[key[0]] = []
 
         ledger_ids = code_pool.search(cr, uid, [], context=context)
         for ledger in code_pool.browse(cr, uid, ledger_ids, context=context):
@@ -588,7 +594,11 @@ class account_analytic_expense(osv.osv):
                         cr, uid, entry.amount, entry.date_from, entry.date_to, 
                         voucher_limit, entry.department_id.id, context=context)
                     name_mask = _('Ref. %s/%s:%s [#%s] (autom. voucher)')
-                    
+                elif entry.code_id.code in code_catalog['transport']:
+                    # TODO Complete with parameters:
+                    contract_new = self.get_transport_splitted_account(
+                        cr, uid, context=context)
+                    name_mask = _('Ref. %s/%s:%s [#%s] (autom. transport)')    
                 else:
                     # -----------------
                     # Generic expences:
