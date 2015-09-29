@@ -150,7 +150,8 @@ class account_analytic_expense(osv.osv):
     # -------------------------------------------------------------------------
     #                           Utility functions:
     # -------------------------------------------------------------------------
-    def get_transport_splitted_account(self, cr, uid, context=None):
+    def get_transport_splitted_account(self, cr, uid, amount=0, month=0, 
+            context=None):
         ''' Function to be written, for now is overrided with module
             contract_manage_transport for temporary phase 
             Costs will be calculated depend on Km for every contract
@@ -579,16 +580,18 @@ class account_analytic_expense(osv.osv):
             #                   Split only if not in contract:    
             # -----------------------------------------------------------------
             if entry.split_type in ('all', 'department'):
-                if entry.code_id.code in code_catalog['voucher']:
-                    # -----------------
-                    # Voucher expenses:
-                    # -----------------
+                # -----------------
+                # Voucher expenses:
+                # -----------------
+                if (entry.code_id.code in code_catalog['voucher'] or 
+                    entry.code_id.code in code_catalog['transport']):
                     if not entry.date_from or not entry.date_to:
                         _logger.error(
-                            _('Voucher need to period from / to: [%s]') % \
+                            _('Voucher/Transport need to period from / to: [%s]') % \
                                 line) 
                         continue        
-                    
+
+                if entry.code_id.code in code_catalog['voucher']:                    
                     # Input data for write procedure:
                     contract_new = self.get_voucher_splitted_account(
                         cr, uid, entry.amount, entry.date_from, entry.date_to, 
@@ -596,8 +599,10 @@ class account_analytic_expense(osv.osv):
                     name_mask = _('Ref. %s/%s:%s [#%s] (autom. voucher)')
                 elif entry.code_id.code in code_catalog['transport']:
                     # TODO Complete with parameters:
+                    mount = "%s%s" % (
+                        entry.date_from[2:4], entry.date_from[5:7])
                     contract_new = self.get_transport_splitted_account(
-                        cr, uid, context=context)
+                        cr, uid, entry.amount, month, context=context)
                     name_mask = _('Ref. %s/%s:%s [#%s] (autom. transport)')    
                 else:
                     # -----------------

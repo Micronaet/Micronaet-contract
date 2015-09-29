@@ -47,7 +47,7 @@ class account_analytic_expense_km(osv.osv):
     _order = 'month'
 
     # -------------------------------------------------------------------------
-    #                                 Scheduled
+    #                                Scheduled
     # -------------------------------------------------------------------------
     def schedule_csv_accounting_transport_movement_import(
             self, cr, uid, path='~/etl/transport', separator=';', header=0, 
@@ -178,109 +178,37 @@ class account_analytic_expense(osv.osv):
     _inherit = 'account.analytic.expense'
 
     # Utility:
-    def get_transport_splitted_account(self, cr, uid, context=None):
+    def get_transport_splitted_account(self, cr, uid, amount=0, month=0, 
+            context=None):
         ''' Function to be written, for now is overrided with module
             contract_manage_transport for temporary phase 
             Costs will be calculated depend on Km for every contract
         '''
-        # TODO change all:
-        data = {}
+        res = {}
 
-        intervent_pool = self.pool.get('hr.analytic.timesheet')
-        employee_pool = self.pool.get('hr.employee')
-        account_pool = self.pool.get('account.analytic.account')
-        
-        if not department_id: # TODO all? 
-            _logger.error(
-                _('Cannot split voucher if department is not present!'))
+        if not amount or not month:
+            _logger.error(_('Amount or month equal to zero!'))            
+            return res
 
-        # ------------------------------
-        # List of user that has voucher:
-        # ------------------------------
-        employee_ids = employee_pool.search(cr, uid, [
-            ('has_voucher', '=', True),
-            # TODO Note: employee should work for other account, so no filter:
-            #('department_id', '=', department_id), 
-            ], context=context)
-        voucher_user_ids = [
-            item.user_id.id for item in employee_pool.browse(
-                cr, uid, employee_ids, context=context) if item.user_id]
-        if not voucher_user_ids: 
-            _logger.error(
-                _('Cannot find active user in dep. selected [%s:%s] (lim. %s)'
-                ) % (date_from, date_to, limit, limit))
-            return {}
+        km_pool = self.pool.get('account.analytic.expense.km')
 
-        # ------------------------------
-        # Account not cancel and :
-        # ------------------------------
-        # TODO check date for closing ?
-        account_ids = account_pool.search(cr, uid, [
-            ('department_id', '=', department_id),
-            ('state', '!=', 'cancel'), # Active (or closed) # TODO necessary?
-            ('not_working', '=', False), # Working account
-            ('is_recover', '=', False), # Not recover account
-            ('is_contract', '=', True), # Is contract
-            ], context=context)
-        if not account_ids: 
-            _logger.error(
-                _('Cannot find active account [%s:%s]') % (
-                    date_from, date_to, limit))
-            return {}
-
-        # ------------------------------------------------------
-        # List of intervent in period for user that has voucher:    
-        # ------------------------------------------------------
-        intervent_ids = intervent_pool.search(cr, uid, [
-            ('date', '>=', date_from), 
-            ('date', '<', date_to), 
-            ('user_id', 'in', voucher_user_ids),       
-            ('account_id', 'in', account_ids)     
+        km_ids = km_pool.search(cr, uid, [
+            ('month', '>=', date_from),  # TODO
             ])
 
-        # -------------------------------------------------------------
-        # Load database for populate limit elements and account + hours    
-        # -------------------------------------------------------------
-        for intervent in intervent_pool.browse(
-                cr, uid, intervent_ids, context=context):
-            key = (intervent.date, intervent.user_id.id)
-            if key not in data:
-                data[key] = [0, {}] # day hours, dict of ID int: hour
-            
-            data[key][0] += intervent.unit_amount # update duration
-            if intervent.account_id in data[key][1]:
-                data[key][1][intervent.account_id.id] += intervent.unit_amount
-            else:    
-                data[key][1][intervent.account_id.id] = intervent.unit_amount
-
-        # -------------------------------------
-        # Loop for clean database (test limit):
-        # -------------------------------------
-        res = {}        
-        total = 0.0
-        for item in data:
-            if data[item][0] < limit:
-                continue # jump, no dinner
-            for account_id in data[item][1]:
-                if account_id not in res:
-                    res[account_id] = 0
-                    
-                res[account_id] += data[item][1][account_id] # total hours
-                total += data[item][1][account_id]
+        total = 0.0    
+        for item in km_pool.browse(cr, uid, km_ids, context=context):
+            res[item.account_id.id] = item.km
+            total += item.km
         
-        # -----------------------------------
-        # Update with amount splitted (rate):
-        # -----------------------------------
         if not total:
-            _logger.error(_(
-                'Total = 0 cannot split voucher amount: %s!') % amount)
+            _logger.error(_('Sum of total Km is 0!'))
             return {}
+
         rate = amount / total
         for item in res:
             res[item] *= rate
-        # TODO keep line with amount 0?    
         return res
-        return {}
 account_analytic_expense()
 
 class account_analytic_account(osv.osv):
