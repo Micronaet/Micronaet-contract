@@ -281,5 +281,17 @@ class account_analytic_expense(osv.osv):
         # TODO keep line with amount 0?    
         return res
         return {}
-account_analytic_expense()    
+account_analytic_expense()
+
+class account_analytic_account(osv.osv):
+    ''' *many relation fields
+    '''
+    _name = 'account.analytic.account'
+    _inherit = 'account.analytic.account'
+    
+    _columns =  {
+        'km_ids': fields.one2many('account.analytic.expense.km', 'account_id',
+            'Cost Km')
+        }
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -1,6 +1,25 @@
 <?xml version="1.0" ?>
 <openerp>
-<data>
-</data>
+    <data>
+        <record id="view_account_analytic_account_contract_km_form" model="ir.ui.view">
+            <field name="name">Km for cost</field>
+            <field name="model">account.analytic.account</field>
+            <field name="inherit_id" ref="account.view_account_analytic_account_form"/>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+               <xpath expr="/form/notebook/page[@string='Account Data']" position="after">
+                   <page string="Cost Km">
+                       <field name="km_ids" nolabel="1">
+                            <tree string="Km cost" editable="bottom">
+                                <field name="account_id" invisible="1" />
+                                <field name="code" readonly="1"/>
+                                <field name="km" readonly="1"/>
+                            </tree>
+                       </field>
+                   </page>
+               </xpath>
+            </field>
+        </record>
+    </data>
 </openerp>
 
