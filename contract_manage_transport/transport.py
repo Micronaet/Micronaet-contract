@@ -26,6 +26,7 @@ import logging
 import netsvc
 import csv
 import decimal_precision as dp
+from os import listdir
 from osv import fields, osv, expression, orm
 from datetime import datetime, timedelta
 from tools.translate import _
@@ -48,7 +49,7 @@ class account_analytic_expense_km(osv.osv):
     #                                 Scheduled
     # -------------------------------------------------------------------------
     def schedule_csv_accounting_transport_movement_import(
-            self, cr, iud, path='~/etl/transport', separator=';', header=0, 
+            self, cr, uid, path='~/etl/transport', separator=';', header=0, 
             verbose=100, bof='transport', context=None):
         ''' Import function that read in:
             path: folder where all transport Km file are
@@ -84,11 +85,12 @@ class account_analytic_expense_km(osv.osv):
         path = os.path.expanduser(path)
         trans_file = [
             filename for filename in listdir(path) if 
-                    isfile(join(path, filename)) and filename.startswith(bof) 
-                    and len(filename) == (len(bof) + 8)]
+                isfile(join(path, filename)) and filename.startswith(bof) 
+                and len(filename) == (len(bof) + 8)]
 
         trans_file.sort() # for have last price correct
         _logger.info("Start auto import of file transport")
+        import pdb; pdb.set_trace()
         for filename in trans_file:        
             try:
                 _logger.info("Load and import file %s" % filename)
@@ -135,7 +137,12 @@ class account_analytic_expense_km(osv.osv):
                         _logger.error(
                             _('%s. More than one code found (%s): %s') % (
                                 i, len(account_ids), code))
-                        continue                    
+                        continue
+                    self.create(cr, uid, {
+                        'account_id': account_ids[0],
+                        'km': km,
+                        'month': year_month,
+                        }, context=context)                      
                 f.close()
                 
                 # History file:
