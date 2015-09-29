@@ -44,6 +44,7 @@ class account_analytic_expense_km(osv.osv):
     _name = 'account.analytic.expense.km'
     _description = 'Monthly transport km'
     _rec_name = 'account_id'
+    _order = 'month'
 
     # -------------------------------------------------------------------------
     #                                 Scheduled
@@ -90,7 +91,7 @@ class account_analytic_expense_km(osv.osv):
 
         trans_file.sort() # for have last price correct
         _logger.info("Start auto import of file transport")
-        import pdb; pdb.set_trace()
+
         for filename in trans_file:        
             try:
                 _logger.info("Load and import file %s" % filename)
@@ -109,7 +110,8 @@ class account_analytic_expense_km(osv.osv):
                 # Load from file:
                 # ---------------
                 i = -header
-                f = open(filename, 'rb')
+                fullpath = join(path, filename)
+                f = open(fullpath, 'rb')
                 for line in f:
                     i += 1
                     if i <= 0: # jump header line
