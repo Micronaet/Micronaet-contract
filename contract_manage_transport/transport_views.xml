@@ -4,7 +4,7 @@
         <record id="view_account_analytic_expense_km_form" model="ir.ui.view">
             <field name="name">Import km</field>
             <field name="model">account.analytic.expense.km</field>
-            <field name="type">tree</field>
+            <field name="type">form</field>
             <field name="arch" type="xml">
                <form string="Import transport" >
                    <field name="datetime" />

@@ -172,7 +172,7 @@ class account_analytic_expense_km(osv.osv):
     _columns = {
         'name': fields.char('Import', size=20, required=True), 
         'datetime': fields.date('Import date'),
-        'text': fields.text('Error'), 
+        'error': fields.text('Error'), 
          }
     
     _defaults = {
@@ -188,7 +188,7 @@ class account_analytic_line(osv.osv):
     
     _columns = {
         'km_import_id': fields.many2one(
-            'account.analytic.expense.km', 'Import Km'),        
+            'account.analytic.expense.km', 'Import Km', ondelete='cascade'),        
         }
 account_analytic_line()
 
@@ -198,7 +198,7 @@ class account_analytic_expense_km(osv.osv):
     _inherit = 'account.analytic.expense.km'
 
     _columns = {
-        'line_id': fields.one2many(
+        'line_ids': fields.one2many(
             'account.analytic.line', 'km_import_id', 'Analytic line'),
         }
 
