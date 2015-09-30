@@ -50,7 +50,6 @@ class hr_employee_force_hour(osv.osv_memory):
         ''' Loop on cost folder searching file that start with bof
         '''
         from os.path import isfile, join
-        import pdb; pdb.set_trace()
         path = os.path.expanduser(path)
         cost_file = [
             filename for filename in listdir(path) if 

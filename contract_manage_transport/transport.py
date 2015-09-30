@@ -51,7 +51,7 @@ class account_analytic_expense_km(osv.osv):
     # -------------------------------------------------------------------------
     def schedule_csv_accounting_transport_movement_import(
             self, cr, uid, path='~/etl/transport', separator=';', header=0, 
-            context=None):
+            general_code='410100', context=None):
         ''' Import function that read in:
             path: folder where all transport Km file are
             separator: csv file format have this column separator
@@ -60,9 +60,7 @@ class account_analytic_expense_km(osv.osv):
         '''
         from os.path import isfile, join
 
-        _logger.info(
-            'Start import transport cost movement, file: %s' % csv_file)
-
+        import pdb; pdb.set_trace()
         # pools used:
         csv_pool = self.pool.get('csv.base')
         account_pool = self.pool.get('account.account')
@@ -176,7 +174,7 @@ class account_analytic_expense_km(osv.osv):
     _columns = {
         'name': fields.char('Import', size=20, required=True), 
         'datetime': fields.date('Import date'),
-        'text': fields.char('Error'), 
+        'text': fields.text('Error'), 
          }
     
     _defaults = {
