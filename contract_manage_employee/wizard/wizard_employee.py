@@ -100,7 +100,7 @@ class hr_employee_force_hour(osv.osv_memory):
                     line_pool.write(cr, uid, line.id, {
                         'name': product_proxy.name_template,            
                         'product_id': product_proxy.id,
-                        'amount': (line.unit_amount * product_proxy.standard_price),
+                        'amount': -(line.unit_amount * product_proxy.standard_price),
                         }, context=context)
                     continue    
                 except:
