@@ -51,44 +51,26 @@ class account_analytic_expense_km(osv.osv):
     # -------------------------------------------------------------------------
     def schedule_csv_accounting_transport_movement_import(
             self, cr, uid, path='~/etl/transport', separator=';', header=0, 
-            verbose=100, context=None):
+            context=None):
         ''' Import function that read in:
             path: folder where all transport Km file are
             separator: csv file format have this column separator
             header: and total line header passed
-            verbose: every x record log event of importation
             context: context for this function
         '''
         from os.path import isfile, join
 
-        _logger.info('Start import accounting movement, file: %s' % csv_file)
-
-        # --------------------------------
-        # Utility: function for procedure:
-        # --------------------------------
-        def format_string(value, default=''):
-            try:
-                return value.strip() or default
-            except:
-                return default
-
-        def format_date(value):
-            return value
-
-        def format_float(value):        
-            try:
-                value = value.replace(',', '.')
-                return float(value)
-            except:
-                return 0.0
+        _logger.info(
+            'Start import transport cost movement, file: %s' % csv_file)
 
         # pools used:
+        csv_pool = self.pool.get('csv.base')
         account_pool = self.pool.get('account.account')
         contract_pool = self.pool.get('account.analytic.account')
         line_pool = self.pool.get('account.analytic.line')
-        csv_pool = self.pool.get('csv.base')
         journal_pool = self.pool.get('account.analytic.journal')
 
+        # Read paramters for write analytic enytry:
         # Purchase journal:
         journal_id = journal_pool.get_journal_purchase(
             cr, uid, context=context)
@@ -100,6 +82,7 @@ class account_analytic_expense_km(osv.osv):
             _logger.error(_('Cannot create analytic line, no ledge!'))
             return False
 
+        # Get file list:
         path = os.path.expanduser(path)
         trans_file = [
             filename for filename in listdir(path) if
@@ -107,19 +90,15 @@ class account_analytic_expense_km(osv.osv):
 
         if not trans_file:
             _logger.warning(_('File not found in transport folder: %s') % path)
+            return True
 
         trans_file.sort() # for have last price correct
-        _logger.info("Start auto import of file transport")
-            
-        for filename in trans_file:        
+        _logger.info("Start auto import of file transport")            
+        for filename in trans_file:
             try:            
                 _logger.info("Load and import file %s" % filename)
                 error = []
                 
-                # ---------------
-                # Load from file:
-                # ---------------
-                    
                 i = -header
                 fullpath = join(path, filename)
                 f = open(fullpath, 'rb')
@@ -142,24 +121,25 @@ class account_analytic_expense_km(osv.osv):
                         _logger.error(
                             _('%s. Code not found on OpenERP: %s') % (i, code))
                         continue
+                
                     elif len(account_ids) > 1:
                         _logger.error(
                             _('%s. More than one code found (%s): %s') % (
                                 i, len(account_ids), code))
                         continue
                     
-                    month = {}
-                    for i in range(1, len(line):
+                    for i in range(1, len(line)):
                         month = csv_pool.decode_string(line[i])
                         
                         line_pool.create(cr, uid, {
                             'amount': amount,
                             'user_id': uid,
-                            'name': _('Car costs: %s '),
+                            'name': _('Car costs: %s ') % month,
                             'unit_amount': 1.0,
                             'account_id': account_id,
                             'general_account_id': general_id,
                             'journal_id': journal_id, 
+                            # TODO date?
                             
                             # Link to import record:
                             'km_import_id': parent_id,
@@ -180,10 +160,16 @@ class account_analytic_expense_km(osv.osv):
                         datetime.now().strftime('%Y%m%d.%H%M%S'),
                         filename, )),
                     )
+                    
+                # TODO write error in file
+                if error:
+                    self.write(cr, uid, parent_id, {
+                        'error': '\n'.join(error)}, context=context)
 
             except:
                 _logger.error('No correct file format: %s' % filename)
                 _logger.error((sys.exc_info(), ))
+                
         _logger.info("End auto import of file transport")
         return True
 
