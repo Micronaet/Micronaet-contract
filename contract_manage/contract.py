@@ -419,9 +419,8 @@ class account_analytic_expense(osv.osv):
                                 counter, account_code))
                     continue                
 
-                # TODO use object (boolean)
-                # No ledger:
-                if account_code in exclude_ledger_start:
+                # No ledger (analytic in objecct):
+                if account_code in exclude_ledger:
                     if log_warning:
                         _logger.warning(_(
                             '%s. Jump ledger: %s') % (

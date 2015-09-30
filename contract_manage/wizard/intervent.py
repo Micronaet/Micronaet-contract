@@ -191,8 +191,8 @@ class account_analytic_intervent_wizard(osv.osv_memory):
 
         try: # Try to create hr.analytic.tymesheet or account.analytic.account
             employee_proxy=self.pool.get('hr.employee').browse(cr, uid, employee_ids[0])
-            company_id= item_wizard.user_id.company_id.id
-            account_id=item_wizard.account_analytic_id.id
+            company_id = item_wizard.user_id.company_id.id
+            account_id = item_wizard.account_analytic_id.id
             
             if item_wizard.range_vacancy: # Vacancy range:
                 from datetime import datetime, timedelta
