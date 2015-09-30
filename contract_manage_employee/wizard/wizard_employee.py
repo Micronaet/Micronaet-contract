@@ -45,6 +45,27 @@ class hr_employee_force_hour(osv.osv_memory):
     # --------------------
     # Schedule operations:
     # --------------------
+    def forte_update_product_analytic_line(self, cr, uid, context=None):
+        ''' Temp function called via XMLRPC for update description in analytic
+            line
+        ''' 
+        line_pool = self.pool.get('account.analytic.line')
+        
+        _logger.info("Start update!")
+        att_ids = journal_pool.search(cr, uid, [
+            ('code', '=', 'ATT')], context=context)
+
+        line_ids = line_pool.search(cr, uid, [
+            ('journal_id', '=', att_ids[0]),
+            ], context=context)
+            
+        for line in line_pool.browse(cr, uid, line_ids, context=context):
+            print "From %s to %s" % (name, line.product_id.name)
+            line_pool.update(cr, uid, line.id, {
+               'name': line.product_id.name,
+               }, context=context)
+        _logger.info("End update!")
+
     def schedule_importation_cost(self, cr, uid, path='~/etl/employee', 
             bof='cost', separator=';', context=None):
         ''' Loop on cost folder searching file that start with bof
