@@ -129,7 +129,7 @@ class account_analytic_expense_km(osv.osv):
                         amount = csv_pool.decode_float(line[i])
                         
                         line_pool.create(cr, uid, {
-                            'amount': amount,
+                            'amount': -amount,
                             'user_id': uid,
                             'name': _('Import: %s') % filename, # TODO
                             'unit_amount': 1.0,
