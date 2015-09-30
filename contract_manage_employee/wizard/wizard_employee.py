@@ -65,9 +65,6 @@ class hr_employee_force_hour(osv.osv_memory):
         _logger.info('Found %s line!' % len(line_ids))  
         for line in line_pool.browse(cr, uid, line_ids, context=context):
             i += 1
-            if i % 30 == 0:
-                print i
-                import pdb; pdb.set_trace()
             if not line.product_id:
                 _logger.error('Product not found (null in line)')
                 continue
@@ -130,15 +127,6 @@ class hr_employee_force_hour(osv.osv_memory):
                 _logger.warning('Not updated: %s' % line.name)
                        
         _logger.info("End update!")
-        import pdb; pdb.set_trace()
-        import pdb; pdb.set_trace()
-        import pdb; pdb.set_trace()
-        import pdb; pdb.set_trace()
-        import pdb; pdb.set_trace()
-        import pdb; pdb.set_trace()
-        import pdb; pdb.set_trace()
-        import pdb; pdb.set_trace()
-        import pdb; pdb.set_trace()
         return True
 
     def schedule_importation_cost(self, cr, uid, path='~/etl/employee', 
