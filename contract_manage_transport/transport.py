@@ -60,7 +60,6 @@ class account_analytic_expense_km(osv.osv):
         '''
         from os.path import isfile, join
 
-        import pdb; pdb.set_trace()
         # pools used:
         csv_pool = self.pool.get('csv.base')
         account_pool = self.pool.get('account.account')
@@ -112,29 +111,29 @@ class account_analytic_expense_km(osv.osv):
 
                     code = csv_pool.decode_string(line[0])
                     # Search contract
-                    account_ids = account_pool.search(cr, uid, [
+                    contract_ids = contract_pool.search(cr, uid, [
                         ('code', '=', code)], context=context)
 
-                    if not account_ids:
+                    if not contract_ids:
                         _logger.error(
                             _('%s. Code not found on OpenERP: %s') % (i, code))
                         continue
                 
-                    elif len(account_ids) > 1:
+                    elif len(contract_ids) > 1:
                         _logger.error(
                             _('%s. More than one code found (%s): %s') % (
-                                i, len(account_ids), code))
+                                i, len(contract_ids), code))
                         continue
                     
                     for i in range(1, len(line)):
-                        month = csv_pool.decode_string(line[i])
+                        amount = csv_pool.decode_float(line[i])
                         
                         line_pool.create(cr, uid, {
                             'amount': amount,
                             'user_id': uid,
-                            'name': _('Car costs: %s ') % month,
+                            'name': _('Car costs: %02d/2015 ') % i, # TODO
                             'unit_amount': 1.0,
-                            'account_id': account_id,
+                            'account_id': contract_ids[0],
                             'general_account_id': general_id,
                             'journal_id': journal_id, 
                             # TODO date?
@@ -148,7 +147,8 @@ class account_analytic_expense_km(osv.osv):
                             #'ref', 'to_invoice', 'invoice_id', 
                             # 'extra_analytic_line_timesheet_id', 'import_type',
                             ##'activity_id', 'mail_raccomanded', 'location',
-                            }, context=context)                            
+                            }, context=context)
+                        import pdb; pdb.set_trace()                           
                 f.close()
                 
                 # History file:
