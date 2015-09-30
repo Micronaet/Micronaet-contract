@@ -101,7 +101,7 @@ class account_analytic_expense_km(osv.osv):
                 f = open(fullpath, 'rb')
 
                 parent_id = self.create(cr, uid, {
-                    'name': _('Import file: %s') % fullpath,
+                    'name': _('Import file: %s') % filename,
                     }, context=context)
                 for line in f:
                     i += 1
@@ -170,7 +170,7 @@ class account_analytic_expense_km(osv.osv):
         return True
 
     _columns = {
-        'name': fields.char('Import', size=20, required=True), 
+        'name': fields.char('Import', size=120, required=True), 
         'datetime': fields.date('Import date'),
         'error': fields.text('Error'), 
          }

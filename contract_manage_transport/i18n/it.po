@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenERP Server 6.0.4\n"
 "Report-Msgid-Bugs-To: support@openerp.com\n"
-"POT-Creation-Date: 2015-09-29 09:21+0000\n"
-"PO-Revision-Date: 2015-09-29 11:11+0100\n"
+"POT-Creation-Date: 2015-09-30 12:06+0000\n"
+"PO-Revision-Date: 2015-09-30 13:57+0100\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -18,51 +18,49 @@ msgstr ""
 "X-Generator: Poedit 1.6.10\n"
 
 #. module: contract_manage_transport
-#: field:account.analytic.expense.km,account_id:0
-msgid "Account"
-msgstr "Contratto"
+#: field:account.analytic.expense.km,datetime:0
+msgid "Import date"
+msgstr "Data importazione"
 
 #. module: contract_manage_transport
-#: help:account.analytic.expense.km,month:0
-msgid "Format YYMM"
-msgstr "Formato AAMM"
+#: field:account.analytic.line,km_import_id:0
+msgid "Import Km"
+msgstr "Import Km"
 
 #. module: contract_manage_transport
-#: code:addons/contract_manage_transport/transport.py:205
+#: code:addons/contract_manage_transport/transport.py:134
 #, python-format
-msgid "Sum of total Km is 0!"
-msgstr "La somma totale dei Km è zero!"
+msgid "Import: %s"
+msgstr "Importazione: %s"
 
 #. module: contract_manage_transport
-#: view:account.analytic.account:0 field:account.analytic.account,km_ids:0
-msgid "Cost Km"
-msgstr "Costo kilom."
+#: model:ir.model,name:contract_manage_transport.model_account_analytic_line
+msgid "Analytic Line"
+msgstr "Linea conto analitico"
 
 #. module: contract_manage_transport
-#: code:addons/contract_manage_transport/transport.py:136
+#: code:addons/contract_manage_transport/transport.py:104
+#, python-format
+msgid "Import file: %s"
+msgstr "File importato: %s"
+
+#. module: contract_manage_transport
+#: code:addons/contract_manage_transport/transport.py:119
 #, python-format
 msgid "%s. Code not found on OpenERP: %s"
 msgstr "%s. Codice contratto non trovato in OpenERP: %s"
 
 #. module: contract_manage_transport
-#: model:ir.model,name:contract_manage_transport.model_account_analytic_expense_km
-msgid "Monthly transport km"
-msgstr "Trasporto mensile Km"
+#: code:addons/contract_manage_transport/transport.py:79
+#, python-format
+msgid "Cannot create analytic line, no ledge!"
+msgstr "Impossibile creare riga analitica, nessun mastro!"
 
 #. module: contract_manage_transport
-#: view:account.analytic.account:0
-msgid "Km cost"
-msgstr "Costo Km."
-
-#. module: contract_manage_transport
-#: field:account.analytic.expense.km,km:0
-msgid "Km"
-msgstr "Km"
-
-#. module: contract_manage_transport
-#: field:account.analytic.expense.km,month:0
-msgid "Month"
-msgstr "Mese"
+#: view:account.analytic.expense.km:0
+#: model:ir.actions.act_window,name:contract_manage_transport.action_account_analytic_expense_km
+msgid "Import transport"
+msgstr "Importa trasporti"
 
 #. module: contract_manage_transport
 #: model:ir.model,name:contract_manage_transport.model_account_analytic_account
@@ -70,10 +68,21 @@ msgid "Analytic Account"
 msgstr "Contabilità Analitica"
 
 #. module: contract_manage_transport
-#: code:addons/contract_manage_transport/transport.py:190
+#: model:ir.model,name:contract_manage_transport.model_account_analytic_expense_km
+msgid "Monthly transport km"
+msgstr "Trasporto mensile Km"
+
+#. module: contract_manage_transport
+#: view:account.analytic.expense.km:0
+#: field:account.analytic.expense.km,error:0
+msgid "Error"
+msgstr "Errore"
+
+#. module: contract_manage_transport
+#: code:addons/contract_manage_transport/transport.py:89
 #, python-format
-msgid "Amount or month equal to zero!"
-msgstr "Importo o mese uguale a zero!"
+msgid "File not found in transport folder: %s"
+msgstr "File non trovati nella cartella trasporti: %s"
 
 #. module: contract_manage_transport
 #: constraint:account.analytic.account:0
@@ -85,10 +94,20 @@ msgstr ""
 "selezionata"
 
 #. module: contract_manage_transport
-#: code:addons/contract_manage_transport/transport.py:128
-#, python-format
-msgid "%s. Code or Km not found"
-msgstr "%s. Codice contratto o Km non trovati nel file"
+#: model:ir.model,name:contract_manage_transport.model_account_analytic_expense
+msgid "Analytic expense"
+msgstr "Spese analitiche"
+
+#. module: contract_manage_transport
+#: model:ir.ui.menu,name:contract_manage_transport.menu_account_analytic_expense_km
+msgid "Transport import"
+msgstr "Importa trasporti"
+
+#. module: contract_manage_transport
+#: view:account.analytic.expense.km:0
+#: field:account.analytic.expense.km,line_ids:0
+msgid "Analytic line"
+msgstr "Riga analitica"
 
 #. module: contract_manage_transport
 #: constraint:account.analytic.account:0
@@ -96,12 +115,12 @@ msgid "Error! You can not create recursive analytic accounts."
 msgstr "Errore! Non è possibile creare conti analitici ricorsivi."
 
 #. module: contract_manage_transport
-#: model:ir.model,name:contract_manage_transport.model_account_analytic_expense
-msgid "Analytic expense"
-msgstr "Spese analitiche"
+#: field:account.analytic.expense.km,name:0
+msgid "Import"
+msgstr "Importa"
 
 #. module: contract_manage_transport
-#: code:addons/contract_manage_transport/transport.py:140
+#: code:addons/contract_manage_transport/transport.py:124
 #, python-format
 msgid "%s. More than one code found (%s): %s"
 msgstr "%s. Trovati più codici per il contratto (%s): %s"
