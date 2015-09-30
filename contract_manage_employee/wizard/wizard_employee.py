@@ -262,12 +262,21 @@ class hr_employee_force_hour(osv.osv_memory):
         product_pool = self.pool.get('product.product')
         employee_pool = self.pool.get('hr.employee')
         line_pool = self.pool.get('account.analytic.line')
+        journal_pool = self.pool.get('account.analytic.journal')
         log_pool = self.pool.get('hr.employee.force.log')
         
         # ---------------
         # Log operations:
         # ---------------
         # Note: Logged before for get ID
+        timesheet_journal_ids = journal_pool.search(cr, uid, [
+            ('code', '=', 'TS')], context=context)
+        if not timesheet_journal_ids:
+            _logger.error('Timesheet (TS) journal not found!')
+            return False
+        _logger.info('Get Timesheet (code TS) journal for filter')
+            
+             
         update_log_id = log_pool.log_operation(
             cr, uid, name, from_date, error, context=context)
 
@@ -299,6 +308,7 @@ class hr_employee_force_hour(osv.osv_memory):
                 # Update analytic lines save log operation parent:
                 # ------------------------------------------------
                 domain = [
+                    ('journal_id', '=', timesheet_journal_ids[0]), # only
                     ('user_id', '=', cost.employee_id.user_id.id),
                     ('date', '>=', from_date),
                     ]
