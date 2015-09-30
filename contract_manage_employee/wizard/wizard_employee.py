@@ -60,8 +60,14 @@ class hr_employee_force_hour(osv.osv_memory):
         line_ids = line_pool.search(cr, uid, [
             ('journal_id', '=', att_ids[0]),
             ], context=context)
-            
+
+        i = 0          
+        _logger.info('Found %s line!' % len(line_ids))  
         for line in line_pool.browse(cr, uid, line_ids, context=context):
+            i += 1
+            if i % 30 == 0:
+                print i
+                import pdb; pdb.set_trace()
             if not line.product_id:
                 _logger.error('Product not found (null in line)')
                 continue
@@ -69,7 +75,6 @@ class hr_employee_force_hour(osv.osv_memory):
             # Hour cost need to change also product:
             if line.product_id.is_hour_cost:
                 try:
-                    import pdb; pdb.set_trace()
                     # Change product_id and after set name of product
                     product_ids = product_pool.search(cr, uid, [
                         ('name', '=', line.name)], context=context)
@@ -125,6 +130,15 @@ class hr_employee_force_hour(osv.osv_memory):
                 _logger.warning('Not updated: %s' % line.name)
                        
         _logger.info("End update!")
+        import pdb; pdb.set_trace()
+        import pdb; pdb.set_trace()
+        import pdb; pdb.set_trace()
+        import pdb; pdb.set_trace()
+        import pdb; pdb.set_trace()
+        import pdb; pdb.set_trace()
+        import pdb; pdb.set_trace()
+        import pdb; pdb.set_trace()
+        import pdb; pdb.set_trace()
         return True
 
     def schedule_importation_cost(self, cr, uid, path='~/etl/employee', 
