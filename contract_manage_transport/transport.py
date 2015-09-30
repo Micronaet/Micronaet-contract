@@ -47,22 +47,21 @@ class account_analytic_expense_km(osv.osv):
     _order = 'month'
 
     # -------------------------------------------------------------------------
-    #                                Scheduled
+    #                          XMLRPC function
     # -------------------------------------------------------------------------
     def schedule_csv_accounting_transport_movement_import(
             self, cr, uid, path='~/etl/transport', separator=';', header=0, 
-            verbose=100, bof='transport', context=None):
+            verbose=100, context=None):
         ''' Import function that read in:
             path: folder where all transport Km file are
             separator: csv file format have this column separator
             header: and total line header passed
             verbose: every x record log event of importation
-            bof: the input file must start with this string, after:
-                YYMM.csv for get also the ref. month
             context: context for this function
         '''
         from os.path import isfile, join
-        account_pool = self.pool.get('account.analytic.account')
+
+        _logger.info('Start import accounting movement, file: %s' % csv_file)
 
         # --------------------------------
         # Utility: function for procedure:
@@ -82,12 +81,29 @@ class account_analytic_expense_km(osv.osv):
                 return float(value)
             except:
                 return 0.0
-        
+
+        # pools used:
+        account_pool = self.pool.get('account.account')
+        contract_pool = self.pool.get('account.analytic.account')
+        line_pool = self.pool.get('account.analytic.line')
+        csv_pool = self.pool.get('csv.base')
+        journal_pool = self.pool.get('account.analytic.journal')
+
+        # Purchase journal:
+        journal_id = journal_pool.get_journal_purchase(
+            cr, uid, context=context)
+
+        # Code for entry (ledger) operation:
+        general_id = account_pool.get_account_id(
+            cr, uid, general_code, context=context)
+        if not general_id:
+            _logger.error(_('Cannot create analytic line, no ledge!'))
+            return False
+
         path = os.path.expanduser(path)
         trans_file = [
-            filename for filename in listdir(path) if 
-                isfile(join(path, filename)) and filename.startswith(bof) 
-                and len(filename) == (len(bof) + 8)]
+            filename for filename in listdir(path) if
+                isfile(join(path, filename)) and filename[-3:] == 'csv']
 
         if not trans_file:
             _logger.warning(_('File not found in transport folder: %s') % path)
@@ -96,41 +112,29 @@ class account_analytic_expense_km(osv.osv):
         _logger.info("Start auto import of file transport")
             
         for filename in trans_file:        
-            try:
+            try:            
                 _logger.info("Load and import file %s" % filename)
                 error = []
-                year_month = os.path.splitext(filename)[0][-4:]
-                
-                # --------------------------------
-                # Remove all line for that period:
-                # --------------------------------
-                item_ids = self.search(cr, uid, [
-                    ('month', '=', year_month),
-                    ], context=context)
-                self.unlink(cr, uid, item_ids, context=context)
                 
                 # ---------------
                 # Load from file:
                 # ---------------
+                    
                 i = -header
                 fullpath = join(path, filename)
                 f = open(fullpath, 'rb')
+
+                parent_id = self.create(cr, uid, {
+                    'name': _('Import file: %s') % fullpath,
+                    }, context=context)
                 for line in f:
                     i += 1
                     if i <= 0: # jump header line
                         continue
-
                     line = line.strip().split(separator)
-                    
-                    # Parse file:                    
-                    code = format_string(line[0])
-                    km = format_float(line[1])
-                    
-                    # Check contract:
-                    if not code or not km:
-                        _logger.warning(_('%s. Code or Km not found') % i)
-                        continue
-                    
+
+                    code = csv_pool.decode_string(line[0])
+                    # Search contract
                     account_ids = account_pool.search(cr, uid, [
                         ('code', '=', code)], context=context)
 
@@ -143,11 +147,30 @@ class account_analytic_expense_km(osv.osv):
                             _('%s. More than one code found (%s): %s') % (
                                 i, len(account_ids), code))
                         continue
-                    self.create(cr, uid, {
-                        'account_id': account_ids[0],
-                        'km': km,
-                        'month': year_month,
-                        }, context=context)                      
+                    
+                    month = {}
+                    for i in range(1, len(line):
+                        month = csv_pool.decode_string(line[i])
+                        
+                        line_pool.create(cr, uid, {
+                            'amount': amount,
+                            'user_id': uid,
+                            'name': _('Car costs: %s '),
+                            'unit_amount': 1.0,
+                            'account_id': account_id,
+                            'general_account_id': general_id,
+                            'journal_id': journal_id, 
+                            
+                            # Link to import record:
+                            'km_import_id': parent_id,
+                            
+                            # Not used:
+                            #'company_id', 'code', 'currency_id', 'move_id',
+                            #'product_id', 'product_uom_id', 'amount_currency',
+                            #'ref', 'to_invoice', 'invoice_id', 
+                            # 'extra_analytic_line_timesheet_id', 'import_type',
+                            ##'activity_id', 'mail_raccomanded', 'location',
+                            }, context=context)                            
                 f.close()
                 
                 # History file:
@@ -163,66 +186,39 @@ class account_analytic_expense_km(osv.osv):
                 _logger.error((sys.exc_info(), ))
         _logger.info("End auto import of file transport")
         return True
-    
+
     _columns = {
-         'account_id': fields.many2one('account.analytic.account', 'Account',
-             required=True),
-         'km': fields.float('Km', digits=(16, 2),
-             required=True), 
-         'month': fields.char('Month', size=4, help='Format YYMM',
-             required=True), 
-         }    
+        'name': fields.char('Import', size=20, required=True), 
+        'datetime': fields.date('Import date'),
+        'text': fields.char('Error'), 
+         }
+    
+    _defaults = {
+        'datetime': lambda *x: datetime.now().strftime(
+            DEFAULT_SERVER_DATETIME_FORMAT),
+        }     
 account_analytic_expense_km()    
 
-class account_analytic_expense(osv.osv):
+class account_analytic_line(osv.osv):
+    ''' Extra fields for analytic line
+    '''
+    _inherit = 'account.analytic.line'
+    
+    _columns = {
+        'km_import_id': fields.many2one(
+            'account.analytic.expense.km', 'Import Km'),        
+        }
+account_analytic_line()
+
+class account_analytic_expense_km(osv.osv):
     ''' Add schedule method and override split method
     '''
-    _name = 'account.analytic.expense'
-    _inherit = 'account.analytic.expense'
+    _inherit = 'account.analytic.expense.km'
 
-    # Utility:
-    def get_transport_splitted_account(self, cr, uid, amount=0, month=0, 
-            context=None):
-        ''' Function to be written, for now is overrided with module
-            contract_manage_transport for temporary phase 
-            Costs will be calculated depend on Km for every contract
-        '''
-        res = {}
-
-        if not amount or not month:
-            _logger.error(_('Amount or month equal to zero!'))            
-            return res
-
-        km_pool = self.pool.get('account.analytic.expense.km')
-
-        km_ids = km_pool.search(cr, uid, [
-            ('month', '>=', date_from),  # TODO
-            ])
-
-        total = 0.0    
-        for item in km_pool.browse(cr, uid, km_ids, context=context):
-            res[item.account_id.id] = item.km
-            total += item.km
-        
-        if not total:
-            _logger.error(_('Sum of total Km is 0!'))
-            return {}
-
-        rate = amount / total
-        for item in res:
-            res[item] *= rate
-        return res
-account_analytic_expense()
-
-class account_analytic_account(osv.osv):
-    ''' *many relation fields
-    '''
-    _name = 'account.analytic.account'
-    _inherit = 'account.analytic.account'
-    
-    _columns =  {
-        'km_ids': fields.one2many('account.analytic.expense.km', 'account_id',
-            'Cost Km')
+    _columns = {
+        'line_id': fields.one2many(
+            'account.analytic.line', 'km_import_id', 'Analytic line'),
         }
-account_analytic_account()
+
+account_analytic_expense_km()
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

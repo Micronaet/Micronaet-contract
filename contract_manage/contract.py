@@ -581,7 +581,7 @@ class account_analytic_expense(osv.osv):
             #     key: ID account, value: amount splitted
             #     name_mask, es. 'Ref. %s/%s:%s [#%s]' << used for event name
             # -----------------------------------------------------------------
-            #                   Split only if not in contract:    
+            #                   Split only if not in contract:
             # -----------------------------------------------------------------
             if entry.split_type in ('all', 'department'):
                 # -----------------
