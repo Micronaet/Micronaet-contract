@@ -392,11 +392,11 @@ class account_analytic_expense(osv.osv):
 
                 series = csv_pool.decode_string(line[1])
                 number = csv_pool.decode_string(line[2])
-                
+
                 # General ledge:
                 account_code = csv_pool.decode_string(line[3])
                 account_name = csv_pool.decode_string(line[4])
-                
+
                 # Analytic account:
                 contract_code = csv_pool.decode_string(line[5])
                 
@@ -408,6 +408,20 @@ class account_analytic_expense(osv.osv):
                 name = csv_pool.decode_string(line[10]) # prot_id
                 year = csv_pool.decode_string(line[11])
 
+                # Get split type:
+                for key in code_catalog:
+                    if account_code in code_catalog[key]:
+                        code_type = key
+                        break
+
+                # Temporary:
+                if (date <= '2015/10/01' and department_code == '1' and 
+                         code_type == 'transport'):# meter
+                    _logger.error(_( # TODO warning
+                        '%s. 2015-10-01 Jump meter transport ledger: %s') % (
+                            counter, account_code))
+                    continue
+                    
                 # -----------------
                 # Get extra fields:
                 # -----------------                 
@@ -452,12 +466,6 @@ class account_analytic_expense(osv.osv):
                 # Department (always present):
                 department_id = dept_pool.get_department(
                     cr, uid, department_code, context=context)
-
-                # Get split type:
-                for key in code_catalog:
-                    if account_code in code_catalog[key]:
-                        code_type = key
-                        break
 
                 # Test if is department to jump (only in generic operations):
                 if (code_type != 'voucher' and 
@@ -586,28 +594,31 @@ class account_analytic_expense(osv.osv):
                 # -----------------
                 # Voucher expenses:
                 # -----------------
-                if (entry.code_id.code in code_catalog['voucher'] or 
-                    entry.code_id.code in code_catalog['transport']):
+                # Check date:
+                if (entry.code_id.code in code_catalog['voucher']):# or entry.code_id.code in code_catalog['transport']): # TODO ripristinare appena operativo
                     if not entry.date_from or not entry.date_to:
                         _logger.error(
                             _('Voucher/Transport need to period from / to: [%s]') % \
                                 line) 
                         continue        
 
+                # ------------------
+                # 3 cases for split:
+                # ------------------
                 if entry.code_id.code in code_catalog['voucher']:                    
                     # Input data for write procedure:
                     contract_new = self.get_voucher_splitted_account(
                         cr, uid, entry.amount, entry.date_from, entry.date_to, 
                         voucher_limit, entry.department_id.id, context=context)
                     name_mask = _('Ref. %s/%s:%s [#%s] (autom. voucher)')
-                elif entry.code_id.code in code_catalog['transport']:
-                    # TODO Complete with parameters:
-                    month = "%s%s" % (
-                        entry.date_from[2:4], entry.date_from[5:7])
-                    contract_new = self.get_transport_splitted_account(
-                        cr, uid, entry.amount, month, context=context)
-                    name_mask = _('Ref. %s/%s:%s [#%s] (autom. transport)')    
-                else:
+                #elif entry.code_id.code in code_catalog['transport']:
+                #    # TODO Complete with parameters:
+                #    month = "%s%s" % (
+                #        entry.date_from[2:4], entry.date_from[5:7])
+                #    contract_new = self.get_transport_splitted_account(
+                #        cr, uid, entry.amount, month, context=context)
+                #    name_mask = _('Ref. %s/%s:%s [#%s] (autom. transport)')    
+                else: # Generic TODO for now transport
                     # -----------------
                     # Generic expences:
                     # -----------------
