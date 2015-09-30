@@ -131,12 +131,12 @@ class account_analytic_expense_km(osv.osv):
                         line_pool.create(cr, uid, {
                             'amount': amount,
                             'user_id': uid,
-                            'name': _('Car costs: %02d/2015 ') % i, # TODO
+                            'name': _('Import: %s') % filename, # TODO
                             'unit_amount': 1.0,
                             'account_id': contract_ids[0],
                             'general_account_id': general_id,
                             'journal_id': journal_id, 
-                            # TODO date?
+                            'date': '2015-%02d-01' % i, # TODO
                             
                             # Link to import record:
                             'km_import_id': parent_id,
@@ -148,7 +148,6 @@ class account_analytic_expense_km(osv.osv):
                             # 'extra_analytic_line_timesheet_id', 'import_type',
                             ##'activity_id', 'mail_raccomanded', 'location',
                             }, context=context)
-                        import pdb; pdb.set_trace()                           
                 f.close()
                 
                 # History file:
@@ -163,7 +162,6 @@ class account_analytic_expense_km(osv.osv):
                 if error:
                     self.write(cr, uid, parent_id, {
                         'error': '\n'.join(error)}, context=context)
-
             except:
                 _logger.error('No correct file format: %s' % filename)
                 _logger.error((sys.exc_info(), ))
