@@ -602,7 +602,7 @@ class account_analytic_expense(osv.osv):
                     name_mask = _('Ref. %s/%s:%s [#%s] (autom. voucher)')
                 elif entry.code_id.code in code_catalog['transport']:
                     # TODO Complete with parameters:
-                    mount = "%s%s" % (
+                    month = "%s%s" % (
                         entry.date_from[2:4], entry.date_from[5:7])
                     contract_new = self.get_transport_splitted_account(
                         cr, uid, entry.amount, month, context=context)
