@@ -61,7 +61,6 @@ class hr_employee_force_hour(osv.osv_memory):
             ('journal_id', '=', att_ids[0]),
             ], context=context)
             
-        import pdb; pdb.set_trace()
         for line in line_pool.browse(cr, uid, line_ids, context=context):
             if not line.product_id:
                 _logger.error('Product not found (null in line)')
@@ -69,8 +68,8 @@ class hr_employee_force_hour(osv.osv_memory):
 
             # Hour cost need to change also product:
             if line.product_id.is_hour_cost:
-                import pdb; pdb.set_trace()
                 try:
+                    import pdb; pdb.set_trace()
                     # Change product_id and after set name of product
                     product_ids = product_pool.search(cr, uid, [
                         ('name', '=', line.name)], context=context)
@@ -79,18 +78,25 @@ class hr_employee_force_hour(osv.osv_memory):
                         _logger.error('Product name not found in database')
                         continue
 
+                    if len(product_ids) > 1:
+                        _logger.warning('More than one record (take first)!')
+                        continue
+
                     product_proxy = product_pool.browse(
                         cr, uid, product_ids, context=context)[0]
 
-                    _logger.info('Update product: %s [%s] in %s [%s]' % (
-                        line.product_id.name,
+                    _logger.info('%s. %s Update product: %s [%s] in %s>%s [%s]' % (
+                        line.id,
+                        line.date,
+                        line.product_id.name_template,
                         line.product_id.standard_price,
                         product_proxy.name,
+                        product_proxy.name_template,
                         product_proxy.standard_price,
                         ))  
 
                     line_pool.write(cr, uid, line.id, {
-                        'name': product_proxy.name,            
+                        'name': product_proxy.name_template,            
                         'product_id': product_proxy.id,
                         'amount': (line.unit_amount * product_proxy.standard_price),
                         }, context=context)
@@ -100,15 +106,17 @@ class hr_employee_force_hour(osv.osv_memory):
                     _logger.error('%s' % (sys.exc_info(), ))
                     continue
         
-            # other line check onli name
-            if line.product_id.name != line.name:
-                import pdb; pdb.set_trace()
+            # other line check only name
+            if line.product_id.name != line.product_id.name_template:
                 try:
+                    _logger.info("%s. Change name %s > %s" % ( 
+                        line.id,
+                        line.product_id.name,
+                        line.product_id.name_template,
+                        ))
                     line_pool.write(cr, uid, line.id, {
-                        'name': line.product_id.name,
+                        'name': line.product_id.name_template,
                         }, context=context)
-                    _logger.info('From %s to %s' % (
-                        line.name, line.product_id.name))
                 except:
                     _logger.error('Error')
                     _logger.error('%s' % (sys.exc_info(), ))
@@ -117,6 +125,7 @@ class hr_employee_force_hour(osv.osv_memory):
                 _logger.warning('Not updated: %s' % line.name)
                        
         _logger.info("End update!")
+        return True
 
     def schedule_importation_cost(self, cr, uid, path='~/etl/employee', 
             bof='cost', separator=';', context=None):
