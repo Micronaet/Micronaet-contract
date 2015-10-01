@@ -190,7 +190,7 @@ class account_analytic_account(osv.osv):
                    if not amount: # TODO amount for line??
                        log_error.append(_(
                            'No amount: %s %s contract %s amount %s') % (
-                               ref, ref_line, contract, amount)
+                               ref, ref_line, contract, amount))
                        _logger.error(log_error[-1])        
                        continue # jump line
 
@@ -253,12 +253,12 @@ class account_analytic_account(osv.osv):
                                'Update %s contract %s amount %s') % (
                                    ref_id, contract, amount))
                            if verbose:
-                               _logger.info(log_list[-1])                                       
+                               _logger.info(log_list[-1])                                      
                        except:
                            log_error.append(_(
                                'Error modify: %s, contract %s, amount %s') % (
                                    ref_id, contract, amount))
-                           _logger.error(log_error[-1])                                       
+                           _logger.error(log_error[-1])                                
                    else: # Create
                        try:
                            line_pool.craete(cr, uid, data, context=context) 
@@ -266,12 +266,11 @@ class account_analytic_account(osv.osv):
                                'Create %s contract %s amount %s') % (
                                    ref_id, contract, amount))
                            if verbose:
-                               _logger.info(log_list[-1])                                       
+                               _logger.info(log_list[-1])                                     
                        except:
                            log_error.append(_(
                                'Error create: %s, contract %s, amount %s') % (
                                    ref_id, contract, amount))
-                           _logger.error(log_error[-1])                                       
-        _logger.info(_('End import invoice elements'))
-                           
+                           _logger.error(log_error[-1])                                  
+        _logger.info(_('End import invoice elements'))                           
         return True

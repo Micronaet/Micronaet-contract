@@ -1,20 +1,19 @@
 <?xml version="1.0" ?>
 <openerp>
 	<data noupdate="1">
-		<record id="ir_cron_etl_csv_accounting_movement_0" model="ir.cron">
-			<field eval="&quot;&quot;&quot;schedule_csv_accounting_movement_import&quot;&quot;&quot;" name="function"/>
+		<record id="ir_cron_import_invoice_analytic_0" model="ir.cron">
+			<field eval="&quot;&quot;&quot;schedule_import_invoice&quot;&quot;&quot;" name="function"/>
 			<field eval="&quot;&quot;&quot;days&quot;&quot;&quot;" name="interval_type"/>
 			<field name="user_id" ref="base.user_root"/>
-			<field eval="&quot;&quot;&quot;CSV Import accounting movement&quot;&quot;&quot;" name="name"/>
+			<field eval="&quot;&quot;&quot;CSV Import analytic accounting invoice&quot;&quot;&quot;" name="name"/>
 			<field eval="-1" name="numbercall"/>
 			<field eval="&quot;&quot;&quot;2015-05-05 11:15:00&quot;&quot;&quot;" name="nextcall"/>
 			<field eval="5" name="priority"/>
 			<field eval="0" name="doall"/>
 			<field eval="1" name="active"/>
-			<!--File; separator; header; verbose; general department; jump department; general account code; average method; voucher list-->
-			<field name="args">('~/etl/analitic.CMP', ';', 0, 100, [], ['40'], '410100', 'amount', ['403.00007'], 6, ['1', '2', '3'], True)</field>
+			<field name="args">('~/ETL/servizi/', 'daticommoerp.SEE', 0, ';', '150100', 'SAL', True)</field>
 			<field eval="1" name="interval_number"/>
-			<field eval="&quot;&quot;&quot;account.analytic.expense&quot;&quot;&quot;" name="model"/>
+			<field eval="&quot;&quot;&quot;account.analytic.line&quot;&quot;&quot;" name="model"/>
 		</record>
 	</data>
 </openerp>
