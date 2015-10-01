@@ -26,6 +26,7 @@ import logging
 import netsvc
 import xmlrpclib
 import csv
+from os import listdir
 import decimal_precision as dp
 from osv import fields, osv, expression, orm
 from datetime import datetime, timedelta
@@ -47,23 +48,23 @@ class account_analytic_account(osv.osv):
     
     # Schedule procedure:
     def schedule_import_invoice(self, cr, uid, path='~/ETL/servizi/', 
-            file_filter='daticommoerp.SEE', header=0, separator=';', 
+            file_filter='daticommoerp.SEE', header=0, delimiter=';', 
             general_code='150100', journal_code='SAL',
             verbose=True, context=None):
         ''' Import CSV file for invoice (year based)
             path: folder for get file list 
             file_filter: string that MUST be in the file format
             header: number of header line
-            separator: column separator
+            delimiter: column separator
             general_code: code used for account ledger in analytic line
             journal: journal code used for analytic line
             verbose: write log operation in openerp
             context: context
         '''
+        from os.path import isfile, join
         # Start initializing elements:
         log_list = []
         log_error = []
-        path_file = os.path.expanduser(path)
         
         # Pools:
         account_pool = self.pool.get('account.account')
@@ -83,15 +84,20 @@ class account_analytic_account(osv.osv):
             log_error.append('Journal not found, code: %s' % journal_code)
             _logger.error(log_error[-1])
             return False
-            
-           
-        lines = csv.reader(open(sys.argv[1],'rb'),delimiter=separator)
-        counter={'tot':-header_lines,'new':0,'upd':0,'err':0,'err_upd':0,'tot_add':0,'new_add':0,'upd_add':0,} # tot negative (jump N lines)
+        
+        # Read file in folder:
+        path = os.path.expanduser(path)
+        invoice_file = [
+            filename for filename in listdir(path) if 
+                    isfile(join(path, filename)) and file_filter in filename]
 
-        tot_colonne = 0
-        fattura_precedente = ''
-        esporta = False
-
+        invoice_file.sort() # for have last price correct
+        for csv_file in invoice_file:
+            lines = csv.reader(
+                open(csv_file, 'rb'), delimiter=delimiter)
+            i = -header
+            tot_colonne = 0
+            fattura_precedente = ''
 
         for line in lines:
             if counter['tot']<0:  # jump n lines of header 
@@ -174,13 +180,6 @@ class account_analytic_account(osv.osv):
 
                        data_periodo = data_periodo or data    # prendo la data fattura se non è indicata
                        
-                       #if not fattura_precedente or fattura_precedente != ref: # prima fattura o diversa dalla precedente
-                       #   esporta = True
-                       #   fattura_precedente = ref
-                       #else:
-                       #   esporta = False 
-
-                       #if esporta: # salto le righe da non esportare:
 
                        # Ricerca conto analitico:
                        # TODO IMPORTANTE: vedere poi per le sottovoci come comporsi: eventualmente commessa + numero sottovoce
