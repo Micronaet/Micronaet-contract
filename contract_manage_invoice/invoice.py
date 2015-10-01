@@ -61,7 +61,7 @@ class account_analytic_account(osv.osv):
             context: context
         '''
         from os.path import isfile, join
-        
+        import pdb; pdb.set_trace()
         # --------
         # Utility:
         # --------
@@ -274,3 +274,4 @@ class account_analytic_account(osv.osv):
                            _logger.error(log_error[-1])                                  
         _logger.info(_('End import invoice elements'))                           
         return True
+account_analytic_account()        
