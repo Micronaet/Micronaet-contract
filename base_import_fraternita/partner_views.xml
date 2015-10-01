@@ -1,0 +1,40 @@
+<?xml version="1.0" ?>
+<openerp>
+<data>
+    <record id='view_partner_add_fiam_fields' model='ir.ui.view'>
+        <field name='name'>Partner extra field</field>
+        <field name='model'>res.partner</field>
+        <field name="inherit_id" ref="base.view_partner_form"/>
+        <field name='type'>form</field>
+        <field name='arch' type='xml'>
+              <xpath expr="/form/notebook/page[@string='General']//field[@name='email']" position="after">
+                  <field name="extra_phone" />
+              </xpath>
+        </field>
+    </record>
+    <record id="view_view_employee_form_extra_field" model="ir.ui.view">
+        <field name="name">Employee extra  field</field>
+        <field name="model">hr.employee</field>
+        <field name="inherit_id" ref="hr.view_employee_form"/>
+        <field name="type">form</field>
+        <field name="arch" type="xml">
+           <field name="birthday" position="after">
+              <field name="birth_place" />
+           </field>               
+           <xpath expr="/form/notebook/page[@string='Personal Information']/group[4]" position="after">
+               <group colspan="4">
+                  <separator string="Contract" colspan="4" />
+                  <field name="date_recruitment" />
+                  <field name="date_retired" />
+                  <field name="date_end_contract" />
+                  <field name="patent_type" />
+                  <separator string="Curricula" colspan="4" />
+                  <field name="curricula" colspan="4" nolabel="1" />
+                  <newline />
+               </group>
+           </xpath>
+        </field>
+    </record>
+</data>
+</openerp>
+
