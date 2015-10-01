@@ -62,6 +62,32 @@ class account_analytic_account(osv.osv):
             context: context
         '''
         from os.path import isfile, join
+        
+        # --------
+        # Utility:
+        # --------
+        def prepare(value):  
+            #value = value.decode('cp1252')
+            #value = value.encode('utf-8')
+            return value.strip()
+            
+        def prepare_date_ISO(value):
+            ''' Calcolo data (formato 1900/01/01)
+            ''' 
+            value = value.strip()
+            if value and len(value) == 8:
+               return '%s-%s-%s' % (value[:4], value[4:6], value[-2:])
+            return False   
+
+        def prepare_float(value):
+            if value:
+                try:
+                   value = value.strip().replace(",", ".")
+                   return float(value)
+                except:
+                    pass
+            return 0.0
+
         # Start initializing elements:
         log_list = []
         log_error = []
