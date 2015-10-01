@@ -1,0 +1,101 @@
+# Translation of OpenERP Server.
+# This file contains the translation of the following modules:
+# 	* contract_manage_invoice
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OpenERP Server 6.0.4\n"
+"Report-Msgid-Bugs-To: support@openerp.com\n"
+"POT-Creation-Date: 2015-10-01 21:39+0000\n"
+"PO-Revision-Date: 2015-10-01 23:43+0100\n"
+"Last-Translator: <>\n"
+"Language-Team: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: \n"
+"Language: it\n"
+"X-Generator: Poedit 1.6.10\n"
+
+#. module: contract_manage_invoice
+#: code:addons/contract_manage_invoice/invoice.py:93
+#, python-format
+msgid "Start import invoice elements"
+msgstr "Inizio importazione fatture (per contabilità analitica)"
+
+#. module: contract_manage_invoice
+#: code:addons/contract_manage_invoice/invoice.py:267
+#, python-format
+msgid "Create %s contract %s amount %s"
+msgstr "Creato %s contratto %s importo %s"
+
+#. module: contract_manage_invoice
+#: code:addons/contract_manage_invoice/invoice.py:178
+#, python-format
+msgid "Document type not found: %s"
+msgstr "Tipo documento non trovato: %s"
+
+#. module: contract_manage_invoice
+#: model:ir.model,name:contract_manage_invoice.model_account_analytic_line
+msgid "Analytic Line"
+msgstr "Linea conto analitico"
+
+#. module: contract_manage_invoice
+#: code:addons/contract_manage_invoice/invoice.py:164
+#, python-format
+msgid "Date not present, row: %s"
+msgstr "Data non presente, riga: %s"
+
+#. module: contract_manage_invoice
+#: code:addons/contract_manage_invoice/invoice.py:210
+#, python-format
+msgid "Analytic account not found: %s"
+msgstr "Conto analitico non trovato: %s"
+
+#. module: contract_manage_invoice
+#: code:addons/contract_manage_invoice/invoice.py:254
+#, python-format
+msgid "Update %s contract %s amount %s"
+msgstr "Aggiornato %s contratto %s importo %s"
+
+#. module: contract_manage_invoice
+#: code:addons/contract_manage_invoice/invoice.py:273
+#, python-format
+msgid "Error create: %s, contract %s, amount %s"
+msgstr "Errore creando linea: %s, contratto %s, importo %s"
+
+#. module: contract_manage_invoice
+#: code:addons/contract_manage_invoice/invoice.py:193
+#, python-format
+msgid "No amount: %s %s contract %s amount %s"
+msgstr "Importo non presente: %s %s contratto %s importo %s"
+
+#. module: contract_manage_invoice
+#: code:addons/contract_manage_invoice/invoice.py:215
+#, python-format
+msgid "More analytic account found: %s"
+msgstr "Trovati più conti analitici: %s"
+
+#. module: contract_manage_invoice
+#: code:addons/contract_manage_invoice/invoice.py:276
+#, python-format
+msgid "End import invoice elements"
+msgstr "Fine importazione fatture contabili"
+
+#. module: contract_manage_invoice
+#: code:addons/contract_manage_invoice/invoice.py:139
+#, python-format
+msgid "Total column found: %s"
+msgstr "Totale colonne trovate: %s"
+
+#. module: contract_manage_invoice
+#: code:addons/contract_manage_invoice/invoice.py:260
+#, python-format
+msgid "Error modify: %s, contract %s, amount %s"
+msgstr "Errore modificando: %s, contratto %s, importo %s"
+
+#. module: contract_manage_invoice
+#: code:addons/contract_manage_invoice/invoice.py:127
+#, python-format
+msgid "Import invoice file: %s"
+msgstr "Importazione file fatture: %s"

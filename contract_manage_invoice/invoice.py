@@ -122,7 +122,6 @@ class account_analytic_account(osv.osv):
                     isfile(join(path, filename)) and file_filter in filename]
 
         invoice_file.sort() # for have last price correct
-        import pdb; pdb.set_trace()
         for csv_file in invoice_file:
             _logger.info(_('Import invoice file: %s') % csv_file)
             lines = csv.reader(
@@ -207,14 +206,15 @@ class account_analytic_account(osv.osv):
                     
                 if not account_ids: 
                     log_error.append(_(
-                        'Analytic account not found: %s') % contract)
+                        'Analytic account not found: %s [%s]') % (
+                            contract, ref_id))
                     _logger.error(log_error[-1])
                     continue
                 elif len(account_ids) > 1:
                     log_error.append(_(
                         'More analytic account found: %s') % contract)
                     _logger.error(log_error[-1])
-                    continue
+                    #continue # Update first only
                    
                 data = {
                     'name': "%s %s" % (contract, ref_id),
@@ -241,7 +241,7 @@ class account_analytic_account(osv.osv):
  
                 # I: ref=FT-2-12345 
                 # L: ref=FT-2-12345-1
-                line_ids = line.pool.search(cr, uid, [
+                line_ids = line_pool.search(cr, uid, [
                     ('ref', '=', ref_id),
                     ('import_type', '=', import_type)
                     ], context=context) 
@@ -262,7 +262,7 @@ class account_analytic_account(osv.osv):
                         _logger.error(log_error[-1])                                
                 else: # Create
                     try:
-                        line_pool.craete(cr, uid, data, context=context) 
+                        line_pool.create(cr, uid, data, context=context) 
                         log_list.append(_(
                             'Create %s contract %s amount %s') % (
                                 ref_id, contract, amount))
@@ -272,7 +272,9 @@ class account_analytic_account(osv.osv):
                         log_error.append(_(
                             'Error create: %s, contract %s, amount %s') % (
                                 ref_id, contract, amount))
-                        _logger.error(log_error[-1])                                  
-        _logger.info(_('End import invoice elements'))                           
+                        _logger.error(log_error[-1])  
+        if log_error:
+            _logger.error('\n'.join(log_error))                                                
+        _logger.info(_('End import invoice elements'))
         return True
 account_analytic_account()        
