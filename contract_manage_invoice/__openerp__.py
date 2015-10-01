@@ -38,7 +38,7 @@
     'update_xml': [
         #'security/ir.model.access.csv',
         'invoice_view.xml',
-        #'scheduler.xml',
+        'scheduler.xml',
         ],
     'demo_xml': [],
     'active': False, 
