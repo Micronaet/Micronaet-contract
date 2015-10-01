@@ -35,8 +35,7 @@ from tools import (DEFAULT_SERVER_DATE_FORMAT,
     DEFAULT_SERVER_DATETIME_FORMAT, 
     DATETIME_FORMATS_MAP, 
     )
-# TODO remove:
-from parse_function import *
+
 
 _logger = logging.getLogger(__name__)
 
@@ -88,13 +87,18 @@ class account_analytic_account(osv.osv):
                     pass
             return 0.0
 
+        # ----------------------------
         # Start initializing elements:
+        # ----------------------------
+        _logger.info(_('Start import invoice elements'))
         log_list = []
         log_error = []
         
         # Pools:
         account_pool = self.pool.get('account.account')
         journal_pool = self.pool.get('account.analytic.journal')
+        contract_pool = self.pool.get('account.analytic.account')
+        line_pool = self.pool.get('account.analytic.line')
 
         # Search element for analytic line:
         general_account_ids = account_pool.search(cr, uid, [
@@ -119,6 +123,7 @@ class account_analytic_account(osv.osv):
 
         invoice_file.sort() # for have last price correct
         for csv_file in invoice_file:
+            _logger.info(_('Import invoice file: %s') % csv_file)
             lines = csv.reader(
                 open(csv_file, 'rb'), delimiter=delimiter)
 
@@ -163,88 +168,110 @@ class account_analytic_account(osv.osv):
                    ref = "%s/%s-%s-(%s)" % (document, series, number, date[:4])                   
                    ref_line = "%s-R%s" % (ref, sequence) # row
                    
-                   if document in ("FT","NF"):
-                      segno = +1
-                   elif document in ("NC", "FF"):
-                      segno = -1
+                   if document in ('FT', 'NF'):
+                       operator = +1
+                   elif document in ('NC', 'FF'):
+                       operator = -1
                    else:
-                      error = "[ERR] Sigla documento non trovata:", sigla
-                      print error
-                      file_log.write("%s"%(error,))
+                       log_error.append(_(
+                           'Document type not found: %s') % operator)
+                       _logger.error(log_error[-1])
+                       continue
 
-                   if item_description: # if line to analytic account so there's the description
+                   if item_description: # if analytic row there's description
                        import_type = "L"    # L for single (L)ine
-                       amount = amount_row * segno
+                       amount = amount_row * operator
                        ref_id = ref_line
                    else:    
                        import_type = "I"    # I for all (I)nvoice
-                       amount = amount * segno
+                       amount = amount * operator
                        ref_id = ref
                    
-                   if not amount: # TODO per le linee come viene messo l'importo?***********************************************************
-                       error = "[WARN] Amount not present:", ref, ref_line, "su commessa", contract, "importo:", amount
-                       if verbose: print error
-                       file_log.write("%s"%(error,))
-       
+                   if not amount: # TODO amount for line??
+                       log_error.append(_(
+                           'No amount: %s %s contract %s amount %s') % (
+                               ref, ref_line, contract, amount)
+                       _logger.error(log_error[-1])        
                        continue # jump line
 
-                   unit_amount = 1.0 # TODO vedere se è il caso di mettere il totale elementi o tenere 1 come per fattura
+                   # TODO vedere se è il caso di mettere il totale elementi o 
+                   # tenere 1 come per fattura
+                   unit_amount = 1.0 
 
-                   period = period or data    # prendo la data fattura se non è indicata
-                   
+                   period = period or data # Invoice date if not present
 
-                   # Ricerca conto analitico:
-                   # TODO IMPORTANTE: vedere poi per le sottovoci come comporsi: eventualmente commessa + numero sottovoce
-                   account_ids = sock.execute(dbname, uid, pwd, 'account.analytic.account', 'search', [('code', '=', contract),]) # TODO tolto ('parent_id','=',False)
-                   
-                   if not account_ids: 
-                       error = "[ERR] Conto analitico non trovato:", contract 
-                       print error
-                       file_log.write("%s"%(error,))
-
-                   else: # TODO segnalare errore se len(account_ids) è >1
-                       # Creazione voce giornale analitico
-                       line_id = sock.execute(dbname, uid, pwd, 'account.analytic.line', 'search', [('ref', '=', ref_id),('import_type', '=', import_type)])   # for I: ref=FT-2-12345 for L: ref=FT-2-12345-1
+                   # Get analytic account:
+                   account_ids = contract_pool.search(cr, uid, [
+                       ('code', '=', contract)], context=context)
                        
-                       data_account = {
-                                     'name': "%s %s"%(contract, ref_id) ,#'2010001 FERIE',
-                                     'import_type': import_type,
-                                     #'code': False,
-                                     #'user_id': [419, 'Moletta Giovanni'],
-                                     'general_account_id': general_account_id, #[146, '410100 merci c/acquisti '],
-                                     #'product_uom_id': False,
-                                     #'company_id': [1, u'Franternit\xe0 Servizi'],
-                                     'journal_id': journal_id, #[2, 'Timesheet Journal'],
-                                     #'currency_id': False,
-                                     #'to_invoice': [1, 'Yes (100%)'],
-                                     'amount': amount,
-                                     #'product_id': False,
-                                     'unit_amount': unit_amount, #10.5,
-                                     #'invoice_id': False,
-                                     'date': period, #'2012-07-09',
-                                     #'extra_analytic_line_timesheet_id': False,
-                                     #'amount_currency': 0.0,
-                                     'ref': ref_id,   # TODO or ref_line
-                                     #'move_id': False,
-                                     'account_id': account_ids[0], #[257, '2010001 FERIE']
-                                 }
+                   if not account_ids: 
+                       log_error.append(_(
+                           'Analytic account not found: %s') % contract)
+                       _logger.error(log_error[-1])
+                       continue
+                   elif len(account_ids) > 1:
+                       log_error.append(_(
+                           'More analytic account found: %s') % contract)
+                       _logger.error(log_error[-1])
+                       continue
+                       
+                   data = {
+                       'name': "%s %s" % (contract, ref_id),
+                       'import_type': import_type,
+                       'general_account_id': general_account_id,
+                       'journal_id': journal_id,
+                       'amount': amount,
+                       'unit_amount': unit_amount,
+                       'date': period,
+                       'ref': ref_id,
+                       'account_id': account_ids[0],
+                       'user_id': uid,
+                       #'code': False,
+                       #'product_uom_id': False,
+                       #'company_id': 1,
+                       #'currency_id': False,
+                       #'to_invoice': 1,
+                       #'product_id': False,
+                       #'invoice_id': False,
+                       #'extra_analytic_line_timesheet_id': False,
+                       #'amount_currency': 0.0,
+                       #'move_id': False,
+                       }
 
-                       if line_id: # UPDATE:
-                           try:
-                               item_mod = sock.execute(dbname, uid, pwd, 'account.analytic.line', 'write', line_id, data_account) 
-                               if verbose: print "[INFO] Account already exist, updated:", ref_id, "su commessa", contract, "importo:", amount
-                           except:
-                               error = "[ERR] modified", ref_id, "su commessa", contract, "importo:", amount
-                               print error
-                               file_log.write("%s"%(error,))
-                       else: # CREATE
-                          try:
-                              create_id = sock.execute(dbname, uid, pwd, 'account.analytic.line', 'create', data_account) 
-                              if verbose: print "[INFO] Account create: ", ref_id, "su commessa", contract, "importo:", amount
-                          except:
-                              error = "[ERR] modified", ref_id, "su commessa", contract, "importo:", amount
-                              print error
-                              file_log.write("%s"%(error,))
+                   # I: ref=FT-2-12345 
+                   # L: ref=FT-2-12345-1
+                   line_ids = line.pool.search(cr, uid, [
+                       ('ref', '=', ref_id),
+                       ('import_type', '=', import_type)
+                       ], context=context) 
 
-
-
+                   if line_ids: # Update:
+                       try:
+                           line_pool.write(cr, uid, line_ids, data, 
+                               context=context) 
+                           log_list.append(_(
+                               'Update %s contract %s amount %s') % (
+                                   ref_id, contract, amount))
+                           if verbose:
+                               _logger.info(log_list[-1])                                       
+                       except:
+                           log_error.append(_(
+                               'Error modify: %s, contract %s, amount %s') % (
+                                   ref_id, contract, amount))
+                           _logger.error(log_error[-1])                                       
+                   else: # Create
+                       try:
+                           line_pool.craete(cr, uid, data, context=context) 
+                           log_list.append(_(
+                               'Create %s contract %s amount %s') % (
+                                   ref_id, contract, amount))
+                           if verbose:
+                               _logger.info(log_list[-1])                                       
+                       except:
+                           log_error.append(_(
+                               'Error create: %s, contract %s, amount %s') % (
+                                   ref_id, contract, amount))
+                           _logger.error(log_error[-1])                                       
+        _logger.info(_('End import invoice elements'))
+                           
+        return True
