@@ -199,11 +199,7 @@ class account_analytic_account(osv.osv):
                     _logger.error(log_error[-1])        
                     continue # jump line
  
-                # TODO vedere se è il caso di mettere il totale elementi o 
-                # tenere 1 come per fattura
-                unit_amount = 1.0 
- 
-                period = period or data # Invoice date if not present
+                period = period or date # Invoice date if not present
  
                 # Get analytic account:
                 account_ids = contract_pool.search(cr, uid, [
@@ -226,7 +222,7 @@ class account_analytic_account(osv.osv):
                     'general_account_id': general_account_ids[0],
                     'journal_id': journal_ids[0],
                     'amount': amount,
-                    'unit_amount': unit_amount,
+                    'unit_amount': 1.0,
                     'date': period,
                     'ref': ref_id,
                     'account_id': account_ids[0],
