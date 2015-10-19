@@ -388,6 +388,7 @@ class account_analytic_expense(osv.osv):
                 # --------------------------
                 # Load fields from CSV file:
                 # --------------------------
+                import pdb; pdb.set_trace()
                 causal = csv_pool.decode_string(line[0])
 
                 series = csv_pool.decode_string(line[1])
@@ -407,6 +408,9 @@ class account_analytic_expense(osv.osv):
                 department_code = csv_pool.decode_string(line[9])
                 name = csv_pool.decode_string(line[10]) # prot_id
                 year = csv_pool.decode_string(line[11])
+                
+                partner_code = csv_pool.decode_string(line[12])
+                partner_text = csv_pool.decode_string(line[13])
 
                 # Get split type:
                 for key in code_catalog:
@@ -498,7 +502,7 @@ class account_analytic_expense(osv.osv):
                 # Sync or create elements:        
                 # ------------------------
                 data = { # Standard elements:
-                    'name': name,
+                    'name': '%s %s' % (name, partner_text),
                     #'note': False,
                     'causal': causal,
                     'series': series,
