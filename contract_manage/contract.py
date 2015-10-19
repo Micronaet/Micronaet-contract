@@ -501,7 +501,8 @@ class account_analytic_expense(osv.osv):
                 # Sync or create elements:        
                 # ------------------------
                 data = { # Standard elements:
-                    'name': '%s %s' % (name, partner_text),
+                    'name': name,
+                    'partner': partner_text,
                     #'note': False,
                     'causal': causal,
                     'series': series,
@@ -745,6 +746,8 @@ class account_analytic_expense(osv.osv):
     _columns = {
         'name': fields.char('Protocol #', size=64, required=True,
             help='ID in accounting for link the record of OpenERP'), 
+        'partner': fields.char('Partner', size=64,
+            help='Partner name where is required'), 
         'amount': fields.float('Amount', digits=(16, 2)),
         'note': fields.text('Note'),
 

@@ -1038,7 +1038,7 @@
         <field name="model">account.analytic.expense</field>
         <field name="type">search</field>
         <field name="arch" type="xml">
-            <search string="Expcense">
+            <search string="Expense">
                 <separator orientation="vertical"/>
                 <field name="name"/>
                 <field name="department_id" widget="selection"/>
@@ -1048,6 +1048,7 @@
                 <field name="series"/>
                 <field name="number"/>
                 <field name="year"/>
+                <field name="partner"/>
                 <field name="split_type"/>
                 <newline />
 
@@ -1092,6 +1093,7 @@
                 <field name="year"/>
                 <field name="split_type"/>
                 <field name="department_id"/>
+                <field name="partner"/>
             </tree>
        </field>
    </record>
@@ -1121,8 +1123,8 @@
                 <field name="code_id" readonly="1"/>
                 <field name="code_type" readonly="1"/>
 
+                <field name="partner"/>
                 <field name="amount" readonly="1"/>
-
                 
                 <field name="analytic_line_ids" nolabel="1" colspan="4" readonly="1">
                     <tree string="Analytic line">
