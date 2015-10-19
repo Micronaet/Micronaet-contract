@@ -388,7 +388,6 @@ class account_analytic_expense(osv.osv):
                 # --------------------------
                 # Load fields from CSV file:
                 # --------------------------
-                import pdb; pdb.set_trace()
                 causal = csv_pool.decode_string(line[0])
 
                 series = csv_pool.decode_string(line[1])
