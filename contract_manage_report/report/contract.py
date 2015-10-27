@@ -463,11 +463,15 @@ class Parser(report_sxw.rml_parse):
         domain = [
             ('account_id', '=', account_id),
             ('journal_id', 'in', journal_list),
+            
+            # No product cost only service:
+            ('product_id.type', '=', 'service'),            
+            # TODO after parametrize in wizard!!!
             ]
         if start_date:
             domain.append(('date', '>=', start_date))
         if end_date:
-            domain.append(('date', '<=', end_date))
+            domain.append(('date', '<=', end_date))                  
 
         cost_pool = self.pool.get('account.analytic.line')
         cost_ids = cost_pool.search(self.cr, self.uid, domain) 
