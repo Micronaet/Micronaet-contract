@@ -62,6 +62,7 @@ class hr_analytic_timesheet(orm.orm):
     # -------------------------------------------------------------------------
     #                                Utility:
     # -------------------------------------------------------------------------
+    # TODO used?
     def force_update_product_analytic_line(self, cr, uid, context=None):
         ''' Schedule function (ex called via XMLRPC) to update description in 
             analytic line
