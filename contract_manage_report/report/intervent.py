@@ -150,10 +150,17 @@ class hr_analytic_timesheet(osv.osv):
             # TODO update total!!!! (worked and not worked)
         return 
         
-    def get_calendar(self, cr, uid, data=None, context=None):
+    def get_calendar(self, cr, uid, data=None, origin='report', context=None):
         ''' Original function moved here from parser for calculate all database
             for report intervent
             NOTE: The function is moved here as we call also from importation
+            
+            self: instance obj
+            cr: database curso
+            uid: user ID
+            data: wizard data dict for pass parameters 
+            origin: 'report' or 'importation' are admitted
+            context: extra parameters array
         '''
         # ---------------------------------------------------------------------
         #                          Utility function: 
@@ -379,8 +386,12 @@ class hr_analytic_timesheet(osv.osv):
                         ) for item in range(1,33)]
             else:
                 pass # TODO error if there's not a user in employee    
-        ris = [res_dict[k] for k in res_dict]
-        ris.sort()
-        return ris
+        if origin == 'report':        
+            calendar = [res_dict[k] for k in res_dict]
+            calendar.sort()
+        else: # importation
+            calendar = [k for k in res_dict]
+                
+        return calendar
         
 hr_analytic_timesheet()
