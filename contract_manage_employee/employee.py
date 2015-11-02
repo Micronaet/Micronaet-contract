@@ -210,7 +210,7 @@ class hr_analytic_timesheet(osv.osv):
         refound_journal_ids = journal_pool.search(cr, uid, [
             ('code', '=', 'REF')], context=context)
         if refound_journal_ids:
-            refound_journal_id = refound_journal_ids
+            refound_journal_id = refound_journal_ids[0]
         else: # Create journal
             _logger.warning('Intervent refound (REF) journal not found!')
             refound_journal_id = journal_pool.create(cr, uid, {
@@ -308,24 +308,26 @@ class hr_analytic_timesheet(osv.osv):
         #                        REFOUND INTERVENT:
         # ---------------------------------------------------------------------
         # Delete user intervent in this period for regenerate:
-        import pdb; pdb.set_trace()
         user_ids = refound_db.keys() # for readability
         
         domain = [
             ('user_id', 'in', user_ids),
-            ('timesheet_id', '=', refound_journal_id), # only this timesheet
+            ('journal_id', '=', refound_journal_id), # only this timesheet
             ]
         domain.extend(date_range_domain)
-        line_pool.unlink(cr, uid, domain, context=context)
+        line_ids = line_pool.search(cr, uid, domain, context=context)
+        if line_ids: 
+            line_pool.unlink(cr, uid, line_ids, context=context)
 
         # Populate worked and not worked hours (used report function):
         employee_worked_hours = {}
         employee_not_worked_hours = {}
         employee_not_worked_recover_hours = {}
 
-        report_database = ts_pool.get_employee_worked_hours(cr, uid, 
+        import pdb; pdb.set_trace()
+        report_database = self.get_employee_worked_hours(cr, uid, 
             user_ids,
-            start_date, stop_date, 
+            from_date, to_date, 
             employee_worked_hours, 
             employee_not_worked_hours, 
             employee_not_worked_recover_hours)
@@ -352,14 +354,14 @@ class hr_analytic_timesheet(osv.osv):
                     'name': _('Month %s refound user %s') % (
                         'month', # TODO
                         reference.user_id.name, 
-                        )
+                        ),
                     'unit_amount': unit_amount,
                     'date': '%s-01' % reference.date[:7], # TODO Check
                     'company_id': reference.company_id.id,
                     'account_id': account_id,
-                    'general_account_id': reference.company_id.id,,
-                    'product_id': reference.company_id.id,,
-                    'product_uom_id': reference.company_id.id,,
+                    'general_account_id': reference.company_id.id,
+                    'product_id': reference.company_id.id,
+                    'product_uom_id': reference.company_id.id,
                     'journal_id': refound_journal_id,
                     
                     # Unused or empty fields:
