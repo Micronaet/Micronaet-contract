@@ -43,14 +43,9 @@ class hr_employee_force_hour(osv.osv_memory):
     _description = 'Employee force hour cost'
     
     def force_update_product_analytic_line(self, cr, uid, context=None):
-<<<<<<< HEAD
         ''' Schedule function (ex called via XMLRPC) to update description in 
             analytic line
             (ex import procedure now automate launched from master schedule)
-=======
-        ''' Temp function called via XMLRPC for update description in analytic
-            line
->>>>>>> parent of d2710ea... Remove wizard view (no more used like wizard only scheduled procedure)
         ''' 
         journal_pool = self.pool.get('account.analytic.journal')
         line_pool = self.pool.get('account.analytic.line')
