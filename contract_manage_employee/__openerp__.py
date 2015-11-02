@@ -46,6 +46,7 @@
         'security/ir.model.access.csv',
         'employee_view.xml',
         'data/festivity.xml',
+        'wizard/wizard_employee_views.xml',
         'scheduler.xml',
         ],
     'demo_xml': [],
