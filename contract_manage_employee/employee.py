@@ -25,6 +25,7 @@ import os
 import sys
 from osv import fields, osv, expression
 from datetime import datetime, timedelta
+from os.path import isfile, join
 
 
 # python represent weekday starting from 0 = Monday
@@ -370,7 +371,6 @@ class hr_analytic_timesheet(osv.osv):
             bof='cost', separator=';', context=None):
         ''' Loop on cost folder searching file that start with bof
         '''
-        from os.path import isfile, join
         path = os.path.expanduser(path)
         cost_file = [
             filename for filename in listdir(path) if 
@@ -433,8 +433,7 @@ hr_analytic_timesheet()
 class contract_employee_timesheet_tipology(osv.osv):
     ''' Contract tipology: contains a list of "day of a week" elements and the
         total amount of hour to be worked that day
-    '''
-    
+    '''    
     _name = 'contract.employee.timesheet.tipology'
     _description = 'Timesheet tipology'
     
@@ -445,8 +444,7 @@ contract_employee_timesheet_tipology()
 
 class contract_employee_timesheet_tipology_line(osv.osv):
     ''' Sub element of contract tipology: contains dow and tot. hours
-    '''
-    
+    '''    
     _name = 'contract.employee.timesheet.tipology.line'
     _description = 'Timesheet tipology line'
     
@@ -461,8 +459,7 @@ contract_employee_timesheet_tipology_line()
 
 class contract_employee_timesheet_tipology(osv.osv):
     ''' Contract tipology: add relation 2many fields
-    '''
-    
+    '''    
     _inherit = 'contract.employee.timesheet.tipology'
 
     _columns = {
@@ -476,8 +473,7 @@ class contract_employee_festivity(osv.osv):
     ''' Festivity manage: 
         manage static festivity (also with from-to period)
         manage dynamic list of festivity (ex. Easter monday)
-    '''
-    
+    '''    
     _name = 'contract.employee.festivity'
     _description = 'Contract festivity'
     
@@ -712,8 +708,7 @@ hr_employee_hour_cost()
 
 class hr_employee_force_log(osv.osv):
     """ Object that log all force operations
-    """    
-    
+    """
     _name = 'hr.employee.force.log'
     _description = 'Employee force log'
     _rec_name = 'name'
@@ -778,8 +773,7 @@ account_analytic_line()
 
 class hr_employee_force_log(osv.osv):
     """ Update log with *many relation fileds
-    """    
-    
+    """
     _inherit = 'hr.employee.force.log'
     
     _columns = {
