@@ -26,6 +26,7 @@ import sys
 from osv import fields, osv, expression
 from datetime import datetime, timedelta
 from os.path import isfile, join
+from os import listdir
 
 
 # python represent weekday starting from 0 = Monday
@@ -374,8 +375,8 @@ class hr_analytic_timesheet(osv.osv):
         path = os.path.expanduser(path)
         cost_file = [
             filename for filename in listdir(path) if 
-                    isfile(join(path, filename)) and filename.startswith(bof) 
-                    and len(filename) == (len(bof) + 8)] # YYAA.csv = 8 char
+                isfile(join(path, filename)) and filename.startswith(bof) 
+                and len(filename) == (len(bof) + 8)] # YYAA.csv = 8 char
 
         cost_file.sort() # for have last price correct
         _logger.info("Start auto import of file cost")
