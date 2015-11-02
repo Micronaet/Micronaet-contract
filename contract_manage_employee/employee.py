@@ -148,75 +148,6 @@ class hr_analytic_timesheet(orm.orm):
         _logger.info("End update!")
         return True
 
-    # -------------------------------------------------------------------------
-    #                               Schedule operations:
-    # -------------------------------------------------------------------------
-    # Master function for scheduled importation:
-    def schedule_importation_cost(self, cr, uid, path='~/etl/employee', 
-            bof='cost', separator=';', context=None):
-        ''' Loop on cost folder searching file that start with bof
-        '''
-        from os.path import isfile, join
-        path = os.path.expanduser(path)
-        cost_file = [
-            filename for filename in listdir(path) if 
-                    isfile(join(path, filename)) and filename.startswith(bof) 
-                    and len(filename) == (len(bof) + 8)] # YYAA.csv = 8 char
-
-        cost_file.sort() # for have last price correct
-        _logger.info("Start auto import of file cost")
-        for filename in cost_file:        
-            try:
-                _logger.info("Load and import file %s" % filename)
-                error = []                             
-                # -------------------------------------------------------------
-                #                             Load
-                # -------------------------------------------------------------
-                self.load_one_cost(cr, uid, path=path, filename=filename, 
-                    separator=separator, error=error, context=context)
-                    
-                # -------------------------------------------------------------
-                #                            Import
-                # -------------------------------------------------------------
-                # Parse date
-                file_date = os.path.splitext(filename)[0][-4:]
-                from_year = int(file_date[:2])
-                from_month = int(file_date[2:])
-                
-                # Next value
-                if from_month == 12:
-                    next_month = 1
-                    next_year = from_year + 1
-                else:    
-                    next_month = from_month + 1
-                    next_year = from_year
-
-                from_date = '20%02d-%02d-01' % (from_year, from_month)
-                to_date = '20%02d-%02d-01' % (next_year, next_month)
-
-                name = _('Auto import [month: %s-%s]') % (
-                    from_month, from_year)
-
-                self.import_one_cost(cr, uid, name=name, from_date=from_date, 
-                    to_date=to_date, error=error, context=context)
-                
-                # History file:
-                os.rename(
-                    os.path.join(path, filename),
-                    os.path.join(path, 'history', '%s.%s' % (
-                        datetime.now().strftime('%Y%m%d.%H%M%S'),
-                        filename, )),
-                    )
-
-            except:
-                _logger.error('No correct file format: %s' % filename)
-                _logger.error((sys.exc_info(), ))
-        _logger.info("End auto import of file cost")
-        return True
-
-    # --------
-    # Utility:        
-    # --------
     def load_one_cost(self, cr, uid, path, filename, separator,
             from_wizard=False, error=None, context=None):
         ''' Import one file 
@@ -443,61 +374,73 @@ class hr_analytic_timesheet(orm.orm):
             return {'type': 'ir.actions.act_window_close'}
         else:    
             return True
-
-    # --------------
-    # Button events:
-    # --------------
-    # TODO Remove wizard? vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-    def load_button(self, cr, uid, ids, context=None):
-        ''' Load all active employee and his product, create if not present
-            After open view with the list
+            
+    # -------------------------------------------------------------------------
+    #                               Schedule operations:
+    # -------------------------------------------------------------------------
+    # Master function for scheduled importation:
+    def schedule_importation_cost(self, cr, uid, path='~/etl/employee', 
+            bof='cost', separator=';', context=None):
+        ''' Loop on cost folder searching file that start with bof
         '''
-        # ----------------------
-        # Import file parameters
-        # ----------------------
-        # TODO load parameter from scheduled importation
-        path = '~/etl/servizi/employee/'
-        separator = ';'
-        bof = 'costi' # begin of file
+        from os.path import isfile, join
+        path = os.path.expanduser(path)
+        cost_file = [
+            filename for filename in listdir(path) if 
+                    isfile(join(path, filename)) and filename.startswith(bof) 
+                    and len(filename) == (len(bof) + 8)] # YYAA.csv = 8 char
 
-        return self.load_one_cost(cr, uid, path, filename, separator, 
-            from_wizard=True, context=context)
+        cost_file.sort() # for have last price correct
+        _logger.info("Start auto import of file cost")
+        for filename in cost_file:        
+            try:
+                _logger.info("Load and import file %s" % filename)
+                error = []                             
+                # -------------------------------------------------------------
+                #                             Load
+                # -------------------------------------------------------------
+                self.load_one_cost(cr, uid, path=path, filename=filename, 
+                    separator=separator, error=error, context=context)
+                    
+                # -------------------------------------------------------------
+                #                            Import
+                # -------------------------------------------------------------
+                # Parse date
+                file_date = os.path.splitext(filename)[0][-4:]
+                from_year = int(file_date[:2])
+                from_month = int(file_date[2:])
+                
+                # Next value
+                if from_month == 12:
+                    next_month = 1
+                    next_year = from_year + 1
+                else:    
+                    next_month = from_month + 1
+                    next_year = from_year
 
-    def force_button(self, cr, uid, ids, context=None):
-        ''' Force button update records
-        ''' 
-        wiz_proxy = self.browse(cr, uid, ids)[0]
-        
-        # NOTE: no to_date from wizard:
-        return self.import_one_cost(cr, uid, wiz_proxy.name, 
-            wiz_proxy.from_date, False, from_wizard=True, context=context)
-    # TODO Remove wizard? ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                from_date = '20%02d-%02d-01' % (from_year, from_month)
+                to_date = '20%02d-%02d-01' % (next_year, next_month)
 
-    _columns = {
-        'name': fields.char('Description', size=80),
-        'from_date': fields.date('From date', 
-            help='Choose the date, every intervent from that date take costs'),
-        #'to_date': fields.date('To date', 
-        #    help='Choose the date, every intervent from that date take costs'),
-        'operation': fields.selection([
-            ('load', 'Load current'),
-            ('absence', 'Force update'),
-            ], 'Operation', select=True, required=True),
-        'department_id': fields.many2one('hr.department', 'Department'),
-        'mode': fields.selection([
-            ('file', 'From file'),
-            ('employee', 'From employee list'),
-            ], 'Mode'),
-        }    
-        
-    _defaults = {
-        'from_date': lambda *x: datetime.now().strftime('%Y-%m-%d'),
-        #'to_date': lambda *x: datetime.now().strftime('%Y-%m-%d'),
-        'operation': lambda *a: 'load',
-        'mode': lambda *a: 'file',
-        }
-    
-    
+                name = _('Auto import [month: %s-%s]') % (
+                    from_month, from_year)
+
+                self.import_one_cost(cr, uid, name=name, from_date=from_date, 
+                    to_date=to_date, error=error, context=context)
+                
+                # History file:
+                os.rename(
+                    os.path.join(path, filename),
+                    os.path.join(path, 'history', '%s.%s' % (
+                        datetime.now().strftime('%Y%m%d.%H%M%S'),
+                        filename, )),
+                    )
+
+            except:
+                _logger.error('No correct file format: %s' % filename)
+                _logger.error((sys.exc_info(), ))
+        _logger.info("End auto import of file cost")
+        return True
+
 hr_analytic_timesheet()    
 
 class contract_employee_timesheet_tipology(osv.osv):
