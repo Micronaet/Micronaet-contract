@@ -335,11 +335,14 @@ class hr_analytic_timesheet(osv.osv):
 
             if refound_hours <= 0.0: 
                 continue # no extra hours so no splitting:
-                
+            
+            # TODO splitted based on maked hours:
+            split_coeff = redound_hours / calendar_database[key][-1][1] 
+            
             reference = refound_db[key][1] # browse of analytic line
             for account_id in refound_db[key][0]:
                 # TODO calculate (attention to new value of cost / hour)
-                unit_amount = refound_db[key][0][account_id] / refound_hours
+                unit_amount = refound_db[key][0][account_id] * split_coeff
                 amount = +(
                     unit_amount * 
                     refound_db[key][0] # hour cost
