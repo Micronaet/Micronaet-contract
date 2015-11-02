@@ -30,6 +30,7 @@
         
         Wizard for import hour cost assign to every employee a product with
         hour cost
+        Correct extra hour to be recovered
         """,
     'author': 'Micronaet s.r.l.',
     'website': 'http://www.micronaet.it',
@@ -46,7 +47,6 @@
         'security/ir.model.access.csv',
         'employee_view.xml',
         'data/festivity.xml',
-        'wizard/wizard_employee_views.xml',
         'scheduler.xml',
         ],
     'demo_xml': [],

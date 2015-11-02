@@ -242,7 +242,7 @@ class Parser(report_sxw.rml_parse):
         employee_not_worked_hours = {}
         employee_not_worked_recover_hours = {}
 
-        te_pool.get_employee_worked_hours(self.cr, self.uid, user_ids, 
+        ts_pool.get_employee_worked_hours(self.cr, self.uid, user_ids, 
             start_date, stop_date, employee_worked_hours, 
             employee_not_worked_hours, employee_not_worked_recover_hours) 
         
@@ -262,7 +262,8 @@ class Parser(report_sxw.rml_parse):
                 else:
                     exist_tipology=False
                     
-                # Create default month loading block (after compute worked hour and absence hour)
+                # Create default month loading block 
+                # (after compute worked hour and absence hour)
                 tot_hour_to_work=[0.0] 
                 res_dict[employee.user_id.id] = ["%s\n(%s)\n%s" % (
                     employee.name, 
@@ -285,4 +286,4 @@ class Parser(report_sxw.rml_parse):
                 pass # TODO error if there's not a user in employee    
         ris = [res_dict[k] for k in res_dict]
         ris.sort()
-        return  ris
+        return ris

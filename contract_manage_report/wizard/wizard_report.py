@@ -84,14 +84,18 @@ class contract_report_intervent_wizard(osv.osv_memory):
         
     _columns = {
         'all':fields.boolean('All department', required=False),
-        'department_id':fields.many2one('hr.department', 'Department', required=False),
+        'department_id':fields.many2one('hr.department', 'Department', 
+            required=False),
         'year': fields.integer('Year', required=True),
-        'month':fields.selection(month_list, 'Month', select=True, readonly=False, required=True),
+        'month':fields.selection(month_list, 'Month', select=True, 
+            readonly=False, required=True),
         'mode':fields.selection([
             ('intervent','Intervent'),
             ('absence','Absence'),            
         ],'Mode', select=True, readonly=False, required=True),
-        'absence_account_id':fields.many2one('account.analytic.account', 'Absence type', required=False, help="If absence report is only for one type of account"),
+        'absence_account_id': fields.many2one('account.analytic.account', 
+            'Absence type', required=False, 
+            help="If absence report is only for one type of account"),
         }    
         
     _defaults = {
@@ -167,14 +171,16 @@ class contract_department_report_wizard(osv.osv_memory):
         }
         
     _columns = {
-        'all_contract':fields.boolean('All contract',),
-        'active_contract':fields.boolean('Active contract',),
-        'contract_id':fields.many2one('account.analytic.account', 'Contract', required=False, help="All 'working' contract in contract list (absence fake contract not visible)"),
+        'all_contract': fields.boolean('All contract',),
+        'active_contract': fields.boolean('Active contract',),
+        'contract_id': fields.many2one('account.analytic.account', 'Contract', 
+            required=False, 
+            help="All 'working' contract in contract list (absence fake contract not visible)"),
 
         'all':fields.boolean('All department',),
         'active':fields.boolean('Only active', help='In open state'),
-        'department_id':fields.many2one('hr.department', 'Department', required=False),
-
+        'department_id':fields.many2one('hr.department', 'Department', 
+            required=False),
 
         'mode':fields.selection([
             ('list','Short list'),
