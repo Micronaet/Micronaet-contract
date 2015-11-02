@@ -84,8 +84,10 @@ class Parser(report_sxw.rml_parse):
     def get_calendar(self, data=None):
         ''' Get calendar for user/mont/year passed
         '''
+        if data is None:
+            data = {}
         return self.pool.get('hr.analytic.timesheet').get_calendar(
-            self.cr, self.uid, data=data)
+            self.cr, self.uid, data)
         
 class hr_analytic_timesheet(osv.osv):
     ''' Put utility function here for to be used alse from external
@@ -157,6 +159,10 @@ class hr_analytic_timesheet(osv.osv):
         return 
         
     def get_calendar(self, cr, uid, data=None, context=None):
+        ''' Original function moved here from parser for calculate all database
+            for report intervent
+            The function is moved here as we call also from importation
+        '''
         # ---------------------------------------------------------------------
         #                          Utility function: 
         # ---------------------------------------------------------------------            
@@ -212,7 +218,7 @@ class hr_analytic_timesheet(osv.osv):
             elif actual_date.strftime("%m") == ref_month: # same month
                 # test if is festivity day:
                 if festivity_pool.is_festivity(
-                        self.cr, self.uid, actual_date): 
+                        cr, uid, actual_date): 
                     # festivity
                     res[0] = 0.0 # no work hours
                     res[3] = "\nFES"
@@ -309,10 +315,10 @@ class hr_analytic_timesheet(osv.osv):
         # ------------------
         # Get employee list:
         # ------------------
-        if user_ids: # from importation:
+        if importation_user_ids: # from importation:
             # NOTE: from importation no department_id admitted
             employee_ids = employee_pool.search(
-                self.cr, self.uid, [('user_id', 'in', user_ids)])
+                cr, uid, [('user_id', 'in', importation_user_ids)])
             
         else: # from wizard:
             # Filter department or all:    
@@ -321,9 +327,9 @@ class hr_analytic_timesheet(osv.osv):
             else:
                 filter_department = []
             employee_ids = employee_pool.search(
-                self.cr, self.uid, filter_department) #, order='name')
+                cr, uid, filter_department) #, order='name')
                 
-        employee_proxy = employee_pool.browse(self.cr, self.uid, employee_ids)
+        employee_proxy = employee_pool.browse(cr, uid, employee_ids)
 
         # ----------------------------------------------------------
         # Load all worked hours and festivity for selected employee:
@@ -339,7 +345,7 @@ class hr_analytic_timesheet(osv.osv):
         employee_not_worked_hours = {}
         employee_not_worked_recover_hours = {}
 
-        ts_pool.get_employee_worked_hours(self.cr, self.uid, user_ids, 
+        ts_pool.get_employee_worked_hours(cr, uid, user_ids, 
             start_date, stop_date, employee_worked_hours, 
             employee_not_worked_hours, employee_not_worked_recover_hours) 
         
