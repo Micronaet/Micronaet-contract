@@ -319,17 +319,17 @@ class hr_analytic_timesheet(osv.osv):
         if line_ids: 
             line_pool.unlink(cr, uid, line_ids, context=context)
 
-        import pdb; pdb.set_trace()        
-        report_database = self.get_calendar(cr, uid, {
+        calendar_database = self.get_calendar(cr, uid, {
             # use from date for get month and year (always refer to month)
             'month': from_date[5:7],
             'year': from_date[:4],
             'user_ids': user_ids,
             }, context=context)
 
+        import pdb; pdb.set_trace()        
         for key in refound_db:
             # Create coefficient for split refound:
-            refound_hours = report_database # TODO
+            refound_hours = calendar_database # TODO
             if refound_hours <= 0.0: 
                 continue # no extra hours so no splitting:
                 

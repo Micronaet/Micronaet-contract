@@ -153,7 +153,7 @@ class hr_analytic_timesheet(osv.osv):
     def get_calendar(self, cr, uid, data=None, context=None):
         ''' Original function moved here from parser for calculate all database
             for report intervent
-            The function is moved here as we call also from importation
+            NOTE: The function is moved here as we call also from importation
         '''
         # ---------------------------------------------------------------------
         #                          Utility function: 
