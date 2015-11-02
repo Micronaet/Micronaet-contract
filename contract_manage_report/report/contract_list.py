@@ -51,7 +51,8 @@ class Parser(report_sxw.rml_parse):
                 filter_dept=[('id','=',dept)]
 
         dept_pool = self.pool.get('hr.department')
-        dept_ids = dept_pool.search(self.cr, self.uid, filter_dept, order='name')
+        dept_ids = dept_pool.search(self.cr, self.uid, filter_dept, 
+            order='name')
         return dept_pool.browse(self.cr, self.uid, dept_ids)
         
     def get_contract(self, department_id, data=None):
@@ -70,6 +71,7 @@ class Parser(report_sxw.rml_parse):
            domain.append(('id','=',contract_id))
         
         contract_pool = self.pool.get('account.analytic.account')
-        contract_ids = contract_pool.search(self.cr, self.uid, domain, order='code,name')
+        contract_ids = contract_pool.search(self.cr, self.uid, domain, 
+            order='code,name')
         return contract_pool.browse(self.cr, self.uid, contract_ids)
 
