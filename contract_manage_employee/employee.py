@@ -52,7 +52,7 @@ class hr_analytic_timesheet(osv.osv):
     #                                Utility:
     # -------------------------------------------------------------------------
     def load_one_cost(self, cr, uid, path, filename, separator,
-            from_wizard=False, error=None, context=None):
+            error=None, context=None):
         ''' Import one file 
         '''
         # Utility: function for procedure:
@@ -74,6 +74,7 @@ class hr_analytic_timesheet(osv.osv):
 
         # Pool used:
         employee_pool = self.pool.get('hr.employee')            
+        hc_pool = self.pool.get('hr.employee.hour.cost')
 
         tot_col = 5 # TODO change if file will be extended
         if error is None:
@@ -108,10 +109,7 @@ class hr_analytic_timesheet(osv.osv):
                 if len(record) != tot_col:
                     error.append(_(
                         '%s. Record different format: %s (col.: %s)') % (
-                            i, 
-                            tot_col,
-                            len(record),
-                            ))
+                            i, tot_col, len(record)))
                     _logger.error(error[-1])
                     continue
 
@@ -176,30 +174,16 @@ class hr_analytic_timesheet(osv.osv):
         domain.append(('id', 'in', item_ids))
                 
         # Load in object for check:
-        self.pool.get('hr.employee.hour.cost').load_all_employee(
+        hc_pool.load_all_employee(
             cr, uid, domain, force_cost, context=context)
             
-        # Open view:    
-        if from_wizard:
-            return {
-                'view_type': 'form',
-                'view_mode': 'tree,form',
-                'res_model': 'hr.employee.hour.cost', # obj linked to the view
-                #'views': [(view_id, 'form')],
-                'view_id': False,
-                'type': 'ir.actions.act_window',
-                #'target': 'new',
-                #'res_id': res_id, # ID selected
-                }
-        else:
-            return True
+        return True
     
     def import_one_cost(self, cr, uid, name='', from_date=False, to_date=False,
-            from_wizard=False, error=None, context=None):
+            error=None, context=None):
         ''' Import previous loaded list of employee costs
             name: for log description
             from_date: from date update analytic line
-            from_wizard: for return operation 
         '''
         # Pools used:
         cost_pool = self.pool.get('hr.employee.hour.cost')
@@ -274,11 +258,7 @@ class hr_analytic_timesheet(osv.osv):
                 _logger.error('Employee update: %s' % cost.employee_id.name)
                 _logger.error(sys.exc_info(), )
                 continue
-
-        if from_wizard:
-            return {'type': 'ir.actions.act_window_close'}
-        else:    
-            return True
+        return True
             
     # -------------------------------------------------------------------------
     #                               Schedule operations:
@@ -309,12 +289,12 @@ class hr_analytic_timesheet(osv.osv):
                 # -------------------------------------------------------------
                 #                            Import
                 # -------------------------------------------------------------
-                # Parse date
+                # Parse date:
                 file_date = os.path.splitext(filename)[0][-4:]
                 from_year = int(file_date[:2])
                 from_month = int(file_date[2:])
                 
-                # Next value
+                # Next value:
                 if from_month == 12:
                     next_month = 1
                     next_year = from_year + 1
@@ -331,7 +311,9 @@ class hr_analytic_timesheet(osv.osv):
                 self.import_one_cost(cr, uid, name=name, from_date=from_date, 
                     to_date=to_date, error=error, context=context)
                 
-                # History file:
+                # ------------------
+                # History operation:
+                # ------------------
                 os.rename(
                     os.path.join(path, filename),
                     os.path.join(path, 'history', '%s.%s' % (
