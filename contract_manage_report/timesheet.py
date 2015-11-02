@@ -22,8 +22,12 @@
 
 import os
 import sys
+import logging
+from tools.translate import _
 from osv import fields, osv, expression
 from datetime import datetime, timedelta
+
+_logger = logging.getLogger(__name__)
 
 
 class hr_analytic_timesheet(osv.osv):

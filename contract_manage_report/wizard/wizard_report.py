@@ -25,8 +25,12 @@
 #
 ##############################################################################
 
+import logging
 from osv import osv, fields
-from datetime import datetime
+from tools.translate import _
+from datetime import datetime, timedelta
+
+_logger = logging.getLogger(__name__)
 
 month_list= [('01','January'),
              ('02','February'),

@@ -23,10 +23,15 @@
 
 import os
 import sys
+import logging
+from tools.translate import _
 from osv import fields, osv, expression
 from datetime import datetime, timedelta
 from os.path import isfile, join
 from os import listdir
+
+_logger = logging.getLogger(__name__)
+
 
 
 # python represent weekday starting from 0 = Monday
@@ -385,7 +390,7 @@ class hr_analytic_timesheet(osv.osv):
                 _logger.info("Load and import file %s" % filename)
                 error = []                             
                 # -------------------------------------------------------------
-                #                             Load
+                #                    Load (old wizard procedure)
                 # -------------------------------------------------------------
                 self.load_one_cost(cr, uid, path=path, filename=filename, 
                     separator=separator, error=error, context=context)
