@@ -46,9 +46,10 @@ class hr_employee_force_hour(osv.osv_memory):
     # Schedule operations:
     # --------------------
     def force_update_product_analytic_line(self, cr, uid, context=None):
-        ''' Temp function called via XMLRPC for update description in analytic
-            line
+        ''' Schedule function (ex called via XMLRPC) to update description in 
+            analytic line
         ''' 
+        # Pool used:
         journal_pool = self.pool.get('account.analytic.journal')
         line_pool = self.pool.get('account.analytic.line')
         product_pool = self.pool.get('product.product')
@@ -87,20 +88,22 @@ class hr_employee_force_hour(osv.osv_memory):
                     product_proxy = product_pool.browse(
                         cr, uid, product_ids, context=context)[0]
 
-                    _logger.info('%s. %s Update product: %s [%s] in %s>%s [%s]' % (
-                        line.id,
-                        line.date,
-                        line.product_id.name_template,
-                        line.product_id.standard_price,
-                        product_proxy.name,
-                        product_proxy.name_template,
-                        product_proxy.standard_price,
-                        ))  
+                    _logger.info(
+                        '%s. %s Update product: %s [%s] in %s>%s [%s]' % (
+                            line.id,
+                            line.date,
+                            line.product_id.name_template,
+                            line.product_id.standard_price,
+                            product_proxy.name,
+                            product_proxy.name_template,
+                            product_proxy.standard_price,
+                            )) 
 
                     line_pool.write(cr, uid, line.id, {
                         'name': product_proxy.name_template,            
                         'product_id': product_proxy.id,
-                        'amount': -(line.unit_amount * product_proxy.standard_price),
+                        'amount': -(
+                            line.unit_amount * product_proxy.standard_price),
                         }, context=context)
                     continue    
                 except:
@@ -196,9 +199,8 @@ class hr_employee_force_hour(osv.osv_memory):
     # --------
     def load_one_cost(self, cr, uid, path, filename, separator,
             from_wizard=False, error=None, context=None):
-        ''' Import one file 
+        ''' Import one file, used from import procedure (usually scheduled)
         '''
-        # Utility: function for procedure:
         def format_string(value, default=''):
             try:
                 return value.strip() or default
@@ -419,35 +421,6 @@ class hr_employee_force_hour(osv.osv_memory):
             return {'type': 'ir.actions.act_window_close'}
         else:    
             return True
-
-    # --------------
-    # Button events:
-    # --------------
-    # TODO Remove wizard? vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
-    def load_button(self, cr, uid, ids, context=None):
-        ''' Load all active employee and his product, create if not present
-            After open view with the list
-        '''
-        # ----------------------
-        # Import file parameters
-        # ----------------------
-        # TODO load parameter from scheduled importation
-        path = '~/etl/servizi/employee/'
-        separator = ';'
-        bof = 'costi' # begin of file
-
-        return self.load_one_cost(cr, uid, path, filename, separator, 
-            from_wizard=True, context=context)
-
-    def force_button(self, cr, uid, ids, context=None):
-        ''' Force button update records
-        ''' 
-        wiz_proxy = self.browse(cr, uid, ids)[0]
-        
-        # NOTE: no to_date from wizard:
-        return self.import_one_cost(cr, uid, wiz_proxy.name, 
-            wiz_proxy.from_date, False, from_wizard=True, context=context)
-    # TODO Remove wizard? ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     _columns = {
         'name': fields.char('Description', size=80),
