@@ -13,7 +13,7 @@
 			<field eval="1" name="active"/>
 			<field name="args">('~/etl/employee', 'cost', ';')</field>
 			<field eval="1" name="interval_number"/>
-			<field eval="&quot;&quot;&quot;hr.analytic.timesheet&quot;&quot;&quot;" name="model"/>
+			<field eval="&quot;&quot;&quot;hr.employee.force.hour.wizard&quot;&quot;&quot;" name="model"/>
 		</record>
 	</data>
 </openerp>
