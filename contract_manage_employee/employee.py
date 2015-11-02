@@ -282,6 +282,7 @@ class hr_analytic_timesheet(osv.osv):
 
                     # Save value for refound pool:
                     try:
+                        # TODO: Jump leave contract!!!!
                         user_id = cost.employee_id.user_id.id
                         if user_id not in refound_db:
                             # only the first time
