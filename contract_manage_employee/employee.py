@@ -324,7 +324,7 @@ class hr_analytic_timesheet(osv.osv):
             'month': from_date[5:7],
             'year': from_date[:4],
             'user_ids': user_ids,
-            }, context=context)
+            }, origin='importation', context=context)
 
         import pdb; pdb.set_trace()        
         for key in refound_db:

@@ -360,9 +360,9 @@ class hr_analytic_timesheet(osv.osv):
                     for line in employee.contract_tipology_id.line_ids:                
                         employee_work_hours[
                             day_number[line.week_day]] = line.name
-                    exist_tipology=True
+                    exist_tipology = True
                 else:
-                    exist_tipology=False
+                    exist_tipology = False
                     
                 # Create default month loading block 
                 # (after compute worked hour and absence hour)
@@ -386,6 +386,8 @@ class hr_analytic_timesheet(osv.osv):
                         ) for item in range(1,33)]
             else:
                 pass # TODO error if there's not a user in employee    
+                
+        # Result depend on origin (caller of the function):        
         if origin == 'report':        
             calendar_list = [res_dict[k] for k in res_dict]
             calendar_list.sort()
