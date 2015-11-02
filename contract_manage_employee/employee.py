@@ -326,10 +326,13 @@ class hr_analytic_timesheet(osv.osv):
             'user_ids': user_ids,
             }, origin='importation', context=context)
 
-        import pdb; pdb.set_trace()        
-        for key in refound_db:
-            # Create coefficient for split refound:
-            refound_hours = calendar_database # TODO
+        import pdb; pdb.set_trace()
+        for key in refound_db: # key = user_id
+            # Create coefficient for split refound:            
+            refound_hours = (
+                calendar_database[key][-1][1] - calendar_database[key][-1][0])
+            # Not used element (has extra text)    
+
             if refound_hours <= 0.0: 
                 continue # no extra hours so no splitting:
                 
@@ -346,9 +349,10 @@ class hr_analytic_timesheet(osv.osv):
                     'update_log_id': update_log_id, # parent log
                     'amount': amount,
                     'user_id': reference.user_id.id,
-                    'name': _('Month %s refound user %s') % (
+                    'name': _('Month %s refound user %s (tot.: %s') % (
                         'month', # TODO
                         reference.user_id.name, 
+                        refound_hours, # to split
                         ),
                     'unit_amount': unit_amount,
                     'date': '%s-01' % reference.date[:7], # TODO Check
