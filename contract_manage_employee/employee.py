@@ -32,8 +32,6 @@ from os import listdir
 
 _logger = logging.getLogger(__name__)
 
-
-
 # python represent weekday starting from 0 = Monday
 week_days = [
     ('mo', 'Monday'),  
@@ -53,93 +51,6 @@ class hr_analytic_timesheet(osv.osv):
     # -------------------------------------------------------------------------
     #                                Utility:
     # -------------------------------------------------------------------------
-    # TODO used?
-    def force_update_product_analytic_line(self, cr, uid, context=None):
-        ''' Schedule function (ex called via XMLRPC) to update description in 
-            analytic line
-            (ex import procedure now automate launched from master schedule)
-        ''' 
-        journal_pool = self.pool.get('account.analytic.journal')
-        line_pool = self.pool.get('account.analytic.line')
-        product_pool = self.pool.get('product.product')
-                
-        _logger.info("Start update!")
-        att_ids = journal_pool.search(cr, uid, [
-            ('code', '=', 'ATT')], context=context)
-
-        line_ids = line_pool.search(cr, uid, [
-            ('journal_id', '=', att_ids[0]),
-            ], context=context)
-
-        i = 0          
-        _logger.info('Found %s line!' % len(line_ids))  
-        for line in line_pool.browse(cr, uid, line_ids, context=context):
-            i += 1
-            if not line.product_id:
-                _logger.error('Product not found (null in line)')
-                continue
-
-            # Hour cost need to change also product:
-            if line.product_id.is_hour_cost:
-                try:
-                    # Change product_id and after set name of product
-                    product_ids = product_pool.search(cr, uid, [
-                        ('name', '=', line.name)], context=context)
-
-                    if not product_ids:
-                        _logger.error('Product name not found in database')
-                        continue
-
-                    if len(product_ids) > 1:
-                        _logger.warning('More than one record (take first)!')
-                        continue
-
-                    product_proxy = product_pool.browse(
-                        cr, uid, product_ids, context=context)[0]
-
-                    _logger.info('%s. %s Update product: %s [%s] in %s>%s [%s]' % (
-                        line.id,
-                        line.date,
-                        line.product_id.name_template,
-                        line.product_id.standard_price,
-                        product_proxy.name,
-                        product_proxy.name_template,
-                        product_proxy.standard_price,
-                        ))  
-
-                    line_pool.write(cr, uid, line.id, {
-                        'name': product_proxy.name_template,            
-                        'product_id': product_proxy.id,
-                        'amount': -(
-                            line.unit_amount * product_proxy.standard_price),
-                        }, context=context)
-                    continue    
-                except:
-                    _logger.error('Error')
-                    _logger.error('%s' % (sys.exc_info(), ))
-                    continue
-        
-            # other line check only name
-            if line.product_id.name != line.product_id.name_template:
-                try:
-                    _logger.info("%s. Change name %s > %s" % ( 
-                        line.id,
-                        line.product_id.name,
-                        line.product_id.name_template,
-                        ))
-                    line_pool.write(cr, uid, line.id, {
-                        'name': line.product_id.name_template,
-                        }, context=context)
-                except:
-                    _logger.error('Error')
-                    _logger.error('%s' % (sys.exc_info(), ))
-                    
-            else:
-                _logger.warning('Not updated: %s' % line.name)
-                       
-        _logger.info("End update!")
-        return True
-
     def load_one_cost(self, cr, uid, path, filename, separator,
             from_wizard=False, error=None, context=None):
         ''' Import one file 
