@@ -46,7 +46,7 @@ from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT,
 
 _logger = logging.getLogger(__name__)
 
-class HrAnalyticTimeshee(orm.orm):
+class HrAnalyticTimesheet(orm.orm):
     ''' Add utility to timesheet for calculare month elements
     '''
     _inherit = 'hr.analytic.timesheet'
@@ -103,8 +103,8 @@ class HrAnalyticTimeshee(orm.orm):
             # total column:
             if 32 in dict_ref[line.user_id.id]: 
                 dict_ref[line.user_id.id][32] += amount
-            else:    
+            else:
                 dict_ref[line.user_id.id][32] = amount
             # TODO update total!!!! (worked and not worked)
         return 
-        
+HrAnalyticTimesheet()      
