@@ -75,9 +75,6 @@ class Parser(report_sxw.rml_parse):
     def get_calendar(self, data = None):
         ''' Get calendar for user/mont/year passed
         '''
-        day_number = {
-            'mo': 0, 'tu': 1, 'we': 2, 'th': 3, 'fr': 4, 'sa': 5, 'su': 6}
-        
         # ---------------------------------------------------------------------
         #                          Utility function: 
         # ---------------------------------------------------------------------            
@@ -104,11 +101,7 @@ class Parser(report_sxw.rml_parse):
                       hour to work, KO if <
                 ]                  
             '''
-            # Pool used:
-            ts_pool = self.pool.get('hr.analytic.timesheet')
-            employee_pool = self.pool.get('hr.employee')
-            festivity_pool = self.pool.get('contract.employee.festivity')
-        
+
             res = [0.0, 0.0, 0.0, "", 0.0] # default value  
             actual_date = start_date + timedelta(days = day_of_month - 1)
             wd = datetime.weekday(actual_date)
@@ -133,7 +126,7 @@ class Parser(report_sxw.rml_parse):
                 res[3] = "%s\n%3.2f" % (
                     "recup." if todo >=0 else "manca", 
                     todo) 
-                
+   
             elif actual_date.strftime("%m") == ref_month: # same month
                 # test if is festivity day:
                 if festivity_pool.is_festivity(
@@ -184,9 +177,19 @@ class Parser(report_sxw.rml_parse):
                     res[3] = "???"
                    
             else: # new month
-                res = ["", "", "", "", ""]
-                
+                res = ["", "", "", "", ""]                
             return res[:]
+
+        # ----------
+        # Pool used:
+        # ----------
+        ts_pool = self.pool.get('hr.analytic.timesheet')
+        employee_pool = self.pool.get('hr.employee')
+        festivity_pool = self.pool.get('contract.employee.festivity')
+
+        # Constant used:
+        day_number = {
+            'mo': 0, 'tu': 1, 'we': 2, 'th': 3, 'fr': 4, 'sa': 5, 'su': 6}
 
         # ----------------------
         # Get wizard parameters:
@@ -198,8 +201,7 @@ class Parser(report_sxw.rml_parse):
         ref_month = "%02d" % (
             int(data.get('month', datetime.now().strftime("%m"))))
         ref_year  = "%04d" % (
-            int(data.get('year', datetime.now().strftime("%Y"))))
-        
+            int(data.get('year', datetime.now().strftime("%Y"))))        
         department_id = data.get('department_id', False)
         
         # ---------------
@@ -220,7 +222,7 @@ class Parser(report_sxw.rml_parse):
         # Search employee:
         # ----------------
         if department_id: # get filter if department is present
-            filter_department=[('department_id','=',department_id)]
+            filter_department=[('department_id', '=', department_id)]
         else:
             filter_department=[]    
 

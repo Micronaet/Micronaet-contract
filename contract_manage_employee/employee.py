@@ -38,7 +38,7 @@ week_days = [
     ('su', 'Sunday'),
     ]
 
-class hr_analytic_timesheet(orm.orm):
+class hr_analytic_timesheet(osv.osv):
     ''' Extra function for scheduled procedure (ex wizard)
     '''
     _inherit = 'hr.analytic.timesheet'
@@ -154,6 +154,9 @@ class hr_analytic_timesheet(orm.orm):
             except:
                 return 0.0
 
+        # Pool used:
+        employee_pool = self.pool.get('hr.employee')            
+
         tot_col = 5 # TODO change if file will be extended
         if error is None:
             error = []
@@ -163,7 +166,6 @@ class hr_analytic_timesheet(orm.orm):
         force_cost = {}
        
         # Load from file employee:
-        employee_pool = self.pool.get('hr.employee')            
         item_ids = [] # employee list
         
         # Check file present (for wizard but used alse for sched.)?

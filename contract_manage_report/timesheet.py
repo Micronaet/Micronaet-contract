@@ -1,37 +1,32 @@
+# -*- coding: utf-8 -*-
 ###############################################################################
 #
-# Copyright (c) 2008-2010 SIA "KN dati". (http://kndati.lv) All Rights Reserved.
-#                    General contacts <info@kndati.lv>
-#
-# WARNING: This program as such is intended to be used by professional
-# programmers who take the whole responsability of assessing all potential
-# consequences resulting from its eventual inadequacies and bugs
-# End users who are looking for a ready-to-use solution with commercial
-# garantees and support are strongly adviced to contract a Free Software
-# Service Company
-#
-# This program is Free Software; you can redistribute it and/or
-# modify it under the terms of the GNU General Public License
-# as published by the Free Software Foundation; either version 2
-# of the License, or (at your option) any later version.
+# ODOO (ex OpenERP) 
+# Open Source Management Solution
+# Copyright (C) 2001-2015 Micronaet S.r.l. (<http://www.micronaet.it>)
+# Developer: Nicola Riolini @thebrush (<https://it.linkedin.com/in/thebrush>)
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU Affero General Public License as
+# published by the Free Software Foundation, either version 3 of the
+# License, or (at your option) any later version.
 #
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. 
+# See the GNU Affero General Public License for more details.
 #
-# You should have received a copy of the GNU General Public License
-# along with this program; if not, write to the Free Software
-# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
+# You should have received a copy of the GNU Affero General Public License
+# along with this program. If not, see <http://www.gnu.org/licenses/>.
 #
 ###############################################################################
+
 import os
 import sys
 from osv import fields, osv, expression
 from datetime import datetime, timedelta
 
 
-class HrAnalyticTimesheet(orm.orm):
+class hr_analytic_timesheet(osv.osv):
     ''' Add utility to timesheet for calculare month elements
     '''
     _inherit = 'hr.analytic.timesheet'
@@ -55,8 +50,8 @@ class HrAnalyticTimesheet(orm.orm):
         line_ids = self.search(cr, uid, [
             ('user_id', 'in', user_ids),
             ('date', '>=', from_date.strftime("%Y-%m-%d")),
-            ('date', '<=', to_date.strftime("%Y-%m-%d"))],
-            )
+            ('date', '<=', to_date.strftime("%Y-%m-%d")),
+            ])
                                               
         # -----------------------------------
         # loop all lines for totalize results                                      
@@ -64,7 +59,6 @@ class HrAnalyticTimesheet(orm.orm):
         for line in self.browse(cr, uid, line_ids): 
             month_day = int(line.date[8:10])
             amount = line.unit_amount or 0.0
-            
             
             if line.account_id.is_recover: 
                 # recover:
@@ -92,4 +86,4 @@ class HrAnalyticTimesheet(orm.orm):
                 dict_ref[line.user_id.id][32] = amount
             # TODO update total!!!! (worked and not worked)
         return 
-HrAnalyticTimesheet()      
+hr_analytic_timesheet()      
