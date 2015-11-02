@@ -229,7 +229,7 @@ class hr_analytic_timesheet(osv.osv):
         # ----------------------------------------------------
         # Load all elements previous stored in OpenERP object:
         # ----------------------------------------------------
-        refound_db = {}
+        refound_db = {} # intervent status and reference record
         cost_ids = cost_pool.search(cr, uid, [], context=context)
 
         # Also the same part of domain (used also after):        
@@ -284,13 +284,16 @@ class hr_analytic_timesheet(osv.osv):
                     try:
                         user_id = cost.employee_id.user_id.id
                         if user_id not in refound_db:
-                            refound_db[user_id] = {}
+                            # only the first time
+                            # Database = total h / account, browse line, cost
+                            refound_db[user_id] = [{}, line, standard_price] 
+                            
                         # Save unit amount (amount was the same coeff.)    
-                        if line.account_id.id not in refound_db[user_id]:
-                            refound_db[user_id][
+                        if line.account_id.id not in refound_db[user_id][0]:
+                            refound_db[user_id][0][
                                 line.account_id.id] = line.unit_amount
                         else:    
-                            refound_db[user_id][
+                            refound_db[user_id][0][
                                 line.account_id.id] += line.unit_amount
                     except:
                         _logger.error('Generic error in refound DB :%' % (
@@ -301,17 +304,15 @@ class hr_analytic_timesheet(osv.osv):
                 _logger.error(sys.exc_info(), )
                 continue
                 
-        # --------------------------------------------------------
-        # Create unload intervent for hour that will be recovered:
-        # --------------------------------------------------------
-        return True
-        if not employee_ids:
-            return True
-            
-        # TODO:
+        # ---------------------------------------------------------------------
+        #                        REFOUND INTERVENT:
+        # ---------------------------------------------------------------------
         # Delete user intervent in this period for regenerate:
+        import pdb; pdb.set_trace()
+        user_ids = refound_db.keys() # for readability
+        
         domain = [
-            ('user_id', 'in', refound_db.keys()), # this users
+            ('user_id', 'in', user_ids),
             ('timesheet_id', '=', refound_journal_id), # only this timesheet
             ]
         domain.extend(date_range_domain)
@@ -322,15 +323,62 @@ class hr_analytic_timesheet(osv.osv):
         employee_not_worked_hours = {}
         employee_not_worked_recover_hours = {}
 
-        ts_pool.get_employee_worked_hours(cr, uid, 
-            refound_db.keys(), # user touched
+        report_database = ts_pool.get_employee_worked_hours(cr, uid, 
+            user_ids,
             start_date, stop_date, 
             employee_worked_hours, 
             employee_not_worked_hours, 
             employee_not_worked_recover_hours)
         
-        # TODO link also parent log operation
-            
+        for key in refound_db:
+            # Create coefficient for split refound:
+            refound_hours = report_database # TODO
+            if refound_hours <= 0.0: 
+                continue # no extra hours so no splitting:
+                
+            reference = refound_db[key][1] # browse of analytic line
+            for account_id in refound_db[key][0]:
+                # TODO calculate (attention to new value of cost / hour)
+                unit_amount = refound_db[key][0][account_id] / refound_hours
+                amount = +(
+                    unit_amount * 
+                    refound_db[key][0] # hour cost
+                    ) 
+                
+                line_pool.create(cr, uid, {
+                    'update_log_id': update_log_id, # parent log
+                    'amount': amount,
+                    'user_id': reference.user_id.id,
+                    'name': _('Month %s refound user %s') % (
+                        'month', # TODO
+                        reference.user_id.name, 
+                        )
+                    'unit_amount': unit_amount,
+                    'date': '%s-01' % reference.date[:7], # TODO Check
+                    'company_id': reference.company_id.id,
+                    'account_id': account_id,
+                    'general_account_id': reference.company_id.id,,
+                    'product_id': reference.company_id.id,,
+                    'product_uom_id': reference.company_id.id,,
+                    'journal_id': refound_journal_id,
+                    
+                    # Unused or empty fields:
+                    #'code': False,
+                    #'currency_id': reference.company_id.id,,
+                    #'ref': False,
+                    #'to_invoice': reference.to_invoice,
+                    #'move_id': ,
+                    #'amount_currency': , ??
+                    #'invoice_id': ,
+                    #'extra_analytic_line_timesheet_id': ,
+                    #'import_type': ,
+                    #'activity_id': ,
+                    #'mail_raccomanded': ,
+                    #'location': ,
+                    #'expense_id': ,
+                    #'km_import_id': ,
+                    }, context=context)
+                
             
     # -------------------------------------------------------------------------
     #                               Schedule operations:
