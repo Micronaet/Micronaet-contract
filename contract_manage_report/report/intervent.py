@@ -387,11 +387,10 @@ class hr_analytic_timesheet(osv.osv):
             else:
                 pass # TODO error if there's not a user in employee    
         if origin == 'report':        
-            calendar = [res_dict[k] for k in res_dict]
-            calendar.sort()
+            calendar_list = [res_dict[k] for k in res_dict]
+            calendar_list.sort()
+            return calendar_list
         else: # importation
-            calendar = [k for k in res_dict]
-                
-        return calendar
+            return res_dict
         
 hr_analytic_timesheet()
