@@ -319,20 +319,14 @@ class hr_analytic_timesheet(osv.osv):
         if line_ids: 
             line_pool.unlink(cr, uid, line_ids, context=context)
 
-        # Populate worked and not worked hours (used report function):
-        employee_worked_hours = {}
-        employee_not_worked_hours = {}
-        employee_not_worked_recover_hours = {}
+        import pdb; pdb.set_trace()        
+        report_database = self.get_calendar(cr, uid, {
+            # use from date for get month and year (always refer to month)
+            'month': from_date[5:7],
+            'year': from_date[:4],
+            'user_ids': user_ids,
+            }, context=context)
 
-        import pdb; pdb.set_trace()
-        report_database = self.get_employee_worked_hours(cr, uid, 
-            user_ids,
-            from_date, to_date, 
-            employee_worked_hours, 
-            employee_not_worked_hours, 
-            employee_not_worked_recover_hours,
-            context=context)
-        
         for key in refound_db:
             # Create coefficient for split refound:
             refound_hours = report_database # TODO

@@ -25,8 +25,7 @@
 #
 ##############################################################################
 
-import timesheet
-import wizard
+import wizard # model also here (for keep in where needed)
 import report 
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
