@@ -198,6 +198,7 @@ class hr_analytic_timesheet(osv.osv):
         # -----------------------------
         # Journal operation operations:
         # -----------------------------
+        # Timesheet (TS)
         timesheet_journal_ids = journal_pool.search(cr, uid, [
             ('code', '=', 'TS')], context=context)
         if not timesheet_journal_ids:
@@ -205,12 +206,12 @@ class hr_analytic_timesheet(osv.osv):
             return False # NOTE: No auto creation!
         _logger.info('Get Timesheet (code TS) journal for filter')
 
-        # Note: Logged before for get ID
+        # Refound timesheet elements (REF)
         refound_journal_ids = journal_pool.search(cr, uid, [
             ('code', '=', 'REF')], context=context)
         if refound_journal_ids:
             refound_journal_id = refound_journal_ids
-        else:
+        else: # Create journal
             _logger.warning('Intervent refound (REF) journal not found!')
             refound_journal_id = journal_pool.create(cr, uid, {
                 'name': _('Intervent refound'),
@@ -221,6 +222,7 @@ class hr_analytic_timesheet(osv.osv):
         _logger.info('Get Intervent refound (code REF) journal for filter')
 
         # Create log (parent) operation (note: Logged before for get ID):
+        # Note: Logged before for get ID
         update_log_id = log_pool.log_operation(
             cr, uid, name, from_date, error, context=context)
 
@@ -233,7 +235,7 @@ class hr_analytic_timesheet(osv.osv):
         # Also the same part of domain (used also after):        
         date_range_domain = [('date', '>=', from_date)]
         if to_date: # for schedule update only
-            date_rage_domain.append(('date', '<', to_date))
+            date_range_domain.append(('date', '<', to_date))
             
         for cost in cost_pool.browse(cr, uid, cost_ids, context=context):
             try:               
@@ -256,7 +258,7 @@ class hr_analytic_timesheet(osv.osv):
                         'standard_price': standard_price,
                         'update_price_date': from_date, 
                         }, context=context)
-                    
+
                 # ------------------------------------------------
                 # Update analytic lines save log operation parent:
                 # ------------------------------------------------
@@ -264,19 +266,20 @@ class hr_analytic_timesheet(osv.osv):
                 domain = [
                     ('journal_id', '=', timesheet_journal_ids[0]), # only
                     ('user_id', '=', cost.employee_id.user_id.id),
-                    ].extend(
-                        date_range_domain) # date filter added        
+                    ]
+                domain.extend(date_range_domain) # date filter added        
                 line_ids = line_pool.search(cr, uid, domain, context=context)
-                    
+
                 # loop for total calculation:
                 for line in line_pool.browse(
                         cr, uid, line_ids, context=context):
+                        
                     line_pool.write(cr, uid, line.id, {
                         'amount': -(standard_price * line.unit_amount),
                         'update_log_id': update_log_id,
                         'product_id': cost.product_id.id, 
                         }, context=context)
-                        
+
                     # Save value for refound pool:
                     try:
                         user_id = cost.employee_id.user_id.id
@@ -301,16 +304,18 @@ class hr_analytic_timesheet(osv.osv):
         # --------------------------------------------------------
         # Create unload intervent for hour that will be recovered:
         # --------------------------------------------------------
+        return True
         if not employee_ids:
             return True
             
         # TODO:
         # Delete user intervent in this period for regenerate:
-        line_pool.unlink(cr, uid, [
+        domain = [
             ('user_id', 'in', refound_db.keys()), # this users
             ('timesheet_id', '=', refound_journal_id), # only this timesheet
-            ].extend( # add range date
-                date_range_domain), context=context)
+            ]
+        domain.extend(date_range_domain)
+        line_pool.unlink(cr, uid, domain, context=context)
 
         # Populate worked and not worked hours (used report function):
         employee_worked_hours = {}
@@ -324,6 +329,7 @@ class hr_analytic_timesheet(osv.osv):
             employee_not_worked_hours, 
             employee_not_worked_recover_hours)
         
+        # TODO link also parent log operation
             
             
     # -------------------------------------------------------------------------
