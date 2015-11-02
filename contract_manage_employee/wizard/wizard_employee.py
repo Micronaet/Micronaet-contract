@@ -42,12 +42,10 @@ class hr_employee_force_hour(osv.osv_memory):
     _name = 'hr.employee.force.hour.wizard'
     _description = 'Employee force hour cost'
     
-    # --------------------
-    # Schedule operations:
-    # --------------------
     def force_update_product_analytic_line(self, cr, uid, context=None):
         ''' Schedule function (ex called via XMLRPC) to update description in 
             analytic line
+            (ex import procedure now automate launched from master schedule)
         ''' 
         # Pool used:
         journal_pool = self.pool.get('account.analytic.journal')
@@ -132,6 +130,10 @@ class hr_employee_force_hour(osv.osv_memory):
         _logger.info("End update!")
         return True
 
+    # --------------------
+    # Schedule operations:
+    # --------------------
+    # Master function for scheduled importation:
     def schedule_importation_cost(self, cr, uid, path='~/etl/employee', 
             bof='cost', separator=';', context=None):
         ''' Loop on cost folder searching file that start with bof
@@ -294,8 +296,9 @@ class hr_employee_force_hour(osv.osv_memory):
                             }, context=context)
                     employee_id = employee_ids[0]
                     if employee_id in item_ids:
-                        error.append(_('%s. Double in CSV file: %s %s [%s]') % (
-                            i, surname, name, code))
+                        error.append(
+                            _('%s. Double in CSV file: %s %s [%s]') % (
+                                i, surname, name, code))
                         _logger.error(error[-1])
                     else:
                         item_ids.append(employee_id)
