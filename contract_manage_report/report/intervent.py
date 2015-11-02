@@ -109,22 +109,14 @@ class hr_analytic_timesheet(osv.osv):
         '''
         res = {}
 
-        # Convert datetime in str:
-        if type(from_date) == datetime:
-            form_date = from_date.strftime("%Y-%m-%d")
-        if type(to_date) == datetime:
-            # Bug: this function is used from report and import
-            # Report require: <= to date (datetime), 
-            # Import require: < to_date (string)
-            # So corrected here for use only <:
-            to_date = to_date - timedelta(days=1)
-            to_date = to_date.strftime("%Y-%m-%d")
-
         # ---------------------------------------
         # only this user_id in the from-to period
         # ---------------------------------------
-        line_ids = self.search(cr, uid, [('user_id', 'in', user_ids),
-            ('date', '>=', from_date), ('date', '<', to_date)])
+        line_ids = self.search(cr, uid, [
+            ('user_id', 'in', user_ids),
+            ('date', '>=', from_date.strftime("%Y-%m-%d")), 
+            ('date', '<=', to_date.strftime("%Y-%m-%d")),
+            ])
                                               
         # -----------------------------------
         # loop all lines for totalize results                                      
