@@ -337,7 +337,7 @@ class hr_analytic_timesheet(osv.osv):
                 continue # no extra hours so no splitting:
             
             # TODO splitted based on maked hours:
-            split_coeff = redound_hours / calendar_database[key][-1][1] 
+            split_coeff = refound_hours / calendar_database[key][-1][1] 
             
             reference = refound_db[key][1] # browse of analytic line
             for account_id in refound_db[key][0]:
