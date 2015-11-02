@@ -330,7 +330,8 @@ class hr_analytic_timesheet(osv.osv):
             from_date, to_date, 
             employee_worked_hours, 
             employee_not_worked_hours, 
-            employee_not_worked_recover_hours)
+            employee_not_worked_recover_hours,
+            context=context)
         
         for key in refound_db:
             # Create coefficient for split refound:

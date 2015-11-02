@@ -67,12 +67,13 @@ class Parser(report_sxw.rml_parse):
         if not data:
             return "Nessun filtro"
         else:
-            return "Dipartimento: %s - Periodo: %s-%s" % (
-                data.get('department_name', "All"),
-                data.get('month', "00"), 
-                data.get('year', "0000"))
+            return 'Dipartimento: %s - Periodo: %s-%s' % (
+                data.get('department_name', 'All'),
+                data.get('month', '00'), 
+                data.get('year', '0000'),
+                )
         
-    def get_calendar(self, data = None):
+    def get_calendar(self, data=None):
         ''' Get calendar for user/mont/year passed
         '''
         # ---------------------------------------------------------------------
@@ -106,7 +107,7 @@ class Parser(report_sxw.rml_parse):
             actual_date = start_date + timedelta(days = day_of_month - 1)
             wd = datetime.weekday(actual_date)
 
-            if day_of_month==32: # Total column:
+            if day_of_month == 32: # Total column:
                 res[0] = tot_hour_to_work[0]                
                 # total worked hours
                 res[1] = employee_worked_hours[
@@ -191,19 +192,25 @@ class Parser(report_sxw.rml_parse):
         day_number = {
             'mo': 0, 'tu': 1, 'we': 2, 'th': 3, 'fr': 4, 'sa': 5, 'su': 6}
 
-        # ----------------------
-        # Get wizard parameters:
-        # ----------------------
+        # ---------------------------------------------------------------------
+        #                         DATA PARAMETERS:
+        # ---------------------------------------------------------------------
         if data is None:
            data = {}
-        
-        # Get refer for data (else take actual month)
+
+        # Common parameters:
+        # Get refer for data (else take actual month):
         ref_month = "%02d" % (
             int(data.get('month', datetime.now().strftime("%m"))))
         ref_year  = "%04d" % (
             int(data.get('year', datetime.now().strftime("%Y"))))        
-        department_id = data.get('department_id', False)
+            
+        # From wizard:
+        department_id = data.get('department_id', False) # no from importation
         
+        # From importation:
+        importation_user_ids = data.get('user_ids', False)
+                
         # ---------------
         # Variables used:
         # ---------------
@@ -218,16 +225,23 @@ class Parser(report_sxw.rml_parse):
 
         stop_date = (stop_d_1 + timedelta(days = -1)) 
 
-        # ----------------
-        # Search employee:
-        # ----------------
-        if department_id: # get filter if department is present
-            filter_department=[('department_id', '=', department_id)]
-        else:
-            filter_department=[]    
-
-        employee_ids = employee_pool.search(
-            self.cr, self.uid, filter_department) #, order='name')
+        # ------------------
+        # Get employee list:
+        # ------------------
+        if user_ids: # from importation:
+            # NOTE: from importation no department_id admitted
+            employee_ids = employee_pool.search(
+                self.cr, self.uid, [('user_id', 'in', user_ids)])
+            
+        else: # from wizard:
+            # Filter department or all:    
+            if department_id: # get filter if department is present
+                filter_department = [('department_id', '=', department_id)]
+            else:
+                filter_department = []
+            employee_ids = employee_pool.search(
+                self.cr, self.uid, filter_department) #, order='name')
+                
         employee_proxy = employee_pool.browse(self.cr, self.uid, employee_ids)
 
         # ----------------------------------------------------------
@@ -266,7 +280,7 @@ class Parser(report_sxw.rml_parse):
                     
                 # Create default month loading block 
                 # (after compute worked hour and absence hour)
-                tot_hour_to_work=[0.0] 
+                tot_hour_to_work = [0.0] 
                 res_dict[employee.user_id.id] = ["%s\n(%s)\n%s" % (
                     employee.name, 
                     employee.department_id.name if employee.department_id else "Impostare dipartimento",

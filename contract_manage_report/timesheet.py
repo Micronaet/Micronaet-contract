@@ -47,15 +47,23 @@ class hr_analytic_timesheet(osv.osv):
                    {user_id: {day_of_month: not worked}
         '''
         res = {}
-        
+
+        # Convert datetime in str:
+        if type(from_date) == datetime:
+            form_date = from_date.strftime("%Y-%m-%d")
+        if type(to_date) == datetime:
+            # Bug: this function is used from report and import
+            # Report require: <= to date (datetime), 
+            # Import require: < to_date (string)
+            # So corrected here for use only <:
+            to_date = to_date - timedelta(days=1)
+            to_date = to_date.strftime("%Y-%m-%d")
+
         # ---------------------------------------
         # only this user_id in the from-to period
         # ---------------------------------------
-        line_ids = self.search(cr, uid, [
-            ('user_id', 'in', user_ids),
-            ('date', '>=', from_date.strftime("%Y-%m-%d")),
-            ('date', '<=', to_date.strftime("%Y-%m-%d")),
-            ])
+        line_ids = self.search(cr, uid, [('user_id', 'in', user_ids),
+            ('date', '>=', from_date), ('date', '<', to_date)])
                                               
         # -----------------------------------
         # loop all lines for totalize results                                      
@@ -64,15 +72,13 @@ class hr_analytic_timesheet(osv.osv):
             month_day = int(line.date[8:10])
             amount = line.unit_amount or 0.0
             
-            if line.account_id.is_recover: 
-                # recover:
-                dict_ref = not_worked_recover
-            elif line.account_id.not_working: 
-                # absence: 
-                dict_ref = not_worked
-            else: 
-                # presence
-                dict_ref = worked
+            # Type of hour:
+            if line.account_id.is_recover:                 
+                dict_ref = not_worked_recover # recover:                
+            elif line.account_id.not_working:                 
+                dict_ref = not_worked # absence:                 
+            else:                 
+                dict_ref = worked # presence
 
             if line.user_id.id not in dict_ref:
                 dict_ref[line.user_id.id] = {}
