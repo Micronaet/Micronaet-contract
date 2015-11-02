@@ -26,8 +26,6 @@ import sys
 from osv import fields, osv, expression
 from datetime import datetime, timedelta
 
-_logger = logging.getLogger(__name__)
-
 
 # python represent weekday starting from 0 = Monday
 week_days = [
