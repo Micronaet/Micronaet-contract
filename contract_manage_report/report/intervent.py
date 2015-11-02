@@ -71,54 +71,6 @@ class Parser(report_sxw.rml_parse):
                 data.get('department_name', "All"),
                 data.get('month', "00"), 
                 data.get('year', "0000"))
-            
-
-    def get_employee_worked_hours(self, cr, uid, user_ids, from_date, to_date, 
-            worked, not_worked, not_worked_recover, context=None):
-        ''' Search in analytic account line all employee_id.user_id that 
-            has worked hour for the period
-            compile worked and not worked dict with: 
-                   {user_id: {day_of_month: worked}
-                   {user_id: {day_of_month: not worked}
-        '''
-        res= {}
-        # line_pool = self.pool.get('account.analytic.line')
-        line_pool = self.pool.get('hr.analytic.timesheet')
-        # only this user_id in the from-to period
-        line_ids = line_pool.search(cr, uid, [
-            ('user_id', 'in', user_ids),
-            ('date', '>=', from_date.strftime("%Y-%m-%d")),
-            ('date', '<=', to_date.strftime("%Y-%m-%d"))],
-            )
-                                              
-        # loop all lines for totalize results                                      
-        for line in line_pool.browse(cr, uid, line_ids): 
-            month_day = int(line.date[8:10])
-            amount = line.unit_amount or 0.0
-            
-            
-            if line.account_id.is_recover: # recover:
-                dict_ref = not_worked_recover
-            elif line.account_id.not_working: # absence: 
-                dict_ref = not_worked
-            else: # presence
-                dict_ref = worked
-
-            if line.user_id.id not in dict_ref:
-                dict_ref[line.user_id.id] = {}
-                dict_ref[line.user_id.id][month_day]= amount
-            else:    
-                if month_day in dict_ref[line.user_id.id]:
-                    dict_ref[line.user_id.id][month_day] += amount
-                else:    
-                    dict_ref[line.user_id.id][month_day] = amount
-            # total column:
-            if 32 in dict_ref[line.user_id.id]: 
-                dict_ref[line.user_id.id][32] += amount
-            else:    
-                dict_ref[line.user_id.id][32] = amount
-            # TODO update total!!!! (worked and not worked)
-        return 
         
     def get_calendar(self, data = None):
         ''' Get calendar for user/mont/year passed
@@ -133,7 +85,8 @@ class Parser(report_sxw.rml_parse):
                 tot_hour_to_work, employee_worked_hours, 
                 employee_not_worked_hours, employee_not_worked_recover_hours):
             ''' start_date = datetime element for first day of calendar
-                ref_month = actual month, used to test end of month during day calc
+                ref_month = actual month, used to test end of month during day 
+                    calc
                 employee_work = dict with work hour per day (contract)
                 tot_hour_to_work = list passed as totalizator of hour to work
                 employee_worked_hours = dict with worked hours (intervent)
@@ -151,6 +104,11 @@ class Parser(report_sxw.rml_parse):
                       hour to work, KO if <
                 ]                  
             '''
+            # Pool used:
+            ts_pool = self.pool.get('hr.analytic.timesheet')
+            employee_pool = self.pool.get('hr.employee')
+            festivity_pool = self.pool.get('contract.employee.festivity')
+        
             res = [0.0, 0.0, 0.0, "", 0.0] # default value  
             actual_date = start_date + timedelta(days = day_of_month - 1)
             wd = datetime.weekday(actual_date)
@@ -178,11 +136,13 @@ class Parser(report_sxw.rml_parse):
                 
             elif actual_date.strftime("%m") == ref_month: # same month
                 # test if is festivity day:
-                if self.pool.get('contract.employee.festivity').is_festivity(
-                        self.cr, self.uid, actual_date): # festivity
+                if festivity_pool.is_festivity(
+                        self.cr, self.uid, actual_date): 
+                    # festivity
                     res[0] = 0.0 # no work hours
                     res[3] = "\nFES"
-                else: # other day:
+                else: 
+                    # other day:
                     wh = employee_work[wd] if wd in employee_work else 0.0
                     res[0] = wh
                     tot_hour_to_work[0] += wh
@@ -255,7 +215,6 @@ class Parser(report_sxw.rml_parse):
             1), "%Y-%m-%d")
 
         stop_date = (stop_d_1 + timedelta(days = -1)) 
-        #.strptime("%Y-%m-%d")  # TODO from wizard
 
         # ----------------
         # Search employee:
@@ -265,7 +224,6 @@ class Parser(report_sxw.rml_parse):
         else:
             filter_department=[]    
 
-        employee_pool = self.pool.get('hr.employee')
         employee_ids = employee_pool.search(
             self.cr, self.uid, filter_department) #, order='name')
         employee_proxy = employee_pool.browse(self.cr, self.uid, employee_ids)
@@ -274,7 +232,7 @@ class Parser(report_sxw.rml_parse):
         # Load all worked hours and festivity for selected employee:
         # ----------------------------------------------------------
         # Search user_id list
-        user_ids=[]
+        user_ids = []
         for employee in employee_proxy: # sorted by name
             if employee.user_id and employee.user_id.id not in user_ids:
                 user_ids.append(employee.user_id.id)
@@ -284,9 +242,9 @@ class Parser(report_sxw.rml_parse):
         employee_not_worked_hours = {}
         employee_not_worked_recover_hours = {}
 
-        self.get_employee_worked_hours(self.cr, self.uid, user_ids, start_date, 
-            stop_date, employee_worked_hours, employee_not_worked_hours, 
-            employee_not_worked_recover_hours) 
+        te_pool.get_employee_worked_hours(self.cr, self.uid, user_ids, 
+            start_date, stop_date, employee_worked_hours, 
+            employee_not_worked_hours, employee_not_worked_recover_hours) 
         
         # ------------------
         # Create print list:
