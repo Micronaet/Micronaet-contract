@@ -346,7 +346,7 @@ class hr_analytic_timesheet(osv.osv):
                 unit_amount = refound_db[key][0][account_id] * split_coeff
                 amount = +(
                     unit_amount * 
-                    refound_db[key][0] # hour cost
+                    refound_db[key][2] # hour cost
                     ) 
                 
                 line_pool.create(cr, uid, {
