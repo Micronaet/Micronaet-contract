@@ -186,6 +186,8 @@ class hr_analytic_timesheet(osv.osv):
             
             name: for log description
             from_date: from date update analytic line
+            error: list of error that will be write in log record 
+            context: parameters passed
         '''
         # Pools used:
         cost_pool = self.pool.get('hr.employee.hour.cost')
@@ -195,6 +197,9 @@ class hr_analytic_timesheet(osv.osv):
         journal_pool = self.pool.get('account.analytic.journal')
         log_pool = self.pool.get('hr.employee.force.log')
         
+        if error is None:
+            error = []
+
         # -----------------------------
         # Journal operation operations:
         # -----------------------------
@@ -222,7 +227,7 @@ class hr_analytic_timesheet(osv.osv):
         _logger.info('Get Intervent refound (code REF) journal for filter')
 
         # Create log (parent) operation (note: Logged before for get ID):
-        # Note: Logged before for get ID
+        # Note: Log operation before to get ID
         update_log_id = log_pool.log_operation(
             cr, uid, name, from_date, error, context=context)
 
@@ -304,7 +309,7 @@ class hr_analytic_timesheet(osv.osv):
                         _logger.error('Generic error in refound DB :%' % (
                             sys.exc_info(),
                             ))
-            except:
+            except: # TODO log?                
                 _logger.error('Employee update: %s' % cost.employee_id.name)
                 _logger.error(sys.exc_info(), )
                 continue
@@ -333,10 +338,19 @@ class hr_analytic_timesheet(osv.osv):
             'user_ids': user_ids,
             }, origin='importation', context=context)
 
-        import pdb; pdb.set_trace()
         for key in refound_db: # key = user_id
-            # Create coefficient for split refound:            
+            reference = refound_db[key][1] # browse of analytic line
+            
+            if not calendar_database[key][-1][0]: # contract hour:
+                error.append('No contract set for hour for check, User: %s' % (                    
+                    reference.user_id.name,
+                    ))
+                _logger.error(error[-1])
+                continue
+                
+            # Create coefficient for split refound:                        
             refound_hours = (
+                # Worked hour                 - Contract hour
                 calendar_database[key][-1][1] - calendar_database[key][-1][0])
             # Not used element (has extra text)    
 
@@ -346,7 +360,6 @@ class hr_analytic_timesheet(osv.osv):
             # TODO splitted based on maked hours:
             split_coeff = refound_hours / calendar_database[key][-1][1] 
             
-            reference = refound_db[key][1] # browse of analytic line
             for account_id in refound_db[key][0]:
                 # TODO calculate (attention to new value of cost / hour)
                 unit_amount = refound_db[key][0][account_id] * split_coeff
@@ -359,14 +372,14 @@ class hr_analytic_timesheet(osv.osv):
                     'update_log_id': update_log_id, # parent log
                     'amount': amount,
                     'user_id': reference.user_id.id,
-                    'name': _('Period %s/%s refound user %s (tot. H.: %s') % (
+                    'name': _('Period %s/%s refound user %s (tot. H.: %s)') % (
                         month,
                         year,
                         reference.user_id.name, 
                         refound_hours, # to split
                         ),
                     'unit_amount': unit_amount,
-                    'date': '%s-01' % reference.date[:7], # TODO Check
+                    'date': '%s-01' % reference.date[:7],
                     'company_id': reference.company_id.id,
                     'account_id': account_id,
                     'general_account_id': reference.general_account_id.id,
