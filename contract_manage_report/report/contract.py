@@ -88,6 +88,7 @@ class Parser(report_sxw.rml_parse):
             # Function called from ODT that loop using previous funct 
             # (contract.id and data {})
             'get_intervent_loop': self.get_intervent_loop, # get interv. total
+            'get_refound_loop': self.get_refound_loop, # get refound. total
             'get_cost_loop': self.get_cost_loop,           # get costs total
             'get_invoice_loop': self.get_invoice_loop,     # get invoice total
 
@@ -108,9 +109,6 @@ class Parser(report_sxw.rml_parse):
             'get_variables': self.get_variables,
 
             'filter_description': self.filter_description, # filter desc. (wiz)
-            
-            # Utility: 
-            'format_data_italian': self.format_data_italian,
             })
 
     # -------------------------------------------------------------------------  
@@ -135,23 +133,16 @@ class Parser(report_sxw.rml_parse):
         return self.counters.get(name, 0.0)
     # -------------------------------------------------------------------------  
     
-    # TODO to remove!!!    
-    def format_data_italian(self, value):
-        ''' value = data in ISO format YYYY-MM-DD
-            @return data in italian format DD-MM-YYYY (if present)
-        '''
-        if not value: 
-            return ""
-        
-        value = value.strip()
-        if len(value.strip()) == 10:
-            return "%s/%s/%s" % (value[8:10], value[5:7], value[:4])
-        return "" 
-
     def get_intervent_loop(self, account_id, data=None):
         ''' Reset totals every start
         '''
         response = self.get_intervent(account_id, data=data)
+        return ""
+        
+    def get_refound_loop(self, account_id, data=None):
+        ''' Reset totals every start
+        '''
+        response = self.get_refound(account_id, data=data)
         return ""
         
     def get_cost_loop(self, account_id, data=None):
