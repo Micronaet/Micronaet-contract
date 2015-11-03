@@ -324,10 +324,12 @@ class hr_analytic_timesheet(osv.osv):
         if line_ids: 
             line_pool.unlink(cr, uid, line_ids, context=context)
 
+        month = from_date[5:7]
+        year = from_date[:4]
         calendar_database = self.get_calendar(cr, uid, {
             # use from date for get month and year (always refer to month)
-            'month': from_date[5:7],
-            'year': from_date[:4],
+            'month': month,
+            'year': year,
             'user_ids': user_ids,
             }, origin='importation', context=context)
 
@@ -357,8 +359,9 @@ class hr_analytic_timesheet(osv.osv):
                     'update_log_id': update_log_id, # parent log
                     'amount': amount,
                     'user_id': reference.user_id.id,
-                    'name': _('Month %s refound user %s (tot.: %s') % (
-                        'month', # TODO
+                    'name': _('Period %s/%s refound user %s (tot. H.: %s') % (
+                        month,
+                        year,
                         reference.user_id.name, 
                         refound_hours, # to split
                         ),
