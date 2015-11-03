@@ -309,7 +309,7 @@ class hr_analytic_timesheet(osv.osv):
                         _logger.error('Generic error in refound DB :%' % (
                             sys.exc_info(),
                             ))
-            except: # TODO log?                
+            except: # TODO log error on record?                
                 _logger.error('Employee update: %s' % cost.employee_id.name)
                 _logger.error(sys.exc_info(), )
                 continue
@@ -338,6 +338,7 @@ class hr_analytic_timesheet(osv.osv):
             'user_ids': user_ids,
             }, origin='importation', context=context)
 
+        error_count = 0    
         for key in refound_db: # key = user_id
             reference = refound_db[key][1] # browse of analytic line
             
@@ -346,6 +347,7 @@ class hr_analytic_timesheet(osv.osv):
                     reference.user_id.name,
                     ))
                 _logger.error(error[-1])
+                error_count += 1
                 continue
                 
             # Create coefficient for split refound:                        
@@ -403,7 +405,15 @@ class hr_analytic_timesheet(osv.osv):
                     #'expense_id': ,
                     #'km_import_id': ,
                     }, context=context)
-                
+
+        # Re-write error for cover refound elements:
+        if error_count:
+            error_text = ''
+            for value in error:
+                error_text += "%s\n" % value
+     
+            log_pool.write(cr, uid, update_log_id, {
+                'error': error_text}, context=context)
             
     # -------------------------------------------------------------------------
     #                               Schedule operations:
