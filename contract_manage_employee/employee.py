@@ -369,9 +369,9 @@ class hr_analytic_timesheet(osv.osv):
                     'date': '%s-01' % reference.date[:7], # TODO Check
                     'company_id': reference.company_id.id,
                     'account_id': account_id,
-                    'general_account_id': reference.company_id.id,
-                    'product_id': reference.company_id.id,
-                    'product_uom_id': reference.company_id.id,
+                    'general_account_id': reference.general_account_id.id,
+                    'product_id': reference.product_id.id,
+                    'product_uom_id': reference.product_uom_id.id,
                     'journal_id': refound_journal_id,
                     
                     # Unused or empty fields:
