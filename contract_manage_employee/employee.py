@@ -281,8 +281,12 @@ class hr_analytic_timesheet(osv.osv):
                         }, context=context)
 
                     # Save value for refound pool:
-                    try:
-                        # TODO: Jump leave contract!!!!
+                    try:                        
+                        # Check if is a leave or vacation account
+                        if line.account_id.not_working or line.account_id.is_recover:
+                            continue # jump
+                        
+                        # Populate refound database (for after)
                         user_id = cost.employee_id.user_id.id
                         if user_id not in refound_db:
                             # only the first time
