@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenERP Server 6.0.4\n"
 "Report-Msgid-Bugs-To: support@openerp.com\n"
-"POT-Creation-Date: 2015-09-24 06:38+0000\n"
-"PO-Revision-Date: 2015-09-24 08:24+0100\n"
+"POT-Creation-Date: 2015-11-03 10:54+0000\n"
+"PO-Revision-Date: 2015-11-03 11:43+0100\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -18,29 +18,50 @@ msgstr ""
 "X-Generator: Poedit 1.6.10\n"
 
 #. module: contract_manage_employee
+#: field:contract.employee.festivity,month:0
+msgid "Static month"
+msgstr "Mese statico"
+
+#. module: contract_manage_employee
+#: model:ir.model,name:contract_manage_employee.model_contract_employee_festivity
+msgid "Contract festivity"
+msgstr "Festività contratto"
+
+#. module: contract_manage_employee
+#: model:ir.model,name:contract_manage_employee.model_contract_employee_timesheet_tipology
+msgid "Timesheet tipology"
+msgstr "Tipologia di foglio presenze"
+
+#. module: contract_manage_employee
 #: model:ir.model,name:contract_manage_employee.model_hr_employee_force_log
 msgid "Employee force log"
 msgstr "Log forzatura costi"
 
 #. module: contract_manage_employee
-#: field:hr.employee.hour.cost,new:0
-msgid "New product"
-msgstr "Nuovo prodotto"
+#: selection:contract.employee.timesheet.tipology.line,week_day:0
+msgid "Tuesday"
+msgstr "Martedì"
 
 #. module: contract_manage_employee
-#: help:contract.employee.festivity,periodic:0
-msgid ""
-"Festivity is only for a from-to period (ex.: Patronal festivity but for a "
-"period because of changing city)"
-msgstr ""
-"Festitivà solo per un determinato periodo [da-a] (es.: Festa patronale "
-"vincolata ad un periodo per cambio sede legale successiva)"
+#: field:contract.employee.timesheet.tipology.line,week_day:0
+msgid "Week day"
+msgstr "Giorno settimana"
 
 #. module: contract_manage_employee
-#: code:addons/contract_manage_employee/wizard/wizard_employee.py:203
+#: model:ir.ui.menu,name:contract_manage_employee.contract_report_force_root_menuitem
+msgid "Hour cost"
+msgstr "Costo orario"
+
+#. module: contract_manage_employee
+#: code:addons/contract_manage_employee/employee.py:804
 #, python-format
-msgid "Fount more employee: %s %s"
-msgstr "Trovate più ricorrenze impiegato: %s %s"
+msgid "%s hour cost %s >> %s\n"
+msgstr "%s costo orario %s >> %s\n"
+
+#. module: contract_manage_employee
+#: selection:contract.employee.timesheet.tipology.line,week_day:0
+msgid "Saturday"
+msgstr "Sabato"
 
 #. module: contract_manage_employee
 #: help:contract.employee.festivity,static:0
@@ -52,24 +73,57 @@ msgstr ""
 "dic.), altimenti è considerata dinamica (es. Lunedì dell'angelo)"
 
 #. module: contract_manage_employee
+#: field:hr.employee.hour.cost,hour_cost_new:0
+msgid "New hour cost"
+msgstr "Nuovo costo orario"
+
+#. module: contract_manage_employee
+#: selection:contract.employee.timesheet.tipology.line,week_day:0
+msgid "Thursday"
+msgstr "Giovedì"
+
+#. module: contract_manage_employee
+#: view:hr.employee.force.log:0 field:hr.employee.force.log,note:0
+msgid "Note"
+msgstr "Note"
+
+#. module: contract_manage_employee
+#: view:contract.employee.festivity:0
+msgid "Dynamic date"
+msgstr "Data dinamica"
+
+#. module: contract_manage_employee
 #: selection:contract.employee.timesheet.tipology.line,week_day:0
 msgid "Sunday"
 msgstr "Domenica"
 
 #. module: contract_manage_employee
-#: field:contract.employee.festivity,periodic:0
-msgid "Periodic festivity"
-msgstr "Festività periodica"
+#: model:ir.actions.act_window,name:contract_manage_employee.action_view_contract_employee_festivity_dynamic
+msgid "Festivity (dynamic)"
+msgstr "Festività (dinamica)"
 
 #. module: contract_manage_employee
-#: field:hr.employee.hour.cost,current_product_id:0
-msgid "Current product"
-msgstr "Prodotto attuale"
+#: view:contract.employee.timesheet.tipology:0
+msgid "Details"
+msgstr "Dettagli"
 
 #. module: contract_manage_employee
-#: field:hr.employee.force.hour.wizard,department_id:0
-msgid "Department"
-msgstr "Dipartimento"
+#: field:hr.employee.hour.cost,hour_cost:0
+#: model:ir.actions.act_window,name:contract_manage_employee.action_hr_employee_hour_cost
+msgid "Current hour cost"
+msgstr "Costo orario attuale"
+
+#. module: contract_manage_employee
+#: code:addons/contract_manage_employee/employee.py:148
+#, python-format
+msgid "%s. Error no hour cost: %s %s [%s]"
+msgstr "%s. Errore non presente costo orario: %s %s [%s]"
+
+#. module: contract_manage_employee
+#: code:addons/contract_manage_employee/employee.py:392
+#, python-format
+msgid "Period %s/%s refound user %s (H.: %6.2f/%s)"
+msgstr "Periodo %s/%s recupero utente %s (H.: %6.2f/%s)"
 
 #. module: contract_manage_employee
 #: view:hr.employee.force.log:0
@@ -88,9 +142,57 @@ msgid "Festivity"
 msgstr "Festività"
 
 #. module: contract_manage_employee
+#: field:hr.employee.hour.cost,product_id:0
+#: model:ir.model,name:contract_manage_employee.model_product_product
+msgid "Product"
+msgstr "Prodotti"
+
+#. module: contract_manage_employee
+#: model:ir.model,name:contract_manage_employee.model_account_analytic_line
+msgid "Analytic Line"
+msgstr "Linea conto analitico"
+
+#. module: contract_manage_employee
+#: field:contract.employee.festivity,name:0
+#: field:contract.employee.timesheet.tipology,name:0
+#: field:hr.employee.force.log,name:0
+msgid "Description"
+msgstr "Descrizione"
+
+#. module: contract_manage_employee
+#: model:ir.actions.act_window,help:contract_manage_employee.action_hr_employee_hour_cost
+msgid "Current situation of employee product and hour cost"
+msgstr "Situazione attuale di impiegati prodotti e costi"
+
+#. module: contract_manage_employee
+#: model:ir.ui.menu,name:contract_manage_employee.menu_configuration_contract_tipology_contract
+msgid "Contracts"
+msgstr "Contratti"
+
+#. module: contract_manage_employee
+#: code:addons/contract_manage_employee/employee.py:185
+#, python-format
+msgid "%s. Fount more employee: %s %s [%s]"
+msgstr "%s. Trovato piu' di un impiegato: %s %s [%s]"
+
+#. module: contract_manage_employee
 #: selection:contract.employee.timesheet.tipology.line,week_day:0
 msgid "Friday"
 msgstr "Venerdì"
+
+#. module: contract_manage_employee
+#: field:contract.employee.festivity,periodic:0
+msgid "Periodic festivity"
+msgstr "Festività periodica"
+
+#. module: contract_manage_employee
+#: help:hr.employee,contract_tipology_id:0
+msgid ""
+"Working time for this employee, tipically a contract tipology, like: full "
+"time, part time etc. (for manage hour and presence)"
+msgstr ""
+"Orario lavorativo per dipendente, tipicamente per tipologia di contratto, "
+"come: part time, full time, ecc. (per gestire le ore di presenza)"
 
 #. module: contract_manage_employee
 #: field:contract.employee.festivity,dynamic_date:0
@@ -98,10 +200,49 @@ msgid "Dynamic Date"
 msgstr "Data dinamica"
 
 #. module: contract_manage_employee
-#: code:addons/contract_manage_employee/employee.py:264
+#: code:addons/contract_manage_employee/employee.py:725
 #, python-format
 msgid "Hour cost: %s"
 msgstr "Costo orario: %s"
+
+#. module: contract_manage_employee
+#: code:addons/contract_manage_employee/employee.py:480
+#, python-format
+msgid "Auto import [month: %s-%s]"
+msgstr "Auto importazione [mese: %s-%s]"
+
+#. module: contract_manage_employee
+#: field:contract.employee.festivity,periodic_from:0
+msgid "From year"
+msgstr "Dall'anno"
+
+#. module: contract_manage_employee
+#: field:hr.employee,contract_tipology_id:0
+msgid "Work time"
+msgstr "Orario lavorativo"
+
+#. module: contract_manage_employee
+#: code:addons/contract_manage_employee/employee.py:178
+#, python-format
+msgid "%s. Double in CSV file: %s %s [%s]"
+msgstr "%s. Doppio nel file CSV: %s %s [%s]"
+
+#. module: contract_manage_employee
+#: constraint:hr.employee:0
+msgid "Error ! You cannot create recursive Hierarchy of Employees."
+msgstr "Errore ! Non è possibile creare gerarchie ricorsive di impiegati."
+
+#. module: contract_manage_employee
+#: code:addons/contract_manage_employee/employee.py:136
+#, python-format
+msgid "%s. Record different format: %s (col.: %s)"
+msgstr "%s. Formato differente del record: %s (col.: %s)"
+
+#. module: contract_manage_employee
+#: model:ir.actions.act_window,name:contract_manage_employee.action_hr_employee_force_log
+#: model:ir.ui.menu,name:contract_manage_employee.hr_employee_force_log_menuitem
+msgid "Log cost change"
+msgstr "Log cambio costi"
 
 #. module: contract_manage_employee
 #: view:contract.employee.timesheet.tipology:0
@@ -112,9 +253,32 @@ msgid "Contract tipology"
 msgstr "Tipologia di contratto"
 
 #. module: contract_manage_employee
-#: model:ir.actions.act_window,name:contract_manage_employee.action_view_contract_employee_festivity_dynamic
-msgid "Festivity (dynamic)"
-msgstr "Festività (dinamica)"
+#: code:addons/contract_manage_employee/employee.py:65
+#, python-format
+msgid "Intervent refound"
+msgstr "Recupero intervento"
+
+#. module: contract_manage_employee
+#: view:hr.employee.force.log:0
+msgid "Analytic line"
+msgstr "Righe analitiche"
+
+#. module: contract_manage_employee
+#: view:hr.employee.force.log:0
+msgid "Update lines"
+msgstr "Aggiorna righe"
+
+#. module: contract_manage_employee
+#: code:addons/contract_manage_employee/employee.py:189
+#, python-format
+msgid "%s. Employee not found: %s %s [%s]"
+msgstr "%s. Impiegato non trovato: %s %s [%s]"
+
+#. module: contract_manage_employee
+#: field:hr.employee.hour.cost,employee_id:0
+#: model:ir.model,name:contract_manage_employee.model_hr_employee
+msgid "Employee"
+msgstr "Impiegato"
 
 #. module: contract_manage_employee
 #: constraint:hr.employee:0
@@ -125,97 +289,39 @@ msgstr ""
 "manager."
 
 #. module: contract_manage_employee
-#: help:hr.employee.force.hour.wizard,from_date:0
-msgid "Choose the date, every intervent from that date take costs"
+#: help:contract.employee.festivity,periodic:0
+msgid ""
+"Festivity is only for a from-to period (ex.: Patronal festivity but for a "
+"period because of changing city)"
 msgstr ""
-"Scegli la data, ogni intervento con data >= di quella impostata prende il "
-"nuovo costo"
+"Festitivà solo per un determinato periodo [da-a] (es.: Festa patronale "
+"vincolata ad un periodo per cambio sede legale successiva)"
 
 #. module: contract_manage_employee
-#: model:ir.model,name:contract_manage_employee.model_hr_employee_hour_cost
-msgid "Employee load hour cost"
-msgstr "Carica costo orario impiegato"
+#: selection:contract.employee.timesheet.tipology.line,week_day:0
+msgid "Wednesday"
+msgstr "Mercoledì"
 
 #. module: contract_manage_employee
-#: field:account.analytic.line,update_log_id:0
-msgid "Auto update"
-msgstr "Auto aggiornamento"
+#: field:contract.employee.timesheet.tipology,line_ids:0
+msgid "Lines"
+msgstr "Linee"
 
 #. module: contract_manage_employee
-#: field:contract.employee.festivity,day:0
-msgid "Static day"
-msgstr "Giorno statico"
-
-#. module: contract_manage_employee
-#: field:contract.employee.timesheet.tipology.line,name:0
-msgid "Tot. hours"
-msgstr "Tot. ore"
-
-#. module: contract_manage_employee
-#: field:hr.employee.force.hour.wizard,from_date:0
-#: field:hr.employee.force.log,from_date:0
-msgid "From date"
-msgstr "Dalla data"
-
-#. module: contract_manage_employee
-#: field:hr.employee.force.hour.wizard,operation:0
-msgid "Operation"
-msgstr "Operatione"
-
-#. module: contract_manage_employee
-#: view:hr.employee.force.hour.wizard:0
-#: selection:hr.employee.force.hour.wizard,operation:0
-msgid "Load current"
-msgstr "Carica utenti"
-
-#. module: contract_manage_employee
-#: view:contract.employee.festivity:0
-msgid "Dynamic date"
-msgstr "Data dinamica"
-
-#. module: contract_manage_employee
-#: field:contract.employee.timesheet.tipology.line,week_day:0
-msgid "Week day"
-msgstr "Giorno settimana"
-
-#. module: contract_manage_employee
-#: field:hr.employee.hour.cost,hour_cost:0
-#: model:ir.actions.act_window,name:contract_manage_employee.action_hr_employee_hour_cost
-msgid "Current hour cost"
-msgstr "Costo orario attuale"
-
-#. module: contract_manage_employee
-#: field:hr.employee.hour.cost,employee_id:0
-#: model:ir.model,name:contract_manage_employee.model_hr_employee
-msgid "Employee"
-msgstr "Impiegato"
-
-#. module: contract_manage_employee
-#: code:addons/contract_manage_employee/wizard/wizard_employee.py:181
+#: code:addons/contract_manage_employee/employee.py:129
 #, python-format
-msgid "Error no hour cost: %s %s"
-msgstr "Nessun costo orario: %s %s"
+msgid "%s. Empty line (jumped)"
+msgstr "%s. Riga vuota (saltata)"
 
 #. module: contract_manage_employee
-#: model:ir.model,name:contract_manage_employee.model_contract_employee_timesheet_tipology
-msgid "Timesheet tipology"
-msgstr "Tipologia di foglio presenze"
+#: view:hr.employee.force.log:0 field:hr.employee.force.log,error:0
+msgid "Error"
+msgstr "Errore"
 
 #. module: contract_manage_employee
-#: field:contract.employee.festivity,periodic_from:0
-msgid "From year"
-msgstr "Dall'anno"
-
-#. module: contract_manage_employee
-#: field:hr.employee.hour.cost,hour_cost_new:0
-msgid "New hour cost"
-msgstr "Nuovo costo orario"
-
-#. module: contract_manage_employee
-#: code:addons/contract_manage_employee/wizard/wizard_employee.py:91
-#, python-format
-msgid "Auto import [month: %s-%s]"
-msgstr "Auto importazione [mese: %s-%s]"
+#: field:product.product,update_price_date:0
+msgid "Update price"
+msgstr "Aggiorna prezzo"
 
 #. module: contract_manage_employee
 #: field:product.product,product_employee_id:0
@@ -233,230 +339,10 @@ msgid "Employee force hour cost"
 msgstr "Forza costo orario impiegato"
 
 #. module: contract_manage_employee
-#: code:addons/contract_manage_employee/wizard/wizard_employee.py:167
-#, python-format
-msgid "Record different format: %s (col.: %s)"
-msgstr "Riga CSV con colonne diverse: %s (col.: %s)"
-
-#. module: contract_manage_employee
-#: selection:contract.employee.timesheet.tipology.line,week_day:0
-msgid "Monday"
-msgstr "Lunedì"
-
-#. module: contract_manage_employee
-#: view:contract.employee.festivity:0
-msgid "Static date"
-msgstr "Data statica"
-
-#. module: contract_manage_employee
-#: selection:contract.employee.timesheet.tipology.line,week_day:0
-msgid "Tuesday"
-msgstr "Martedì"
-
-#. module: contract_manage_employee
-#: code:addons/contract_manage_employee/wizard/wizard_employee.py:151
-#, python-format
-msgid "No file found for import: %s"
-msgstr "File CSV non trovato: %s"
-
-#. module: contract_manage_employee
-#: code:addons/contract_manage_employee/wizard/wizard_employee.py:207
-#, python-format
-msgid "Employee not found: %s %s"
-msgstr "Impiegato non trovato (o non più attivo): %s %s"
-
-#. module: contract_manage_employee
-#: model:ir.ui.menu,name:contract_manage_employee.menu_configuration_contract_festivity_static
-msgid "Static"
-msgstr "Statico"
-
-#. module: contract_manage_employee
-#: field:contract.employee.festivity,month:0
-msgid "Static month"
-msgstr "Mese statico"
-
-#. module: contract_manage_employee
-#: code:addons/contract_manage_employee/employee.py:346
-#, python-format
-msgid "%s hour cost %s >> %s\n"
-msgstr "%s costo orario %s >> %s\n"
-
-#. module: contract_manage_employee
-#: view:hr.employee.force.log:0 field:hr.employee.force.log,note:0
-msgid "Note"
-msgstr "Note"
-
-#. module: contract_manage_employee
-#: view:hr.employee.force.hour.wizard:0
-msgid "Force employe hour cost wizard"
-msgstr "Forza costo orario"
-
-#. module: contract_manage_employee
-#: model:ir.actions.act_window,name:contract_manage_employee.hr_employee_force_hour_wizard_action
-msgid "Force hour cost"
-msgstr "Forza costo orario"
-
-#. module: contract_manage_employee
-#: help:hr.employee,contract_tipology_id:0
-msgid ""
-"Working time for this employee, tipically a contract tipology, like: full "
-"time, part time etc. (for manage hour and presence)"
-msgstr ""
-"Orario lavorativo per dipendente, tipicamente per tipologia di contratto, "
-"come: part time, full time, ecc. (per gestire le ore di presenza)"
-
-#. module: contract_manage_employee
-#: model:ir.model,name:contract_manage_employee.model_account_analytic_line
-msgid "Analytic Line"
-msgstr "Linea conto analitico"
-
-#. module: contract_manage_employee
-#: code:addons/contract_manage_employee/employee.py:354
+#: code:addons/contract_manage_employee/employee.py:812
 #, python-format
 msgid "Forced costs from date: %s"
 msgstr "Forza costi da data: %s"
-
-#. module: contract_manage_employee
-#: model:ir.actions.act_window,help:contract_manage_employee.action_hr_employee_hour_cost
-msgid "Current situation of employee product and hour cost"
-msgstr "Situazione attuale di impiegati prodotti e costi"
-
-#. module: contract_manage_employee
-#: model:ir.ui.menu,name:contract_manage_employee.menu_configuration_contract_tipology_contract
-msgid "Contracts"
-msgstr "Contratti"
-
-#. module: contract_manage_employee
-#: selection:hr.employee.force.hour.wizard,mode:0
-msgid "From file"
-msgstr "From file"
-
-#. module: contract_manage_employee
-#: constraint:hr.employee:0
-msgid "Error ! You cannot create recursive Hierarchy of Employees."
-msgstr "Errore ! Non è possibile creare gerarchie ricorsive di impiegati."
-
-#. module: contract_manage_employee
-#: selection:contract.employee.timesheet.tipology.line,week_day:0
-msgid "Wednesday"
-msgstr "Mercoledì"
-
-#. module: contract_manage_employee
-#: view:hr.employee.force.log:0 field:hr.employee.force.log,error:0
-msgid "Error"
-msgstr "Errore"
-
-#. module: contract_manage_employee
-#: view:hr.employee.force.hour.wizard:0
-msgid "Force"
-msgstr "Forza"
-
-#. module: contract_manage_employee
-#: field:contract.employee.festivity,static:0
-msgid "Static festivity"
-msgstr "Festività statica"
-
-#. module: contract_manage_employee
-#: view:hr.employee.force.hour.wizard:0
-msgid "Cancel"
-msgstr "Annulla"
-
-#. module: contract_manage_employee
-#: field:hr.employee.force.log,date:0
-msgid "Date operation"
-msgstr "Data operatione"
-
-#. module: contract_manage_employee
-#: selection:hr.employee.force.hour.wizard,mode:0
-msgid "From employee list"
-msgstr "Dalla lista impiegati"
-
-#. module: contract_manage_employee
-#: model:ir.model,name:contract_manage_employee.model_contract_employee_festivity
-msgid "Contract festivity"
-msgstr "Festività contratto"
-
-#. module: contract_manage_employee
-#: model:ir.ui.menu,name:contract_manage_employee.contract_report_force_root_menuitem
-msgid "Hour cost"
-msgstr "Hour cost"
-
-#. module: contract_manage_employee
-#: selection:contract.employee.timesheet.tipology.line,week_day:0
-msgid "Thursday"
-msgstr "Giovedì"
-
-#. module: contract_manage_employee
-#: selection:hr.employee.force.hour.wizard,operation:0
-msgid "Force update"
-msgstr "Forza aggiornamento"
-
-#. module: contract_manage_employee
-#: view:contract.employee.timesheet.tipology:0
-msgid "Details"
-msgstr "Dettagli"
-
-#. module: contract_manage_employee
-#: model:ir.actions.act_window,name:contract_manage_employee.action_hr_employee_force_log
-#: model:ir.ui.menu,name:contract_manage_employee.hr_employee_force_log_menuitem
-msgid "Log cost change"
-msgstr "Log cambio costi"
-
-#. module: contract_manage_employee
-#: field:hr.employee.hour.cost,product_id:0
-#: model:ir.model,name:contract_manage_employee.model_product_product
-msgid "Product"
-msgstr "Prodotti"
-
-#. module: contract_manage_employee
-#: field:contract.employee.festivity,name:0
-#: field:contract.employee.timesheet.tipology,name:0
-#: field:hr.employee.force.hour.wizard,name:0
-#: field:hr.employee.force.log,name:0
-msgid "Description"
-msgstr "Descrizione"
-
-#. module: contract_manage_employee
-#: field:hr.employee.force.log,line_ids:0
-msgid "Line update from this log"
-msgstr "Righe analitiche aggiornate da questa operazione"
-
-#. module: contract_manage_employee
-#: code:addons/contract_manage_employee/wizard/wizard_employee.py:196
-#, python-format
-msgid "Double in CSV file: %s %s"
-msgstr "Duplicato nel file CSV: %s %s"
-
-#. module: contract_manage_employee
-#: field:hr.employee,contract_tipology_id:0
-msgid "Work time"
-msgstr "Orario lavorativo"
-
-#. module: contract_manage_employee
-#: view:hr.employee.force.log:0
-msgid "Analytic line"
-msgstr "Righe analitiche"
-
-#. module: contract_manage_employee
-#: code:addons/contract_manage_employee/wizard/wizard_employee.py:161
-#, python-format
-msgid "Empty line (jumped): %s"
-msgstr "Riga vuota (saltata): %s"
-
-#. module: contract_manage_employee
-#: model:ir.actions.act_window,name:contract_manage_employee.action_view_contract_employee_festivity
-msgid "Festivity (static)"
-msgstr "Festitivà (statica)"
-
-#. module: contract_manage_employee
-#: field:contract.employee.timesheet.tipology,line_ids:0
-msgid "Lines"
-msgstr "Linee"
-
-#. module: contract_manage_employee
-#: field:hr.employee.force.hour.wizard,mode:0
-msgid "Mode"
-msgstr "Mode"
 
 #. module: contract_manage_employee
 #: help:product.product,product_employee_id:0
@@ -469,9 +355,50 @@ msgid "All intervent from this date will use new value"
 msgstr "Tutti gli interventi da questa data utilizzano il nuovo valore"
 
 #. module: contract_manage_employee
+#: model:ir.model,name:contract_manage_employee.model_hr_employee_hour_cost
+msgid "Employee load hour cost"
+msgstr "Carica costo orario impiegato"
+
+#. module: contract_manage_employee
+#: selection:contract.employee.timesheet.tipology.line,week_day:0
+msgid "Monday"
+msgstr "Lunedì"
+
+#. module: contract_manage_employee
+#: field:account.analytic.line,update_log_id:0
+msgid "Auto update"
+msgstr "Auto aggiornamento"
+
+#. module: contract_manage_employee
+#: view:contract.employee.festivity:0
+msgid "Static date"
+msgstr "Data statica"
+
+#. module: contract_manage_employee
+#: field:contract.employee.festivity,day:0
+msgid "Static day"
+msgstr "Giorno statico"
+
+#. module: contract_manage_employee
+#: field:contract.employee.festivity,static:0
+msgid "Static festivity"
+msgstr "Festività statica"
+
+#. module: contract_manage_employee
 #: model:ir.ui.menu,name:contract_manage_employee.menu_configuration_contract_festivity_dynamic
 msgid "Dynamic"
 msgstr "Dinamico"
+
+#. module: contract_manage_employee
+#: field:contract.employee.timesheet.tipology.line,name:0
+msgid "Tot. hours"
+msgstr "Tot. ore"
+
+#. module: contract_manage_employee
+#: code:addons/contract_manage_employee/employee.py:119
+#, python-format
+msgid "No file found for import: %s"
+msgstr "Non trovato file per importazione: %s"
 
 #. module: contract_manage_employee
 #: constraint:product.product:0
@@ -479,16 +406,46 @@ msgid "Error: Invalid ean code"
 msgstr "Errore: codice EAN non valido"
 
 #. module: contract_manage_employee
-#: view:hr.employee.force.log:0
-msgid "Update lines"
-msgstr "Aggiorna righe"
+#: model:ir.ui.menu,name:contract_manage_employee.menu_configuration_contract_festivity_static
+msgid "Static"
+msgstr "Statico"
 
 #. module: contract_manage_employee
-#: selection:contract.employee.timesheet.tipology.line,week_day:0
-msgid "Saturday"
-msgstr "Sabato"
+#: field:hr.employee.force.log,from_date:0
+msgid "From date"
+msgstr "Dalla data"
+
+#. module: contract_manage_employee
+#: field:hr.employee.hour.cost,new:0
+msgid "New product"
+msgstr "Nuovo prodotto"
+
+#. module: contract_manage_employee
+#: field:hr.employee.force.log,date:0
+msgid "Date operation"
+msgstr "Data operatione"
+
+#. module: contract_manage_employee
+#: model:ir.actions.act_window,name:contract_manage_employee.action_view_contract_employee_festivity
+msgid "Festivity (static)"
+msgstr "Festitivà (statica)"
+
+#. module: contract_manage_employee
+#: model:ir.model,name:contract_manage_employee.model_hr_analytic_timesheet
+msgid "Timesheet Line"
+msgstr "Linea del Timesheet"
+
+#. module: contract_manage_employee
+#: field:hr.employee.force.log,line_ids:0
+msgid "Line update from this log"
+msgstr "Righe analitiche aggiornate da questa operazione"
 
 #. module: contract_manage_employee
 #: model:ir.model,name:contract_manage_employee.model_contract_employee_timesheet_tipology_line
 msgid "Timesheet tipology line"
 msgstr "linea tipo foglio ora"
+
+#. module: contract_manage_employee
+#: field:hr.employee.hour.cost,current_product_id:0
+msgid "Current product"
+msgstr "Prodotto attuale"
