@@ -374,10 +374,11 @@ class hr_analytic_timesheet(osv.osv):
                     'update_log_id': update_log_id, # parent log
                     'amount': amount,
                     'user_id': reference.user_id.id,
-                    'name': _('Period %s/%s refound user %s (tot. H.: %s)') % (
+                    'name': _('Period %s/%s refound user %s (H.: %6.2f/%s)') % (
                         month,
                         year,
                         reference.user_id.name, 
+                        unit_amount,
                         refound_hours, # to split
                         ),
                     'unit_amount': unit_amount,
@@ -408,7 +409,7 @@ class hr_analytic_timesheet(osv.osv):
 
         # Re-write error for cover refound elements:
         if error_count:
-            error_text = ''
+            error_text = _('\nREFOUND IMPORTATION:\n')
             for value in error:
                 error_text += "%s\n" % value
      
