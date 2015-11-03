@@ -39,6 +39,7 @@ class Parser(report_sxw.rml_parse):
         self.totals = {
             'hour': 0.0,
             'hour_cost': 0.0,
+            'refound': 0.0,
             'cost': 0.0,
             'invoice': 0.0,
             'operation':0.0,
@@ -48,6 +49,7 @@ class Parser(report_sxw.rml_parse):
         self.subtotals = {
             'hour': 0.0,
             'hour_cost': 0.0,
+            'refound': 0.0,
             'cost': 0.0,
             'invoice': 0.0,
             'operation': 0.0,
@@ -61,6 +63,7 @@ class Parser(report_sxw.rml_parse):
         self.t_cost = {}
         self.t_hour = {}
         self.t_hour_cost = {}
+        self.t_refound = {}
         self.t_invoice = {}
         self.t_operation = {}
         self.t_supplier = {}
@@ -77,6 +80,7 @@ class Parser(report_sxw.rml_parse):
         
             # Function called from ODT loop passing contract.id and data {}
             'intervent_proxy': self.get_intervent, # get intervent list
+            'refound_proxy': self.get_refound, # get refound loop            
             'cost_proxy': self.get_cost, # get costs list
             'invoice_proxy': self.get_invoice, # get invoice list
             'supplier_proxy': self.get_supplier, # get supplier invoice list
@@ -173,6 +177,8 @@ class Parser(report_sxw.rml_parse):
             return self.t_hour.get(account_id, 0.0)
         elif type_of == 'hour_cost':
             return self.t_hour_cost.get(account_id, 0.0)
+        elif type_of == 'refound':
+            return self.t_refound.get(account_id, 0.0)
         elif type_of == 'operation':    
             return self.t_operation.get(account_id, 0.0)
         elif type_of == 'supplier':
@@ -180,6 +186,7 @@ class Parser(report_sxw.rml_parse):
         elif type_of == 'balance':
             res = self.t_invoice.get(account_id, 0.0) + \
                 self.t_cost.get(account_id, 0.0) + \
+                self.t_refound.get(account_id, 0.0) + \
                 self.t_hour_cost.get(account_id, 0.0)
             self.subtotals[type_of] += res
             return res            
@@ -191,6 +198,7 @@ class Parser(report_sxw.rml_parse):
         self.t_cost = {}
         self.t_hour = {}
         self.t_hour_cost = {}
+        self.t_refound = {}
         self.t_invoice = {}
         self.t_operation = {}
         self.t_supplier = {}
@@ -222,6 +230,7 @@ class Parser(report_sxw.rml_parse):
         self.subtotals = {
             'hour': 0.0,
             'hour_cost': 0.0,
+            'refound': 0.0,
             'cost': 0.0,
             'invoice': 0.0,
             'operation': 0.0,
@@ -278,20 +287,20 @@ class Parser(report_sxw.rml_parse):
                 res += "Alla data %s; " % (
                     self.formatLang(data.get('end_date'), date = True))
 
-            res += "  [ %s - %s - %s - %s - %s - %s ]"%(
-                "interventi visibili" if data.get('intervent', True) \
-                    else "interventi non visibili", 
-                "costi visibili" if data.get('cost', True) \
-                    else "costi non visibili",
-                "fatture pass. visibili" if data.get('supplier', True) \
-                    else "fatture pass. non visibili",
-                "fatturato visibili" if data.get('invoice', True) \
-                    else "fatturato non visibili",
-                "bilancio periodo visibile" \
-                    if data.get('balance_summary', True) \
-                    else "bilancio periodo non visibile",
-                "bilancio visibili" if data.get('balance', True) \
-                    else "bilancio non visibili",
+            res += '  [ %s - %s - %s - %s - %s - %s ]' % (
+                'interventi visibili' if data.get(
+                    'intervent', True) else 'interventi non visibili', 
+                'costi visibili' if data.get(
+                    'cost', True) else 'costi non visibili',
+                'fatture pass. visibili' if data.get(
+                    'supplier', True) else 'fatture pass. non visibili',
+                'fatturato visibili' if data.get(
+                    'invoice', True) else 'fatturato non visibili',
+                'bilancio periodo visibile' if data.get(
+                    'balance_summary', True) \
+                    else 'bilancio periodo non visibile',
+                'bilancio visibili' if data.get(
+                    'balance', True) else 'bilancio non visibili',
                 )
             return res                             
 
@@ -304,6 +313,8 @@ class Parser(report_sxw.rml_parse):
 
         if block == 'intervent':
             return data.get('hour', True)
+        if block == 'refound':
+            return data.get('refound', True)
         elif block == 'cost':
             return data.get('cost', True)
         elif block == 'invoice': 
@@ -405,6 +416,42 @@ class Parser(report_sxw.rml_parse):
         self.t_operation[account_id] = self.totals['operation']
         
         return intervent_proxy
+
+    def get_refound(self, account_id, data=None):
+        ''' Filter all account analytic record and return browse obj
+        '''    
+        if data is None: 
+            data = {}
+
+        # ------------------
+        # Domain generation:
+        # ------------------
+        journal_refound_id = self.pool.get(
+            'account.analytic.journal').get_refound_journal(self.cr, self.uid)
+
+        domain = [
+            ('account_id', '=', account_id),
+            ('journal_id', '=', journal_refound_id),
+            ]
+        start_date = data.get('start_date', False)
+        end_date = data.get('end_date', False)
+        
+        if start_date:
+            domain.append(('date', '>=', start_date))
+        if end_date:
+            domain.append(('date', '<=', end_date))
+
+        analytic_pool = self.pool.get('account.analytic.line')
+        analytic_ids = analytic_pool.search(self.cr, self.uid, domain)
+        analytic_proxy = analytic_pool.browse(
+            self.cr, self.uid, analytic_ids)
+
+        self.totals['refound'] = sum(
+            [analytic.amount or 0.0 for analytic in analytic_proxy])
+
+        self.t_refound[account_id] = self.totals['refound']
+        
+        return analytic_proxy
 
     def get_invoice(self, account_id, data=None):
         ''' Filter all account intervent and return browse obj

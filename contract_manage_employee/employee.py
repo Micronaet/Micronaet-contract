@@ -43,6 +43,31 @@ week_days = [
     ('su', 'Sunday'),
     ]
 
+class account_analytic_journal(osv.osv):
+    ''' Add extra function for refound journal
+    '''
+    _inherit = 'account.analytic.journal'
+    
+    # --------
+    # Utility:
+    # --------
+    def get_refound_journal(self, cr, uid, context=None):
+        ''' Get (and create the first time) refound journal
+        '''
+        refound_journal_ids = self.search(cr, uid, [
+            ('code', '=', 'REF')], context=context)
+            
+        if refound_journal_ids:
+            return refound_journal_ids[0]
+            
+        _logger.warning('Intervent refound (REF) journal not found created!')
+        return self.create(cr, uid, {
+            'name': _('Intervent refound'),
+            'code': 'REF',
+            'type': 'general',
+            }, context=context)
+account_analytic_journal()
+
 class hr_analytic_timesheet(osv.osv):
     ''' Extra function for scheduled procedure (ex wizard)
     '''
@@ -212,19 +237,9 @@ class hr_analytic_timesheet(osv.osv):
         _logger.info('Get Timesheet (code TS) journal for filter')
 
         # Refound timesheet elements (REF)
-        refound_journal_ids = journal_pool.search(cr, uid, [
-            ('code', '=', 'REF')], context=context)
-        if refound_journal_ids:
-            refound_journal_id = refound_journal_ids[0]
-        else: # Create journal
-            _logger.warning('Intervent refound (REF) journal not found!')
-            refound_journal_id = journal_pool.create(cr, uid, {
-                'name': _('Intervent refound'),
-                'code': 'REF',
-                'type': 'general',
-                }, context=context)
-            _logger.info('Created Intervent refound (REF) journal!')
         _logger.info('Get Intervent refound (code REF) journal for filter')
+        refound_journal_id =journal_pool.get_refound_journal(
+            cr, uid, context=context)
 
         # Create log (parent) operation (note: Logged before for get ID):
         # Note: Log operation before to get ID
@@ -409,10 +424,10 @@ class hr_analytic_timesheet(osv.osv):
 
         # Re-write error for cover refound elements:
         if error_count:
-            _logger.warning('Log refound operation on record')
-            error_text = _('\nREFOUND IMPORTATION:\n')
+            error_text = ''
             for value in error:
                 error_text += "%s\n" % value
+
             # Write      
             log_pool.write(cr, uid, update_log_id, {
                 'error': error_text}, context=context)
@@ -767,7 +782,6 @@ class hr_employee_force_log(osv.osv):
     """
     _name = 'hr.employee.force.log'
     _description = 'Employee force log'
-    _rec_name = 'name'
 
     def log_operation(self, cr, uid, name, from_date, error=None, 
             context=None):    
