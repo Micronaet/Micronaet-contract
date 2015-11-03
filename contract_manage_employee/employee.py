@@ -409,10 +409,11 @@ class hr_analytic_timesheet(osv.osv):
 
         # Re-write error for cover refound elements:
         if error_count:
+            _logger.warning('Log refound operation on record')
             error_text = _('\nREFOUND IMPORTATION:\n')
             for value in error:
                 error_text += "%s\n" % value
-     
+            # Write      
             log_pool.write(cr, uid, update_log_id, {
                 'error': error_text}, context=context)
             
