@@ -70,7 +70,6 @@ class account_analytic_expense_km(osv.osv):
 
         # Read paramters for write analytic enytry:
         # Purchase journal:
-        import pdb; pdb.set_trace()
         journal_id = journal_pool.get_journal_purchase(
             cr, uid, context=context)
 
