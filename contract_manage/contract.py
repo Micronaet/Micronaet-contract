@@ -74,8 +74,8 @@ class account_analytic_journal(osv.osv):
     def get_journal_purchase(self, cr, uid, context=None):
         ''' Search or create journal for purchase accounting
         '''
-        code_ids = self.search(cr, uid, [
-            ('code', '=', 'PUR')], context=context)
+        code_ids = self.search(cr, uid, [('code', '=', 'PUR')], 
+            context=context)
         if code_ids:
             return code_ids[0]
             
