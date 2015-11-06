@@ -51,11 +51,13 @@ class account_analytic_expense_km(osv.osv):
     # -------------------------------------------------------------------------
     def schedule_csv_accounting_transport_movement_import(
             self, cr, uid, path='~/etl/transport', separator=';', header=0, 
-            general_code='410100', context=None):
+            general_code='410100', from_month=9, context=None):
         ''' Import function that read in:
             path: folder where all transport Km file are
             separator: csv file format have this column separator
             header: and total line header passed
+            general_code: general account code
+            from_month: number of colum for import extra discount
             context: context for this function
         '''
         from os.path import isfile, join
@@ -69,6 +71,7 @@ class account_analytic_expense_km(osv.osv):
 
         # Read paramters for write analytic enytry:
         # Purchase journal:
+        import pdb; pdb.set_trace()
         journal_id = journal_pool.get_journal_purchase(
             cr, uid, context=context)
 
@@ -125,7 +128,7 @@ class account_analytic_expense_km(osv.osv):
                                 i, len(contract_ids), code))
                         continue
                     
-                    for i in range(1, len(line)):
+                    for i in range(from_month, len(line)):
                         amount = csv_pool.decode_float(line[i])
                         
                         line_pool.create(cr, uid, {
@@ -137,10 +140,10 @@ class account_analytic_expense_km(osv.osv):
                             'general_account_id': general_id,
                             'journal_id': journal_id, 
                             'date': '2015-%02d-01' % i, # TODO
-                            
+
                             # Link to import record:
                             'km_import_id': parent_id,
-                            
+
                             # Not used:
                             #'company_id', 'code', 'currency_id', 'move_id',
                             #'product_id', 'product_uom_id', 'amount_currency',

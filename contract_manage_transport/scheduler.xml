@@ -11,7 +11,7 @@
 			<field eval="5" name="priority"/>
 			<field eval="0" name="doall"/>
 			<field eval="1" name="active"/>
-			<field name="args">('~/etl/transport', ';', 0)</field>
+			<field name="args">('~/etl/transport', ';', 0, '410100', 9)</field>
 			<field eval="1" name="interval_number"/>
 			<field eval="&quot;&quot;&quot;account.analytic.expense.km&quot;&quot;&quot;" name="model"/>
 		</record>
