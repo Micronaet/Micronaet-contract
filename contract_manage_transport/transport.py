@@ -35,7 +35,6 @@ from tools import (DEFAULT_SERVER_DATE_FORMAT,
     DATETIME_FORMATS_MAP, 
     )
 
-
 _logger = logging.getLogger(__name__)
 
 class account_analytic_expense_km(osv.osv):
