@@ -879,6 +879,7 @@
                 <field name="department_id"  widget="selection" />
                 <field name="city_id" />
                 <field name="location_site" />
+                <field name="total_trip_km" />
                 <field name="operation" string="Oper."/>
                 <field name="amount_operation" string="Q. op."/>
                 <field name="amount_operation_etl" string="Q. op. ETL"/>
