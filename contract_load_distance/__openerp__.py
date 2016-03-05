@@ -18,22 +18,24 @@
 ###############################################################################
 
 {
-    'name': '',
+    'name': 'City distance from company',
     'version': '0.1',
-    'category': '',
-    'description': '''        
+    'category': 'Utility',
+    'description': '''  
+        Calculate distance from company and city      
         ''',
     'author': 'Micronaet S.r.l. - Nicola Riolini',
     'website': 'http://www.micronaet.it',
     'license': 'AGPL-3',
     'depends': [
         'base',
+        'l10n_it_base',
         ],
     'init_xml': [],
     'demo': [],
     'data': [
-        #'security/ir.model.access.csv',    
-        #'_view.xml',
+        #'security/ir.model.access.csv',
+        'distance_view.xml',
         ],
     'active': False,
     'installable': True,

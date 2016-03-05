@@ -39,11 +39,17 @@ from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT,
 
 _logger = logging.getLogger(__name__)
 
-class ResCity(osv.osv):
-    """ Model name: City
-    """
-    
-    _inherit = 'res.city'
+class res_city(osv.osv):
+    ''' Object relation for join analytic account with city
+    '''
+    _inherit = "res.city"
+
+    _columns = {
+        'trip_km': fields.float('Trip km (average)', digits=(16, 2),
+            help="Km average for headquarter"),
+        'tour_km': fields.float('Tour km (average)', digits=(16, 2),
+            help="Km average for tour in the city"),
+        }
     
     # -------------------------------------------------------------------------
     #                             Private function:

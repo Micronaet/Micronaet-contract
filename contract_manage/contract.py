@@ -843,6 +843,7 @@ class hr_department_extra(osv.osv):
         }
 hr_department_extra()
 
+# TODO remove: vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
 class res_city(osv.osv):
     ''' Object relation for join analytic account with city
     '''
@@ -856,6 +857,7 @@ class res_city(osv.osv):
             help="Km average for tour in the city"),
         }
 res_city()
+# REMOVE ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 class res_city_relation(osv.osv):
     ''' Object relation for join analytic account with city

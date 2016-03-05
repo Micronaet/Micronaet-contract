@@ -45,6 +45,7 @@
         'report_aeroo',
         'report_aeroo_ooo',
         'csv_base',
+        'contract_load_distance',
         ],
     'init_xml': [], 
     'update_xml': [
