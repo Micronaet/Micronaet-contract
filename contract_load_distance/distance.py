@@ -20,21 +20,9 @@
 import os
 import sys
 import logging
-import openerp
 import urllib
-import openerp.netsvc as netsvc
-import openerp.addons.decimal_precision as dp
-from openerp.osv import fields, osv, expression, orm
+from osv import fields, osv
 from datetime import datetime, timedelta
-from dateutil.relativedelta import relativedelta
-from openerp import SUPERUSER_ID, api
-from openerp import tools
-from openerp.tools.translate import _
-from openerp.tools.float_utils import float_round as round
-from openerp.tools import (DEFAULT_SERVER_DATE_FORMAT, 
-    DEFAULT_SERVER_DATETIME_FORMAT, 
-    DATETIME_FORMATS_MAP, 
-    float_compare)
 
 
 _logger = logging.getLogger(__name__)
@@ -69,8 +57,8 @@ class res_city(osv.osv):
         try:
             return '%sorigins=%s&destinations=%s&sensor=false' % (
                 'http://maps.googleapis.com/maps/api/distancematrix/json?',
-                prepare_element(
-                   self, cr, uid, destination, context=context),
+                origin, 
+                destination,
                 )
         except IOError:
             return None
@@ -86,11 +74,12 @@ class res_city(osv.osv):
         company_pool = self.pool.get('res.company')
         company_ids = company_pool.search(cr, uid, [], context=context)
         company_proxy = company_pool.browse(
-            cr, uid, company_ids, context=context)
-        partner = company_proxy.partner_id        
+            cr, uid, company_ids, context=context)[0]
+        partner = company_proxy.partner_id.address[0] # TODO find default!!!
         origin = self._prepare_element(
-            cr, uid, partner.street, partner.zip, partner.city, 'Italia', 
-            context=context),
+            cr, uid, partner.street, partner.zip, partner.city, 
+            partner.country_id.name, context=context),
+        _logger.info('Origin query: %s' % origin)
 
         # ---------------------------------------------------------------------
         #                      Loop on city passed:
@@ -98,15 +87,24 @@ class res_city(osv.osv):
         city_pool = self.pool.get('res.city')
         for city in city_pool.browse(cr, uid, ids, context=context):
             destination = self._prepare_element(
-                cr, uid, '', city.zip, city.city, 'Italia', 
+                cr, uid, '', 
+                city.zip, 
+                '%s (%s)' % (
+                    city.name, city.province_id.code), 
+                'Italia', 
                 context=context),        
             query = self._distance_query(origin, destination)        
             response = eval(urllib.urlopen(query).read())
+            trip_km = 0.0
             try:
-                trip_km = response['rows'][0]['elements'][0][
-                    'distance']['value'] / 1000.0  # km
+                status = response.get('status', False)
+                if status == 'OK':                    
+                    trip_km = response['rows'][0]['elements'][0][
+                        'distance']['value'] / 1000.0  # km
+                    _logger.info('Destination query: %s' % destination)
+                    _logger.info('Google response: %s' % response)
             except:    
-                trip_km = 0.0
+                pass
             if trip_km:
                 city_pool.write(cr, uid, city.id, {
                     'trip_km': trip_km, }, context=context)
@@ -124,9 +122,8 @@ class res_city(osv.osv):
         
         # Update all:
         return self.update_distance_from_google(
-            cr, uid, item_ids, context=context)        
-    
-ResCity()
+            cr, uid, item_ids, context=context)    
+res_city()
 
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

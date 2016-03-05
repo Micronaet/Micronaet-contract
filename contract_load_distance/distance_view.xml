@@ -11,7 +11,7 @@
                <field name="province_id" position="after">
                   <field name="trip_km" />
                   <field name="tour_km" />
-                  <button name="update_one_city_distance" string="Update Km" type="object" />
+                  <button name="update_one_city_distance" string="Update Km" type="object" icon="gtk-refresh"/>
                </field>
            </field>
         </record>
@@ -25,8 +25,8 @@
                   <separator string="Manage control:" colspan="4"/>
                   <field name="trip_km" />
                   <field name="tour_km" />                  
-                  <button name="update_one_city_distance" string="Update Km" type="object" />
-                  <button name="update_all_city_distance" string="Update Km" type="object" />
+                  <button name="update_one_city_distance" string="Update this Km" type="object" icon="gtk-refresh"/>
+                  <button name="update_all_city_distance" string="Update all city Km" type="object" icon="gtk-refresh"/>
                </field>
            </field>
         </record>
