@@ -42,10 +42,10 @@
                 <field name="account_analytic_id" colspan="4" domain="[('department_id','=',department_id),('state','=','open')]" context="{'tree_view_ref':'contract_manage.account_analytic__tree_tiny'}"  on_change="on_change_contract(account_analytic_id)"/>
 
                 <separator string="Location and trip" colspan="4" />
-                <group colspan="4" col="8">
-                   <field name="trip_type" />
-                   <field name="product_id" attrs="{'required':[('trip_type','!=',False)]}" />
-                   <field name="city_id" attrs="{'required':[('trip_type','!=',False)]}"  />
+                <group colspan="4" col="10">
+                   <field name="trip_type" on_change="onchange_destination_km(trip_type,city_id,account_analytic_id)"/>
+                   <field name="product_id" /> <!--attrs="{'required':[('trip_type','!=',False)]}"TODO Manage not presence!!!--> 
+                   <field name="city_id" attrs="{'required':[('trip_type','!=',False)]}"  on_change="onchange_destination_km(trip_type,city_id,account_analytic_id)" />
                    <field name="location_site" />
                    <field name="total_trip_km" />
                </group>

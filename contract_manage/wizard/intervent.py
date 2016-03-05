@@ -524,6 +524,46 @@ class account_analytic_intervent_wizard(osv.osv_memory):
             # TODO filter for operation (so no change)?
         return res
 
+    def onchange_destination_km(self, cr, uid, ids, trip_type, city_id,
+            account_analytic_id, context=None):
+        ''' Calculate Km for this intervent
+        '''
+        res = {'value': {}}
+        
+        if not(trip_type and city_id and account_analytic_id):
+            return res # do nothing
+            
+        # Check if city is in contract (may be different Km value):
+        account_pool = self.pool.get('account.analytic.account')
+        
+        contract_proxy = account_pool.browse(
+            cr, uid, account_analytic_id, context=context)
+        trip_km = 0.0
+        tour_km = 0.0    
+        for city in contract_proxy.filter_city_ids:
+            if city_id = city.id:
+                trip_km = city.trip_km
+                tour_km = city.tour_km
+                
+        # Check in city record:                
+        if not trip_km:
+            city_pool = self.pool.get('res.city')
+            city_proxy = city_pool.browse(cr, uid, city_id, context=context)
+            trip_km = city_proxy.trip_km
+            if not tour_km: # contract more power
+                tour_km = city_proxy.tour_km
+                        
+        if trip_type == 'all':
+            total_trip_km = trip_km + tour_km
+        elif trip_type == 'trip':
+            total_trip_km = trip_km
+        elif trip_type == 'tour':
+            total_trip_km = tour_km
+        else: 
+            return res    
+        res['value']['total_trip_km'] = total_trip_km
+        return res
+        
     def on_change_hours(self, cr, uid, ids, quantity, operation, amount_operation, context=None):
         ''' If operation if per hours copy the same value
         '''
