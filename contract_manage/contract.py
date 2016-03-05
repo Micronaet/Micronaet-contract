@@ -419,7 +419,7 @@ class account_analytic_expense(osv.osv):
 
                 # TODO Temporary: *********************************************
                 if (date <= '2015/10/01' and department_code == '1' and 
-                         code_type == 'transport'):# meter
+                         code_type == 'transport'): # meter
                     _logger.error(_( # TODO warning
                         '%s. 2015-10-01 Jump meter transport ledger: %s') % (
                             counter, account_code))
