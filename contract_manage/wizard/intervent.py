@@ -529,7 +529,7 @@ class account_analytic_intervent_wizard(osv.osv_memory):
             account_analytic_id, context=None):
         ''' Calculate Km for this intervent
         '''
-        res = {'value': {}}
+        res = {'value': {'total_trip_km': 0.0}}
         
         if not(trip_type and city_id and account_analytic_id):
             return res # do nothing
@@ -542,7 +542,7 @@ class account_analytic_intervent_wizard(osv.osv_memory):
         trip_km = 0.0
         tour_km = 0.0    
         for city in contract_proxy.filter_city_ids:
-            if city_id == city.id:
+            if city_id == city.name.id:
                 trip_km = city.trip_km
                 tour_km = city.tour_km
                 
