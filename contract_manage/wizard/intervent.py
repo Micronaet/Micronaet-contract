@@ -126,13 +126,13 @@ class account_analytic_intervent_wizard(osv.osv_memory):
             intervent_annotation=False, operation=False,
             amount_operation=False, city_id=False, activity_id=False, 
             mail_raccomanded=False, location_site=False, 
-            super_intervent=False, context=None):                              
+            super_intervent=False, total_trip_km=0.0, context=None):                              
 
         ''' Create analytic line
             used for Intervent element and Expense elements too
         '''
         # start record populate:
-        intervent_data= {
+        intervent_data = {
             'user_id': user_id,
             'account_id': account_id,
             'name': name,
@@ -146,18 +146,32 @@ class account_analytic_intervent_wizard(osv.osv_memory):
             'activity_id': activity_id,
             'location_site': location_site,
             'mail_raccomanded': mail_raccomanded,
+            'total_trip_km': total_trip_km,
             }
+
+        # ---------------------------------------------------------------------
+        #                        Normal intervent:                        
+        # ---------------------------------------------------------------------
+        if intervent_id and not super_intervent: 
+            # if has intervent_id is an extra cost:
+            analytic_line_proxy = self.pool.get('account.analytic.line')
+            intervent_data['extra_analytic_line_timesheet_id'] = intervent_id
             
-        if intervent_id and not super_intervent: # if has intervent_id is an extra cost:
-           analytic_line_proxy=self.pool.get('account.analytic.line')
-           intervent_data['extra_analytic_line_timesheet_id']= intervent_id
-        elif intervent_id and super_intervent:   # if has intervent_id and super_intervent, is a timesheet linked to group intervent
-           analytic_line_proxy=self.pool.get('hr.analytic.timesheet')
-           intervent_data['intervent_annotation']=intervent_annotation # Add extra field for intervent
-           intervent_data['superintervent_group_id']=intervent_id # link to group
-        else:            # use Timesheet:
-           analytic_line_proxy=self.pool.get('hr.analytic.timesheet')
-           intervent_data['intervent_annotation']=intervent_annotation # Add extra field for intervent
+        # ---------------------------------------------------------------------
+        #                         Super intervent:                        
+        # ---------------------------------------------------------------------
+        elif intervent_id and super_intervent:   
+            # if has intervent_id and super_intervent, is a timesheet linked to group intervent
+            analytic_line_proxy = self.pool.get('hr.analytic.timesheet')
+            # Add extra field for intervent
+            intervent_data['intervent_annotation'] = intervent_annotation 
+            # Link to group:
+            intervent_data['superintervent_group_id'] = intervent_id 
+            
+        else: # use Timesheet:
+           analytic_line_proxy = self.pool.get('hr.analytic.timesheet')
+           # Add extra field for intervent:
+           intervent_data['intervent_annotation'] = intervent_annotation 
 
         ## TODO vedere perchè non funziona con il giornale impostato su SALE
         amount_value = analytic_line_proxy.on_change_unit_amount(
@@ -229,6 +243,9 @@ class account_analytic_intervent_wizard(osv.osv_memory):
             company_id = item_wizard.user_id.company_id.id
             account_id = item_wizard.account_analytic_id.id
             
+            # -----------------------------------------------------------------
+            #                          Vacancy intervent:
+            # -----------------------------------------------------------------
             if item_wizard.range_vacancy: # Vacancy range:
                 from datetime import datetime, timedelta
                 
@@ -269,13 +286,16 @@ class account_analytic_intervent_wizard(osv.osv_memory):
                         intervent_annotation=item_wizard.intervent_annotation,
                         activity_id=item_wizard.activity_id.id,
                         mail_raccomanded=item_wizard.mail_raccomanded,
-                        location_site = item_wizard.location_site,
+                        location_site=item_wizard.location_site,
                         context=context,
                         )
 
+            # -----------------------------------------------------------------
+            #                        Normal intervent:
+            # -----------------------------------------------------------------
             else: # Normal intervent
                 date = item_wizard.date        
-                intervent_id=self._create_line( # Intervent report:
+                intervent_id = self._create_line( # Intervent report:
                     cr, 
                     uid, 
                     employee_proxy.product_id.id,
@@ -293,10 +313,14 @@ class account_analytic_intervent_wizard(osv.osv_memory):
                     intervent_annotation=item_wizard.intervent_annotation,
                     activity_id=item_wizard.activity_id.id,
                     mail_raccomanded=item_wizard.mail_raccomanded,
-                    location_site = item_wizard.location_site,
-                    context=context)
+                    location_site=item_wizard.location_site,
+                    total_trip_km=item_wizard.total_trip_km, # Add KM 
+                    context=context,
+                    )
 
-            # Create expenses:            
+            # -----------------------------------------------------------------
+            #                       Create expenses:            
+            # -----------------------------------------------------------------
             for expense in item_wizard.extra_ids:
                 expense_id = self._create_line(
                     cr, 
@@ -305,7 +329,8 @@ class account_analytic_intervent_wizard(osv.osv_memory):
                     expense.quantity, 
                     company_id, 
                     False,
-                    self._get_journal_from_type(cr, uid, expense.type, context=context), 
+                    self._get_journal_from_type(
+                        cr, uid, expense.type, context=context), 
                     expense.product_id.name,
                     date, 
                     account_id,
@@ -313,8 +338,12 @@ class account_analytic_intervent_wizard(osv.osv_memory):
                     intervent_id=intervent_id, 
                     context=context,
                     )
-
-            if item_wizard.trip_type: # is set an extra cost for cars trip:
+ 
+            # -----------------------------------------------------------------
+            #                        KM cost for car:
+            # -----------------------------------------------------------------
+            # Is set an extra cost for cars trip: # TODO correct???????????????
+            if item_wizard.trip_type and item_wizard.product_id: 
                 # Manually creation for the expense:
                 total_km_for_trip = self.pool.get(
                     'account.analytic.account').get_km_from_city_trip(

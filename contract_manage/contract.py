@@ -1079,6 +1079,8 @@ class account_analytic_line_extra_fields(osv.osv):
         # not necessary (account_id yet present)    
         #'contract_id': fields.many2one('account.analytic.account', 
         #    'Exp. account', ondelete='cascade'),
+
+        'total_trip_km': fields.float('Tot. km.', digits=(16, 2)),
         }
 
     _defaults = {
