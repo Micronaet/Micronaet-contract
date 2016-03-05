@@ -47,6 +47,7 @@
                    <field name="product_id" attrs="{'required':[('trip_type','!=',False)]}" />
                    <field name="city_id" attrs="{'required':[('trip_type','!=',False)]}"  />
                    <field name="location_site" />
+                   <field name="total_trip_km" />
                </group>
                
                <separator string="Manage control" colspan="4" />

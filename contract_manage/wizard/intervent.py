@@ -549,6 +549,7 @@ class account_analytic_intervent_wizard(osv.osv_memory):
         'city_id':fields.many2one('res.city', 'Località'),
         'trip_type':fields.selection(trip_type,'Trip type', select=True), 
         'product_id': fields.many2one('product.product', 'Car', required=True),
+        'total_trip_km': fields.float('Tot. km.', digits=(16, 2)),
          
         'operation':fields.selection(operation_type,'operation', select=True), 
         'amount_operation': fields.float('amount operation', digits=(16, 2)),
