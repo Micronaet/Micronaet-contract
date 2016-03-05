@@ -541,7 +541,7 @@ class account_analytic_intervent_wizard(osv.osv_memory):
         trip_km = 0.0
         tour_km = 0.0    
         for city in contract_proxy.filter_city_ids:
-            if city_id = city.id:
+            if city_id == city.id:
                 trip_km = city.trip_km
                 tour_km = city.tour_km
                 
