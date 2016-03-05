@@ -521,6 +521,7 @@ class account_analytic_intervent_wizard(osv.osv_memory):
                # NOTE: not use: res.city.relation for city_id field pfor when there's not city setted up
             else:   
                res['domain']['city_id'] = [] # all contract
+               #res['value']['total_trip_km'] = 0.0
             # TODO filter for operation (so no change)?
         return res
 
@@ -588,7 +589,7 @@ class account_analytic_intervent_wizard(osv.osv_memory):
         # NOTE: not use: res.city.relation for city_id field pfor when there's not city setted up
         'city_id':fields.many2one('res.city', 'Località'),
         'trip_type':fields.selection(trip_type,'Trip type', select=True), 
-        'product_id': fields.many2one('product.product', 'Car', required=True),
+        'product_id': fields.many2one('product.product', 'Car'),
         'total_trip_km': fields.float('Tot. km.', digits=(16, 2)),
          
         'operation':fields.selection(operation_type,'operation', select=True), 
