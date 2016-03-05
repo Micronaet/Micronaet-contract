@@ -53,7 +53,7 @@ class account_analytic_intervent_type(osv.osv):
     
     _columns = {
         'name': fields.selection(
-            type_selection,'Type', select=True, readonly=False), 
+            type_selection,'Type', select=True), 
         'journal_id': fields.many2one(
             'account.analytic.journal', 'Journal', required=True),
         }
@@ -82,11 +82,11 @@ class account_analytic_intervent_extra_product(osv.osv_memory):
          'product_id': fields.many2one(
              'product.product', 'Product', required=True),
          'uom_id': fields.many2one(
-             'product.uom', 'UOM', required=False),
+             'product.uom', 'UOM'),
          'quantity': fields.float(
              'Quantity', digits=(16, 2), required=True),
          'type': fields.selection(
-             type_selection,'Type', select=True, readonly=False), 
+             type_selection,'Type', select=True), 
          # search in account.analytic.intervent.type
     }     
 account_analytic_intervent_extra_product()
@@ -240,7 +240,8 @@ class account_analytic_intervent_wizard(osv.osv_memory):
 
                 day_2_number = {'mo':0,'tu':1,'we':2,'th':3,'fr':4,'sa':5,'su':6}
                 #day_2_number = {0:'mo',1:'tu',2:'we',3:'th',4:'fr',5:'sa',6:'su'}
-                timesheet_worked = dict((day_2_number[item.week_day], item.name) for item in employee_proxy.contract_tipology_id.line_ids)
+                timesheet_worked = dict(
+                    (day_2_number[item.week_day], item.name) for item in employee_proxy.contract_tipology_id.line_ids)
                     
                 for day in range(0, days + 1):
                     ref_day = from_date + timedelta(days=day)
@@ -250,7 +251,7 @@ class account_analytic_intervent_wizard(osv.osv_memory):
                         continue # day not created
                     quantity = timesheet_worked[wd] #8             # Hours (item_wizard.quantity)
                     
-                    intervent_id=self._create_line( # Intervent report:
+                    intervent_id = self._create_line( # Intervent report:
                         cr, 
                         uid, 
                         employee_proxy.product_id.id,
@@ -540,34 +541,31 @@ class account_analytic_intervent_wizard(osv.osv_memory):
         'account_analytic_id': fields.many2one('account.analytic.account', 
             'Contract', required=True),
         'quantity': fields.float('Quantity', digits=(16, 2),),
-        'extra_ids':fields.one2many('account.analytic.extra.wizard', 'wizard_id', 'Extra', required=False),
+        'extra_ids':fields.one2many('account.analytic.extra.wizard', 'wizard_id', 'Extra'),
         'date': fields.date('Date', required=True),
          
         # location cost:
         # NOTE: not use: res.city.relation for city_id field pfor when there's not city setted up
-        'city_id':fields.many2one('res.city', 'Località', required=False),
-        'trip_type':fields.selection(trip_type,'Trip type', select=True, 
-            readonly=False), 
+        'city_id':fields.many2one('res.city', 'Località'),
+        'trip_type':fields.selection(trip_type,'Trip type', select=True), 
         'product_id': fields.many2one('product.product', 'Car', required=True),
          
-        'operation':fields.selection(operation_type,'operation', select=True, 
-            readonly=False), 
+        'operation':fields.selection(operation_type,'operation', select=True), 
         'amount_operation': fields.float('amount operation', digits=(16, 2)),
         'intervent_annotation': fields.text('Note'),      
         'activity_id':fields.many2one('account.analytic.intervent.activity', 
-            'Activity', required=False),          
-        'mail_raccomanded':fields.boolean('Raccomanded', required=False, 
+            'Activity'),          
+        'mail_raccomanded':fields.boolean('Raccomanded', 
             help="Mail is a raccomanded"),
-        'location_site': fields.char('Location', size=50, required=False, 
-            readonly=False, help="Location of intervent"),
-        'like_last':fields.boolean('Like last', required=False, 
+        'location_site': fields.char('Location', size=50, 
+            help="Location of intervent"),
+        'like_last':fields.boolean('Like last', 
             help="Set deafult user or date like last intervent inserted"),  
-        'week_day':fields.char('Label', size=5, required=False, 
-            readonly=False), # only for view, not saved
+        'week_day':fields.char('Label', size=5), # only for view, not saved
 
-        'range_vacancy':fields.boolean('Vacancy (range)', required=False, 
+        'range_vacancy':fields.boolean('Vacancy (range)', 
             help="If cheched added a 'to' date for vacancy period"),
-        'to_date': fields.date('To Date', required=False),
+        'to_date': fields.date('To Date'),
         } 
 
     # constraits function:
@@ -609,7 +607,7 @@ class account_analytic_intervent_extra_product(osv.osv_memory):
     
     _columns = {
          'wizard_id':fields.many2one('account.analytic.intervent.wizard', 
-             'Wizard', required=False),
+             'Wizard'),
     }     
 account_analytic_intervent_extra_product()
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
