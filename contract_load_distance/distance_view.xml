@@ -11,6 +11,7 @@
                <field name="province_id" position="after">
                   <field name="trip_km" />
                   <field name="tour_km" />
+                  <button name="update_one_city_distance" string="Update Km" type="object" />
                </field>
            </field>
         </record>
@@ -23,7 +24,9 @@
                <field name="cadaster_code" position="after">
                   <separator string="Manage control:" colspan="4"/>
                   <field name="trip_km" />
-                  <field name="tour_km" />
+                  <field name="tour_km" />                  
+                  <button name="update_one_city_distance" string="Update Km" type="object" />
+                  <button name="update_all_city_distance" string="Update Km" type="object" />
                </field>
            </field>
         </record>

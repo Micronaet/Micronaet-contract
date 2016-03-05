@@ -117,15 +117,14 @@ class res_city(osv.osv):
         return self.update_distance_from_google(
             cr, uid, ids, context=context)
 
-    def update_all_partner_distance(self, cr, uid, ids, context=None):
+    def update_all_city_distance(self, cr, uid, ids, context=None):
         # Search city
         city_pool = self.pool.get('res.city')
         item_ids = city_pool.search(cr, uid, [], context=context)
         
         # Update all:
         return self.update_distance_from_google(
-            cr, uid, item_ids, context=context)
-        
+            cr, uid, item_ids, context=context)        
     
 ResCity()
 

@@ -58,33 +58,6 @@
             <field name="search_view_id" ref="view_account_analytic_expense_account_search"/>
         </record>
 
-        <!-- res.city -->
-        <record id="view_res_city_costs_tree" model="ir.ui.view">
-            <field name="name">Cost for city (Km)</field>
-            <field name="model">res.city</field>
-            <field name="inherit_id" ref="l10n_it_base.view_res_city_tree"/>
-            <field name="type">tree</field>
-            <field name="arch" type="xml">
-               <field name="province_id" position="after">
-                  <field name="trip_km" />
-                  <field name="tour_km" />
-               </field>
-           </field>
-        </record>
-        <record id="view_res_city_costs_form" model="ir.ui.view">
-            <field name="name">Cost for city (Km)</field>
-            <field name="model">res.city</field>
-            <field name="inherit_id" ref="l10n_it_base.view_res_city_form"/>
-            <field name="type">form</field>
-            <field name="arch" type="xml">
-               <field name="cadaster_code" position="after">
-                  <separator string="Manage control:" colspan="4"/>
-                  <field name="trip_km" />
-                  <field name="tour_km" />
-               </field>
-           </field>
-        </record>
-
       <!-- res.users -->
         <record id='view_res_users_add_fields_search' model='ir.ui.view'>
             <field name='name'>User extra lecture</field>
