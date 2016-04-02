@@ -815,6 +815,8 @@ class product_product_extra(osv.osv):
     _inherit = 'product.product'
 
     _columns = {
+        # TODO for future use (onchange when select car in wizard
+        'vehicle_type': fields.selection(vehicle_type, 'Vehicle type'),    
         'is_hour_cost': fields.boolean('Hour cost'),
         'department_id': fields.many2one('hr.department', 'Dipartimento',
             help="The department that usually has this product / service / instrument"),
@@ -1087,7 +1089,7 @@ class account_analytic_line_extra_fields(osv.osv):
         #    'Exp. account', ondelete='cascade'),
 
         'total_trip_km': fields.float('Tot. km.', digits=(16, 2)),
-        'vehicle_type':fields.selection(vehicle_type, 'Vehicle type'),
+        'vehicle_type': fields.selection(vehicle_type, 'Vehicle type'),
         }
 
     _defaults = {
