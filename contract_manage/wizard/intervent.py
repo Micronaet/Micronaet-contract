@@ -41,9 +41,11 @@ operation_type = [
     ('mailing','Mailing'),
     ]
 trip_type=[
-    ('trip','Trip only'),
+    ('trip','1 Trip only'),
+    ('trip2','2 Trip only'),
     ('tour','Tour only'),
-    ('all','All (tour + trip)'),
+    ('all','All 1 (1 tour + trip)'),
+    ('all2','All 2 (2 tour + trip)'),
     ]
 
 class account_analytic_intervent_type(osv.osv):
@@ -583,10 +585,14 @@ class account_analytic_intervent_wizard(osv.osv_memory):
             if not tour_km: # contract more power
                 tour_km = city_proxy.tour_km
                         
-        if trip_type == 'all':
+        if trip_type == 'all': # with 1 tour
             total_trip_km = trip_km + tour_km
-        elif trip_type == 'trip':
+        elif trip_type == 'all2': # with 2 tour
+            total_trip_km = trip_km * 2 + tour_km
+        elif trip_type == 'trip': # 1 trip
             total_trip_km = trip_km
+        elif trip_type == 'trip2': # 2 trip
+            total_trip_km = trip_km * 2
         elif trip_type == 'tour':
             total_trip_km = tour_km
         else: 
