@@ -306,7 +306,7 @@ class account_analytic_intervent_wizard(osv.osv_memory):
             #                        Normal intervent:
             # -----------------------------------------------------------------
             else: # Normal intervent
-                date = item_wizard.date        
+                date = item_wizard.date    
                 intervent_id = self._create_line( # Intervent report:
                     cr, 
                     uid, 
@@ -327,7 +327,7 @@ class account_analytic_intervent_wizard(osv.osv_memory):
                     mail_raccomanded=item_wizard.mail_raccomanded,
                     location_site=item_wizard.location_site,
                     total_trip_km=item_wizard.total_trip_km, # Add KM 
-                    vehicle_type= item_wizard.vehicle_type,
+                    vehicle_type=item_wizard.vehicle_type,
                     context=context,
                     )
 
