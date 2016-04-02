@@ -158,6 +158,7 @@ class account_analytic_intervent_wizard(osv.osv_memory):
             'location_site': location_site,
             'mail_raccomanded': mail_raccomanded,
             'total_trip_km': total_trip_km,
+            'vehicle_type': vehicle_type,
             }
 
         # ---------------------------------------------------------------------
