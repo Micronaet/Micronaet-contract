@@ -262,7 +262,7 @@ msgstr "Mastro contabile"
 #: field:account.analytic.intervent.wizard,vehicle_type:0
 #: field:account.analytic.line,vehicle_type:0
 msgid "Vehicle type"
-msgstr "Vehicle type"
+msgstr "Tipo veicolo"
 
 #. module: contract_manage
 #: code:addons/contract_manage/contract.py:206
