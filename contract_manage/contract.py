@@ -49,7 +49,13 @@ code_type_list = [
     ('voucher', 'Voucher'),
     ('transport', 'Transport'),
     ]
-
+    
+vehicle_type = [
+    ('car', 'Car'),
+    ('moto', 'Moto / Scooter'),
+    ('camion', 'Camion'),
+    ]
+    
 class account_account(osv.osv):
     ''' Extra function
     '''
@@ -1081,6 +1087,7 @@ class account_analytic_line_extra_fields(osv.osv):
         #    'Exp. account', ondelete='cascade'),
 
         'total_trip_km': fields.float('Tot. km.', digits=(16, 2)),
+        'vehicle_type':fields.selection(vehicle_type, 'Vehicle type'),
         }
 
     _defaults = {

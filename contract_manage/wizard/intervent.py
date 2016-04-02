@@ -31,21 +31,29 @@ from osv import osv, fields
 import time
 
 type_selection = [
-    ('product','Material'),
-    ('service','Use / Tools'),
-    ('invoice','Invoice for account'),
+    ('product', 'Material'),
+    ('service', 'Use / Tools'),
+    ('invoice', 'Invoice for account'),
     ] # NOTE invoice was added but not very correct
+    
 operation_type = [
-    ('lecture','Lecture'),
-    ('hour','Intervent Hours'),
-    ('mailing','Mailing'),
+    ('lecture', 'Lecture'),
+    ('hour', 'Intervent Hours'),
+    ('mailing', 'Mailing'),
     ]
-trip_type=[
-    ('trip','1 Trip only'),
-    ('trip2','2 Trip only'),
-    ('tour','Tour only'),
-    ('all','All 1 (1 tour + trip)'),
-    ('all2','All 2 (2 tour + trip)'),
+    
+trip_type = [
+    ('trip', '1 Trip only'),
+    ('trip2', '2 Trip only'),
+    ('tour', 'Tour only'),
+    ('all', 'All 1 (1 tour + trip)'),
+    ('all2', 'All 2 (2 tour + trip)'),
+    ]
+    
+vehicle_type = [
+    ('car', 'Car'),
+    ('moto', 'Moto / Scooter'),
+    ('camion', 'Camion'),
     ]
 
 class account_analytic_intervent_type(osv.osv):
@@ -128,7 +136,8 @@ class account_analytic_intervent_wizard(osv.osv_memory):
             intervent_annotation=False, operation=False,
             amount_operation=False, city_id=False, activity_id=False, 
             mail_raccomanded=False, location_site=False, 
-            super_intervent=False, total_trip_km=0.0, context=None):                              
+            super_intervent=False, total_trip_km=0.0, vehicle_type=False,
+            context=None):                              
 
         ''' Create analytic line
             used for Intervent element and Expense elements too
@@ -219,7 +228,7 @@ class account_analytic_intervent_wizard(osv.osv_memory):
                         city_id=False,
                         intervent_annotation="General timesheet cost",
                         intervent_id=item[0], 
-                        super_intervent=True,
+                        super_intervent=True,                        
                         context=context)
         except: 
             raise osv.except_osv("Error", "Unable to create intervent!")
@@ -317,6 +326,7 @@ class account_analytic_intervent_wizard(osv.osv_memory):
                     mail_raccomanded=item_wizard.mail_raccomanded,
                     location_site=item_wizard.location_site,
                     total_trip_km=item_wizard.total_trip_km, # Add KM 
+                    vehicle_type= item_wizard.vehicle_type,
                     context=context,
                     )
 
@@ -349,7 +359,7 @@ class account_analytic_intervent_wizard(osv.osv_memory):
                 # Manually creation for the expense:
                 total_km_for_trip = self.pool.get(
                     'account.analytic.account').get_km_from_city_trip(
-                        cr, uid, account_id, item_wizard.trip_type, 
+                        cr, uid, account_id, item_wizard.trip_type,
                         item_wizard.city_id.id, context=context)
                 expense_id = self._create_line(
                     cr, 
@@ -432,15 +442,19 @@ class account_analytic_intervent_wizard(osv.osv_memory):
 
             # set the filter on contract according to department
             if record_id[1]:
-               res['domain']['account_analytic_id'] += [('department_id', '=', record_id[1])]
+               res['domain']['account_analytic_id'] += [
+                   ('department_id', '=', record_id[1])]
         return res
         
-    def on_change_user_name(self, cr, uid, ids, user_id, department_id, like_last, context=None):
+    def on_change_user_name(self, cr, uid, ids, user_id, department_id, 
+            like_last, context=None):
         ''' Search default department according to user name
             (first filter)
         '''
-        res={'value': {},
-             'domain': {}}
+        res = {
+            'value': {},
+            'domain': {},
+            }
         # standard filter:
         res['domain']['account_analytic_id'] = [
             ('is_contract','=',True),
@@ -624,6 +638,8 @@ class account_analytic_intervent_wizard(osv.osv_memory):
         # NOTE: not use: res.city.relation for city_id field pfor when there's not city setted up
         'city_id':fields.many2one('res.city', 'Località'),
         'trip_type':fields.selection(trip_type,'Trip type', select=True), 
+        'vehicle_type':fields.selection(vehicle_type, 'Vehicle type', 
+            select=True), 
         'product_id': fields.many2one('product.product', 'Car'),
         'total_trip_km': fields.float('Tot. km.', digits=(16, 2)),
          

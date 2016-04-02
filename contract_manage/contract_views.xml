@@ -144,7 +144,8 @@
                   <field name="location_site" />
                   <field name="operation" string="Oper."/>
                   <field name="amount_operation" string="Q. op."/>
-                  <field name="total_trip_km" />                  
+                  <field name="total_trip_km" />    
+                  <field name="vehicle_type" />    
                </field>               
             </field>
         </record>	
@@ -533,6 +534,7 @@
                       <group colspan="2" col="2">-->                            
                             <separator string="Trip data" colspan="4"/>
                             <field name="total_trip_km" />
+                            <field name="vehicle_type" />                                
                             <newline />
                             <separator string="Intervent data" colspan="4"/>
                             <!--<field name="user_id"/>-->
