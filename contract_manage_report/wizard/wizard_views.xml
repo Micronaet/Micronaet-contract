@@ -14,10 +14,18 @@
                    
                    <field name="all"/>
                    <field name="department_id" attrs="{'invisible':[('all','=',True)],'required':[('all','=',False)]}" widget="selection" />
-                   <field name="month"/>
-                   <field name="year"/>
-                   <newline />
 
+                   <group colspan="4" col="4" attrs="{'invisible': [('mode','!=','not_work')]}">
+                       <field name="user_id" />
+                       <field name="detailed" />
+
+                       <field name="from_date" />
+                       <field name="to_date" />
+                   </group>    
+                   
+                   <field name="month" attrs="{'invisible': [('mode','=','not_work')], 'required': [('mode','!=','not_work')]}"/>
+                   <field name="year" attrs="{'invisible': [('mode','=','not_work')], 'required': [('mode','!=','not_work')]}"/>
+                   
                    <button string="Cancel" special="cancel" colspan="2"/>                   
                    <button name="print_invoice" type="object" string="Print" icon="gtk-print" colspan="2" />
                 </form>

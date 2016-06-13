@@ -63,7 +63,7 @@ class contract_report_intervent_wizard(osv.osv_memory):
         datas = {}
         if wiz_proxy.all:
             datas['department_id'] = False
-            datas['department_name'] = "All"
+            datas['department_name'] = 'All'
         else:
             datas['department_id'] = wiz_proxy.department_id.id
             datas['department_name'] = wiz_proxy.department_id.name
@@ -75,28 +75,44 @@ class contract_report_intervent_wizard(osv.osv_memory):
         datas['month'] = wiz_proxy.month
         datas['year'] = wiz_proxy.year
         
+        # not_work report:
+        datas['user_id'] = wiz_proxy.user_id.id
+        datas['from_date'] = wiz_proxy.from_date
+        datas['to_date'] = wiz_proxy.to_date
+        datas['detailed'] = wiz_proxy.detailed        
+        
         if wiz_proxy.mode == 'intervent':
             report_name = 'intervent_report'
-        else:    
+        elif wiz_proxy.mode == 'absence':
             report_name = 'absence_report'
+        else:    
+            report_name = 'not_work_report'
 
         return {
             'type': 'ir.actions.report.xml',
             'report_name': report_name,
             'datas': datas,
-        }
+            }
         
     _columns = {
-        'all':fields.boolean('All department', required=False),
-        'department_id':fields.many2one('hr.department', 'Department', 
+        'all': fields.boolean('All department', required=False),
+        'department_id': fields.many2one('hr.department', 'Department', 
             required=False),
-        'year': fields.integer('Year', required=True),
-        'month':fields.selection(month_list, 'Month', select=True, 
-            readonly=False, required=True),
-        'mode':fields.selection([
+        'year': fields.integer('Year'),
+        'month': fields.selection(month_list, 'Month', select=True),
+
+        # For not_work:    
+        'user_id': fields.many2one('res.users', 'Employee / User'),
+        'from_date': fields.date('From date'),
+        'to_date': fields.date('To date'),
+        'detailed': fields.boolean('Detailed'),
+        
+        'mode': fields.selection([
             ('intervent','Intervent'),
-            ('absence','Absence'),            
-        ],'Mode', select=True, readonly=False, required=True),
+            ('absence','Absence'),        
+            ('not_work','Not work status'), # statistic on absence
+        ], 'Mode', select=True, readonly=False, required=True),
+        
         'absence_account_id': fields.many2one('account.analytic.account', 
             'Absence type', required=False, 
             help="If absence report is only for one type of account"),
