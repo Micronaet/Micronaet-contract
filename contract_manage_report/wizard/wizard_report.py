@@ -77,9 +77,11 @@ class contract_report_intervent_wizard(osv.osv_memory):
         
         # not_work report:
         datas['user_id'] = wiz_proxy.user_id.id
+        datas['user_name'] = wiz_proxy.user_id.name
         datas['from_date'] = wiz_proxy.from_date
         datas['to_date'] = wiz_proxy.to_date
         datas['detailed'] = wiz_proxy.detailed        
+
         
         if wiz_proxy.mode == 'intervent':
             report_name = 'intervent_report'

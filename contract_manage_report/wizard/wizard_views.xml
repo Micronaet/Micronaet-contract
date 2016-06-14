@@ -9,15 +9,16 @@
             <field name="arch" type="xml">
                 <form string="Intervent report">
                    <field name="mode"/>
-                   <field name="absence_account_id" domain="[('not_working','=',True)]" attrs="{'invisible':[('mode','!=','absence')]}"/> 
+                   <field name="absence_account_id" domain="[('not_working','=',True)]" attrs="{'invisible':[('mode','not in',('absence','not_work'))]}"/> 
                    <newline />
                    
                    <field name="all"/>
                    <field name="department_id" attrs="{'invisible':[('all','=',True)],'required':[('all','=',False)]}" widget="selection" />
+                   <newline/>
 
                    <group colspan="4" col="4" attrs="{'invisible': [('mode','!=','not_work')]}">
                        <field name="user_id" />
-                       <field name="detailed" />
+                       <field name="detailed" invisible="1"/> <!--TODO manage-->
 
                        <field name="from_date" />
                        <field name="to_date" />

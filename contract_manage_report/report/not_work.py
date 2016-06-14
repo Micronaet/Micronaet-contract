@@ -44,17 +44,31 @@ class Parser(report_sxw.rml_parse):
     def get_filter_description(self, data = None):
         ''' Return string that describe wizard filter elements (from data passed)
         '''
-        if data is None:
-            data = {}
-            
-        if not data:
-            return 'Nessun filtro'
+        data = data or {}
+
+        # Date:
+        from_date = data.get('from_date', '/')
+        to_date = data.get('to_date', '/')
+        
+        # Employee:
+        all_department = data.get('all', False)
+        department_name = data.get('department_name', '/')
+        user_name = data.get('user_name', '/')
+        
+        # Extra:
+        detailed = data.get('detailed', False) # TODO develop management
+        absence_account_name = data.get('absence_account_name', '/')
+
+        if data:
+            return 'Dipartimento: %s - Utente: %s - Periodo: (%s:%s) - Tipo assenza: %s' % (
+                'tutti' if all_department else department_name,
+                user_name,
+                from_date or '/',
+                to_date or '/',
+                absence_account_name,
+                )
         else:
-            return 'Dipartimento: %s - Periodo: %s-%s - Tipo di assenza: %s' % (
-                data.get('department_name', "Tutti"),
-                data.get('month', "00"), 
-                data.get('year', "0000"),
-                data.get('absence_account_name', "Tutte"))
+            return 'Nessun filtro'
             
     def get_objects(self, data=None):
         ''' Return list of employee
@@ -92,7 +106,8 @@ class Parser(report_sxw.rml_parse):
         # Employee block:
         if not all_department:
             if department_id:
-                domain.append(('user_id.department_id', '=', department_id))                
+                domain.append(
+                    ('user_id.context_department_id', '=', department_id))                
             if user_id:
                 domain.append(('user_id', '=', user_id))
             
