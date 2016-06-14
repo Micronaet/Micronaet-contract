@@ -50,6 +50,132 @@ class account_analytic_expense_km(osv.osv):
     # -------------------------------------------------------------------------
     def schedule_csv_accounting_transport_movement_import(
             self, cr, uid, path='~/etl/transport', separator=';', header=0, 
+            general_code='410100', context=None):
+        ''' Import function that read in:
+            path: folder where all transport Km file are
+            separator: csv file format have this column separator
+            header: and total line header passed
+            general_code: general account code
+            context: context for this function
+            
+            Note: file period are coded in filename
+        '''
+        from os.path import isfile, join
+
+        # pools used:
+        csv_pool = self.pool.get('csv.base')
+        account_pool = self.pool.get('account.account')
+        contract_pool = self.pool.get('account.analytic.account')
+        line_pool = self.pool.get('account.analytic.line')
+        journal_pool = self.pool.get('account.analytic.journal')
+
+        # Read paramters for write analytic enytry:
+        # Purchase journal:
+        journal_id = journal_pool.get_journal_purchase(
+            cr, uid, context=context)
+
+        # Code for entry (ledger) operation:
+        general_id = account_pool.get_account_id(
+            cr, uid, general_code, context=context)
+        if not general_id:
+            _logger.error(_('Cannot create analytic line, no ledge!'))
+            return False
+
+        # Get file list:
+        path = os.path.expanduser(path)
+        trans_file = [
+            filename for filename in listdir(path) if
+                isfile(join(path, filename)) and filename[-3:] == 'csv']
+
+        if not trans_file:
+            _logger.warning(_('File not found in transport folder: %s') % path)
+            return True
+
+        trans_file.sort() # for have last price correct
+        _logger.info("Start auto import of file transport")            
+        for filename in trans_file:
+            try:            
+                _logger.info("Load and import file %s" % filename)
+                error = []
+                
+                i = -header
+                fullpath = join(path, filename)
+                f = open(fullpath, 'rb')
+
+                parent_id = self.create(cr, uid, {
+                    'name': _('Import file: %s') % filename,
+                    }, context=context)
+                for line in f:
+                    i += 1
+                    if i <= 0: # jump header line
+                        continue
+                    line = line.strip().split(separator)
+
+                    code = csv_pool.decode_string(line[0])
+                    # Search contract
+                    contract_ids = contract_pool.search(cr, uid, [
+                        ('code', '=', code)], context=context)
+
+                    if not contract_ids:
+                        _logger.error(
+                            _('%s. Code not found on OpenERP: %s') % (i, code))
+                        continue
+                
+                    elif len(contract_ids) > 1:
+                        _logger.error(
+                            _('%s. More than one code found (%s): %s') % (
+                                i, len(contract_ids), code))
+                        continue
+                    
+                    for i in range(from_month, len(line)):
+                        amount = csv_pool.decode_float(line[i])
+                        
+                        line_pool.create(cr, uid, {
+                            'amount': -amount,
+                            'user_id': uid,
+                            'name': _('Import: %s') % filename, # TODO
+                            'unit_amount': 1.0,
+                            'account_id': contract_ids[0],
+                            'general_account_id': general_id,
+                            'journal_id': journal_id, 
+                            'date': '2015-%02d-01' % i, # TODO
+
+                            # Link to import record:
+                            'km_import_id': parent_id,
+
+                            # Not used:
+                            #'company_id', 'code', 'currency_id', 'move_id',
+                            #'product_id', 'product_uom_id', 'amount_currency',
+                            #'ref', 'to_invoice', 'invoice_id', 
+                            # 'extra_analytic_line_timesheet_id', 'import_type',
+                            ##'activity_id', 'mail_raccomanded', 'location',
+                            }, context=context)
+                f.close()
+                
+                # History file:
+                os.rename(
+                    os.path.join(path, filename),
+                    os.path.join(path, 'history', '%s.%s' % (
+                        datetime.now().strftime('%Y%m%d.%H%M%S'),
+                        filename, )),
+                    )
+                    
+                # TODO write error in file
+                if error:
+                    self.write(cr, uid, parent_id, {
+                        'error': '\n'.join(error)}, context=context)
+            except:
+                _logger.error('No correct file format: %s' % filename)
+                _logger.error((sys.exc_info(), ))
+                
+        _logger.info("End auto import of file transport")
+        return True
+
+    # XXX OLD PROCEDURE FOR IMPORT MOVEMENT FILES NOW REPLATED WITH 
+    # FILENAME WITH PERIOD CODED
+    """    
+    def schedule_csv_accounting_transport_movement_import(
+            self, cr, uid, path='~/etl/transport', separator=';', header=0, 
             general_code='410100', from_month=9, context=None):
         ''' Import function that read in:
             path: folder where all transport Km file are
@@ -168,7 +294,7 @@ class account_analytic_expense_km(osv.osv):
                 _logger.error((sys.exc_info(), ))
                 
         _logger.info("End auto import of file transport")
-        return True
+        return True"""
 
     _columns = {
         'name': fields.char('Import', size=120, required=True), 
