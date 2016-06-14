@@ -63,7 +63,6 @@ class account_analytic_expense_km(osv.osv):
         from os.path import isfile, join
 
         # pools used:
-        import pdb; pdb.set_trace()
         csv_pool = self.pool.get('csv.base')
         account_pool = self.pool.get('account.account')
         contract_pool = self.pool.get('account.analytic.account')
@@ -95,9 +94,11 @@ class account_analytic_expense_km(osv.osv):
 
         trans_file.sort() # for have last price correct
         _logger.info('Start auto import of file expences')
+        import pdb; pdb.set_trace()
         for filename in trans_file:
             try:            
                 _logger.info('Load and import file %s' % filename)
+                error = [] # from here log error              
                 
                 # ----------------------------------
                 # Remove previous import if present:
@@ -117,19 +118,19 @@ class account_analytic_expense_km(osv.osv):
                 # Get data period from filename:
                 # ------------------------------                
                 # Format file: COST|YY|MM|.|csv
-                period = filename[:-3][-4:]
+                period = filename[-8:-4]
                 if not period.isdigit():    
-                    _logger.error(
+                    error.append(
                         _('%s. Filename syntax error COSTYYMM.csv: %s') % (
                             filename))
+                    _logger.error(error[-1])
                     continue
 
-                period_date = '20%02d-%02d-01' % (
+                period_date = '20%s-%s-01' % (
                     period[:2],
                     period[2:],
                     )
-                error = []
-                
+                    
                 i = -header
                 fullpath = join(path, filename)
                 f = open(fullpath, 'rb')
@@ -147,19 +148,26 @@ class account_analytic_expense_km(osv.osv):
                     code = csv_pool.decode_string(line[0])
                     amount = csv_pool.decode_float(line[1])
                     
+                    if not code:
+                        error.append(_('%s. Contract code empty') % i)
+                        _logger.error(error[-1])
+                            
                     # Search contract
                     contract_ids = contract_pool.search(cr, uid, [
                         ('code', '=', code)], context=context)
 
                     if not contract_ids:
-                        _logger.error(
-                            _('%s. Code not found on OpenERP: %s') % (i, code))
+                        error.append(
+                            _('%s. Contract not found on OpenERP: %s') % (
+                                i, code))
+                        _logger.error(error[-1])
                         continue
                 
                     elif len(contract_ids) > 1:
-                        _logger.error(
-                            _('%s. More than one code found (%s): %s') % (
+                        error.append(
+                            _('%s. More than one contract found (%s): %s') % (
                                 i, len(contract_ids), code))
+                        _logger.error(error[-1])
                         continue
                     
                     line_pool.create(cr, uid, {
@@ -199,7 +207,8 @@ class account_analytic_expense_km(osv.osv):
                         'error': '\n'.join(error)}, context=context)
             except:
                 _logger.error('No correct file format: %s' % filename)
-                _logger.error((sys.exc_info(), ))
+                error.append('%s' % ((sys.exc_info(), )))
+                _logger.error(error[-1])
                 
         _logger.info('End auto import of file transport')
         return True
