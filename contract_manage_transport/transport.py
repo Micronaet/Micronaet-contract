@@ -63,13 +63,14 @@ class account_analytic_expense_km(osv.osv):
         from os.path import isfile, join
 
         # pools used:
+        import pdb; pdb.set_trace()
         csv_pool = self.pool.get('csv.base')
         account_pool = self.pool.get('account.account')
         contract_pool = self.pool.get('account.analytic.account')
         line_pool = self.pool.get('account.analytic.line')
         journal_pool = self.pool.get('account.analytic.journal')
 
-        # Read paramters for write analytic enytry:
+        # Read parameters for write analytic enytry:
         # Purchase journal:
         journal_id = journal_pool.get_journal_purchase(
             cr, uid, context=context)
@@ -88,14 +89,45 @@ class account_analytic_expense_km(osv.osv):
                 isfile(join(path, filename)) and filename[-3:] == 'csv']
 
         if not trans_file:
-            _logger.warning(_('File not found in transport folder: %s') % path)
+            _logger.warning(
+                _('File not found in transport folder: %s') % path)
             return True
 
         trans_file.sort() # for have last price correct
-        _logger.info("Start auto import of file transport")            
+        _logger.info('Start auto import of file expences')
         for filename in trans_file:
             try:            
-                _logger.info("Load and import file %s" % filename)
+                _logger.info('Load and import file %s' % filename)
+                
+                # ----------------------------------
+                # Remove previous import if present:
+                # ----------------------------------
+                unlink_ids = line_pool.search(cr, uid, [
+                    ('csv_filename', '=', filename),
+                    ], context=context)
+                if unlink_ids:
+                    line_pool.unlink(cr, uid, unlink_ids, context=context)
+                    _logger.info(
+                        'Removed previous costs: %s (file: %s)' % (
+                            len(unlink_ids),
+                            filename,
+                            ))
+                
+                # ------------------------------
+                # Get data period from filename:
+                # ------------------------------                
+                # Format file: COST|YY|MM|.|csv
+                period = filename[:-3][-4:]
+                if not period.isdigit():    
+                    _logger.error(
+                        _('%s. Filename syntax error COSTYYMM.csv: %s') % (
+                            filename))
+                    continue
+
+                period_date = '20%02d-%02d-01' % (
+                    period[:2],
+                    period[2:],
+                    )
                 error = []
                 
                 i = -header
@@ -104,14 +136,17 @@ class account_analytic_expense_km(osv.osv):
 
                 parent_id = self.create(cr, uid, {
                     'name': _('Import file: %s') % filename,
-                    }, context=context)
+                    }, context=context)                    
                 for line in f:
                     i += 1
                     if i <= 0: # jump header line
                         continue
                     line = line.strip().split(separator)
 
+                    # Parse columns: 
                     code = csv_pool.decode_string(line[0])
+                    amount = csv_pool.decode_float(line[1])
+                    
                     # Search contract
                     contract_ids = contract_pool.search(cr, uid, [
                         ('code', '=', code)], context=context)
@@ -127,29 +162,27 @@ class account_analytic_expense_km(osv.osv):
                                 i, len(contract_ids), code))
                         continue
                     
-                    for i in range(from_month, len(line)):
-                        amount = csv_pool.decode_float(line[i])
-                        
-                        line_pool.create(cr, uid, {
-                            'amount': -amount,
-                            'user_id': uid,
-                            'name': _('Import: %s') % filename, # TODO
-                            'unit_amount': 1.0,
-                            'account_id': contract_ids[0],
-                            'general_account_id': general_id,
-                            'journal_id': journal_id, 
-                            'date': '2015-%02d-01' % i, # TODO
+                    line_pool.create(cr, uid, {
+                        'amount': -amount,
+                        'user_id': uid,
+                        'name': _('Import: %s') % filename,
+                        'unit_amount': 1.0,
+                        'account_id': contract_ids[0],
+                        'general_account_id': general_id,
+                        'journal_id': journal_id, 
+                        'date': period_date,
 
-                            # Link to import record:
-                            'km_import_id': parent_id,
+                        # Link to import record:
+                        'km_import_id': parent_id,
+                        'import_filename': filename, # key for deletion
 
-                            # Not used:
-                            #'company_id', 'code', 'currency_id', 'move_id',
-                            #'product_id', 'product_uom_id', 'amount_currency',
-                            #'ref', 'to_invoice', 'invoice_id', 
-                            # 'extra_analytic_line_timesheet_id', 'import_type',
-                            ##'activity_id', 'mail_raccomanded', 'location',
-                            }, context=context)
+                        # Not used:
+                        #'company_id', 'code', 'currency_id', 'move_id',
+                        #'product_id', 'product_uom_id', 'amount_currency',
+                        #'ref', 'to_invoice', 'invoice_id', 
+                        # 'extra_analytic_line_timesheet_id', 'import_type',
+                        ##'activity_id', 'mail_raccomanded', 'location',
+                        }, context=context)
                 f.close()
                 
                 # History file:
@@ -168,7 +201,7 @@ class account_analytic_expense_km(osv.osv):
                 _logger.error('No correct file format: %s' % filename)
                 _logger.error((sys.exc_info(), ))
                 
-        _logger.info("End auto import of file transport")
+        _logger.info('End auto import of file transport')
         return True
 
     # XXX OLD PROCEDURE FOR IMPORT MOVEMENT FILES NOW REPLATED WITH 
@@ -315,7 +348,8 @@ class account_analytic_line(osv.osv):
     
     _columns = {
         'km_import_id': fields.many2one(
-            'account.analytic.expense.km', 'Import Km', ondelete='cascade'),        
+            'account.analytic.expense.km', 'Import Km', ondelete='cascade'),
+        'csv_filename': fields.char('CSV filename', size=80),     
         }
 account_analytic_line()
 
