@@ -155,6 +155,7 @@ class account_analytic_expense_km(osv.osv):
                     if not code:
                         error.append(_('%s. Contract code empty') % i)
                         _logger.error(error[-1])
+                        continue
                             
                     # Search contract
                     contract_ids = contract_pool.search(cr, uid, [
@@ -186,7 +187,7 @@ class account_analytic_expense_km(osv.osv):
 
                         # Link to import record:
                         'km_import_id': parent_id,
-                        'import_filename': filename, # key for deletion
+                        'csv_filename': filename, # key for deletion
 
                         # Not used:
                         #'company_id', 'code', 'currency_id', 'move_id',
