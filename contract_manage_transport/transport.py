@@ -107,7 +107,7 @@ class account_analytic_expense_km(osv.osv):
                     ], context=context)
                 if unlink_ids:
                     line_pool.unlink(cr, uid, unlink_ids, context=context)
-                    _logger.info(
+                    _logger.warning(
                         'Removed previous costs: %s (file: %s)' % (
                             len(unlink_ids),
                             filename,
