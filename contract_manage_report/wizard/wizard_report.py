@@ -103,8 +103,8 @@ class contract_report_intervent_wizard(osv.osv_memory):
 
         # For not_work:    
         'user_id': fields.many2one('res.users', 'Employee / User'),
-        'from_date': fields.date('From date'),
-        'to_date': fields.date('To date'),
+        'from_date': fields.date('From date >='),
+        'to_date': fields.date('To date <='),
         'detailed': fields.boolean('Detailed'),
         
         'mode': fields.selection([

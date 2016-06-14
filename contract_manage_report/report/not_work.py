@@ -58,30 +58,103 @@ class Parser(report_sxw.rml_parse):
             
     def get_objects(self, data=None):
         ''' Return list of employee
-        '''        
+        '''
+        # Pool used:
         ts_pool = self.pool.get('hr.analytic.timesheet')
         
-        # Create filter:
-        if data is None:
-            data = {}
-        # generic:    
-        domain = [
-            ('user_id','=',employee_id),
-            ('account_id.not_working','=',True),
-            ]
-            
-        # check contract selected:
+        # -----------------------
+        # Read wizard parameters:
+        # -----------------------
+        data = data or {}
+
+        # Date:
+        from_date = data.get('from_date', False)
+        to_date = data.get('to_date', False)
+        
+        # Employee:
+        all_department = data.get('all', False)
+        department_id = data.get('department_id', False)
+        user_id = data.get('user_id', False)
+        
+        # Extra:
+        detailed = data.get('detailed', False)
         absence_account_id = data.get('absence_account_id', False)
+
+        # --------------------------------
+        # Generate domain from parameters:
+        # --------------------------------
+        domain = [('account_id.not_working', '=', True)] # no working account
+
+        # Account contract:
         if absence_account_id:
             domain.append(('account_id','=',absence_account_id))
-        # check period
-        month = data.get('month', False)
-        year = data.get('year',False)
-        if month and year:        
-           month = int(month)
-           domain.append(('date', '>=', start))
-           domain.append(('date', '<', end))           
 
-        ts_ids = ts_pool.search(self.cr, self.uid, domain, order='date')
-        return ts_pool.browse(self.cr, self.uid, ts_ids)
+        # Employee block:
+        if not all_department:
+            if department_id:
+                domain.append(('user_id.department_id', '=', department_id))                
+            if user_id:
+                domain.append(('user_id', '=', user_id))
+            
+        # Period range:
+        if from_date:
+           domain.append(('date', '>=', from_date))
+        if to_date:
+           domain.append(('date', '>=', to_date))
+
+        # Read record:
+        ts_ids = ts_pool.search(self.cr, self.uid, domain) # order
+        
+        # Sort record:
+        ts_proxy = ts_pool.browse(self.cr, self.uid, ts_ids)
+        
+        res = []
+        
+        # Break code part:
+        old = [False, False]
+        total = [0, 0]
+        for item in sorted(ts_proxy, key=lambda intervent:(
+                intervent.user_id.name,
+                intervent.account_id.name,
+                intervent.date,
+                )):
+                
+            # Startup break line:
+            if old[0] == False:
+                old[0] = item.user_id.id
+            if old[1] == False:
+                old[1] = item.account_id.id
+            
+            # -----------------            
+            # Write total line:
+            # -----------------            
+            if item.user_id.id != old[0]: # check user break
+                res.append(('tot_user', tuple(total))) # last previous
+                # Old this element:
+                old[0] = item.user_id.id
+                old[1] = item.account_id.id                
+                # Reset total:
+                total[0] = item.unit_amount
+                total[1] = item.unit_amount
+            else: # check account break
+                total[0] += item.unit_amount # same user
+                        
+                if item.account_id.id != old[1]: # break account
+                    res.append(('tot_account', tuple(total))) # last previous
+                    # Old this element:
+                    old[1] = item.account_id.id       
+                    # Reset total:
+                    total[1] = item.unit_amount
+                else:
+                    total[1] += item.unit_amount
+
+            # ----------------            
+            # Write data line:
+            # ----------------            
+            res.append(('intervent', item))
+
+        # TODO append last total    
+        if not(old[0] == False):
+            res.append(('tot_user', total)) # append old
+        return res
 
