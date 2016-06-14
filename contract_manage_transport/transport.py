@@ -94,7 +94,6 @@ class account_analytic_expense_km(osv.osv):
 
         trans_file.sort() # for have last price correct
         _logger.info('Start auto import of file expences')
-        import pdb; pdb.set_trace()
         for filename in trans_file:
             try:            
                 _logger.info('Load and import file %s' % filename)
@@ -145,6 +144,11 @@ class account_analytic_expense_km(osv.osv):
                     line = line.strip().split(separator)
 
                     # Parse columns: 
+                    if len(line) < 2:
+                        error.append(_('%s. Cols < 2') % i)
+                        _logger.error(error[-1])
+                        continue
+                        
                     code = csv_pool.decode_string(line[0])
                     amount = csv_pool.decode_float(line[1])
                     
