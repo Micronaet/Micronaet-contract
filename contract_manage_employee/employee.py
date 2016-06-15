@@ -92,6 +92,7 @@ class hr_analytic_timesheet(osv.osv):
             return value
 
         def format_float(value):        
+            # TODO manage . for thousand separator
             try:
                 value = value.replace(',', '.')
                 return float(value)
@@ -148,6 +149,7 @@ class hr_analytic_timesheet(osv.osv):
                     cost = format_float(record[2])
                     total = 0.0 # no total
                 else: # 5 cols format:    
+                    name = format_string(record[1]).title()
                     surname = format_string(record[2]).title()
                     cost = format_float(record[3])
                     total = format_float(record[4])
@@ -199,7 +201,7 @@ class hr_analytic_timesheet(osv.osv):
                     _logger.error(error[-1])
 
             except:
-                error.append("%" % (sys.exc_info(), ))
+                error.append('%s' % (sys.exc_info(), ))
                 _logger.error('%s. Generic error line:' % i)
                 _logger.error(error[-1])
 
