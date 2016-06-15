@@ -81,7 +81,6 @@ class hr_analytic_timesheet(osv.osv):
         ''' Import one file 
         '''
         # Utility: function for procedure:
-        import pdb; pdb.set_trace()
         def format_string(value, default=''):
             try:
                 return value.strip() or default
