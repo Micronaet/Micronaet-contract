@@ -102,7 +102,7 @@ class hr_analytic_timesheet(osv.osv):
         employee_pool = self.pool.get('hr.employee')            
         hc_pool = self.pool.get('hr.employee.hour.cost')
 
-        tot_col = 5 # TODO change if file will be extended
+        tot_col = 3 # TODO change if file will be extended
         if error is None:
             error = []
 
@@ -123,27 +123,34 @@ class hr_analytic_timesheet(osv.osv):
         i = 0
         for line in f:
             try:
-                i += 1
-                
+                i += 1                
                 line = line.strip()
                 if not line:
                     error.append(_('%s. Empty line (jumped)') % i)
                     _logger.warning(error[-1])
                     continue
                 record = line.split(separator)
-                
-                if len(record) < tot_col:
+                col_len = len(record)
+                if col_len < tot_col:
                     error.append(_(
                         '%s. Record different format: %s (col.: %s)') % (
                             i, tot_col, len(record)))
                     _logger.error(error[-1])
                     continue
-
+               
                 code = format_string(record[0], False)
-                name = format_string(record[1]).title()
-                surname = format_string(record[2]).title()
-                cost = format_float(record[3])
-                total = format_float(record[4])
+                if col_len == 3:
+                    name = format_string(record[1]).title()
+                    # Calculated fields:
+                    names = name.split(' ') # TODO not so awsome...
+                    name = names[-1].title()
+                    surname = names[0].title()
+                    cost = format_float(record[2])
+                    total = 0.0 # no total
+                else: # 5 cols format:    
+                    surname = format_string(record[2]).title()
+                    cost = format_float(record[3])
+                    total = format_float(record[4])
 
                 if not cost:
                     error.append(_('%s. Error no hour cost: %s %s [%s]') % (
