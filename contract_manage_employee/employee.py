@@ -81,6 +81,7 @@ class hr_analytic_timesheet(osv.osv):
         ''' Import one file 
         '''
         # Utility: function for procedure:
+        import pdb; pdb.set_trace()
         def format_string(value, default=''):
             try:
                 return value.strip() or default
@@ -131,7 +132,7 @@ class hr_analytic_timesheet(osv.osv):
                     continue
                 record = line.split(separator)
                 
-                if len(record) != tot_col:
+                if len(record) < tot_col:
                     error.append(_(
                         '%s. Record different format: %s (col.: %s)') % (
                             i, tot_col, len(record)))
