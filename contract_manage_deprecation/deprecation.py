@@ -42,8 +42,7 @@ class account_analytic_expense_deprecation(osv.osv):
     ''' Add schedule method and override split method
     '''
     _name = 'account.analytic.expense.deprecation'
-    _description = 'Monthly deprecation split'
-    _rec_name = 'name'
+    _description = 'Deprecation data'
     
     # -------------------------------------------------------------------------
     #                          XMLRPC function
@@ -51,13 +50,8 @@ class account_analytic_expense_deprecation(osv.osv):
     def schedule_csv_accounting_deprecation_movement_import(
             self, cr, uid, force=False, context=None):
         ''' Import function that read in:
-            path: folder where all transport Km file are
-            separator: csv file format have this column separator
-            header: and total line header passed
             force: delete previous elements
-            general_code: general account code for create analytic line
-            context: context for this function
-            
+            context: context for this function            
             Note: file period are coded in filename
         '''
         # TODO manage force!!
@@ -225,6 +219,7 @@ class account_analytic_expense_deprecation(osv.osv):
     _columns = {
         'name': fields.char('Year', size=4, required=True),        
         'error': fields.text('Error'), # TODO keep?
+        'note': fields.text('Note'),
         }
 account_analytic_expense_deprecation()
 
@@ -237,9 +232,9 @@ class account_analytic_expense_deprecation_period(osv.osv):
     _columns = {
         'name': fields.char('MM', size=2, required=True), 
         'datetime': fields.datetime('Import date'),
-        'error': fields.text('Error'),
         'year_id': fields.many2one(
             'account.analytic.expense.deprecation', 'Year'), 
+        'error': fields.text('Error'),
         }
     
     _defaults = {
