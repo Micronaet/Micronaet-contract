@@ -44,10 +44,16 @@ class account_analytic_expense_deprecation(osv.osv):
     _name = 'account.analytic.expense.deprecation'
     _description = 'Deprecation data'
     
+    # -------------------------------------------------------------------------
+    #                          Utility function
+    # -------------------------------------------------------------------------
     def self.create_analytic_line_deprecation(self, cr, uid, department_id, 
-            total, general_account_id, period, context=None):
+            total, general_account_id, period, error=None, context=None):
         ''' Procedure for split cost passed
         '''
+        # Init setup:
+        error = error or []
+        
         # Pool used:
         journal_pool = self.pool.get('account.analytic.journal')
         line_pool = self.pool.get('account.analytic.line')
@@ -58,6 +64,55 @@ class account_analytic_expense_deprecation(osv.osv):
         journal_id = journal_pool.get_journal_purchase(
             cr, uid, context=context)
         # TODO 
+
+        # Search contract
+        contract_ids = contract_pool.search(cr, uid, [
+            ('department_id', '=', department_id), # department filter
+            ('state', 'in', ('cancel')), # status test
+            # period from and to! 
+            ], context=context)
+
+        if len(contract_ids) > 1:
+            error.append(_('No contract found for split data!'))
+            _logger.error(error[-1])
+            return
+        
+        total_contract = sum([
+            contract.total for contract in contract_pool.browse(
+                cr, uid, contract_ids, context=context)])
+            
+        if not total_contract:
+            error.append(_('No total for contract so no split!'))
+            _logger.error(error[-1])
+            return
+           
+        rate = total / total_contract        
+        for contract in contract_pool.browse(
+                cr, uid, contract_ids, context=context):
+                
+        
+        line_pool.create(cr, uid, {
+            'amount': -amount,
+            'user_id': uid,
+            'name': _('Deprecation period: %s') % period,
+            'unit_amount': 1.0,
+            'account_id': contract_ids[0],
+            'general_account_id': general_account_id,
+            'journal_id': journal_id, 
+            'date': period_date,
+
+            # Link to import record:
+            'km_import_id': parent_id,
+            'csv_filename': filename, # key for deletion
+
+            # Not used:
+            #'company_id', 'code', 'currency_id', 'move_id',
+            #'product_id', 'product_uom_id', 'amount_currency',
+            #'ref', 'to_invoice', 'invoice_id', 
+            # 'extra_analytic_line_timesheet_id', 'import_type',
+            ##'activity_id', 'mail_raccomanded', 'location',
+            }, context=context)
+               
         return True
 
     # -------------------------------------------------------------------------
@@ -126,7 +181,9 @@ class account_analytic_expense_deprecation(osv.osv):
                         to_split[department_id] # total mont to split
                         general_id,
                         key, # for period
-                        context=context)
+                        error,
+                        context=context,
+                        )
                 try:
                     department_id = period.department_id.id
                     total = period.total
@@ -140,54 +197,7 @@ class account_analytic_expense_deprecation(osv.osv):
                         _logger.error(error[-1])
                         continue
                 
-                #for month in 
-                # Create lof element:
-                parent_id = self.create(cr, uid, {
-                    'name': _('Import file: %s') % filename,
-                    'period': '',# TODO
-                    }, context=context)                    
-
-                        
-                # Search contract
-                contract_ids = contract_pool.search(cr, uid, [
-                    ('code', '=', code)], context=context)
-
-                if not contract_ids:
-                    error.append(
-                        _('%s. Contract not found on OpenERP: %s') % (
-                            i, code))
-                    _logger.error(error[-1])
-                    continue
             
-                elif len(contract_ids) > 1:
-                    error.append(
-                        _('%s. More than one contract found (%s): %s') % (
-                            i, len(contract_ids), code))
-                    _logger.error(error[-1])
-                    continue
-                
-                line_pool.create(cr, uid, {
-                    'amount': -amount,
-                    'user_id': uid,
-                    'name': _('Import: %s') % filename,
-                    'unit_amount': 1.0,
-                    'account_id': contract_ids[0],
-                    'general_account_id': general_id,
-                    'journal_id': journal_id, 
-                    'date': period_date,
-
-                    # Link to import record:
-                    'km_import_id': parent_id,
-                    'csv_filename': filename, # key for deletion
-
-                    # Not used:
-                    #'company_id', 'code', 'currency_id', 'move_id',
-                    #'product_id', 'product_uom_id', 'amount_currency',
-                    #'ref', 'to_invoice', 'invoice_id', 
-                    # 'extra_analytic_line_timesheet_id', 'import_type',
-                    ##'activity_id', 'mail_raccomanded', 'location',
-                    }, context=context)
-                
                 # TODO write error in file
                 if error:
                     self.write(cr, uid, parent_id, {
