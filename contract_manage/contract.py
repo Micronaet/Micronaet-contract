@@ -284,8 +284,9 @@ class account_analytic_expense(osv.osv):
     def schedule_csv_accounting_movement_import(self, cr, uid, csv_file,
             delimiter=';', header=0, verbose=100,
             split_on_all=None, department_code_jump=None, 
-            general_code='410100', average_method='number', voucher_limit=6,
-            exclude_ledger_start=None, log_warning=False, context=None):
+            general_code='410100', average_method='number', jump_item=None,
+            voucher_limit=6, exclude_ledger_start=None, log_warning=False, 
+            context=None):
         ''' Import movement sync with record in OpenERP
             csv_file: full path of file to import  (use ~ for home)
             delimiter: for csv separation
@@ -293,7 +294,8 @@ class account_analytic_expense(osv.osv):
             verbose: every X record print a log message (else nothing)
             department_code_jump: list of department code that will be jumper
             general_code: account for analytic line
-            average_method: 'number', 'amount' (average depend on) 
+            average_method: 'number', 'amount' (average depend on)
+            jump_item: list of couple (('01', '501.00001')), 
             voucher_limit: in hour for consider voucher used from an employee
             log_warning: For OpenERP log file
             exclude_ledger_start: list of fist char of account (list of patr.)
@@ -317,17 +319,17 @@ class account_analytic_expense(osv.osv):
         # -----------------
         # Input parameters:
         # -----------------
-        # Imprt only cost account ledger (first char test)
-        if exclude_ledger_start is None:
-            exclude_ledger_start = []
+        # Department, ledger couple to jump:
+        jump_item = jump_item or ()
+
+        # Import only cost account ledger (first char test)
+        exclude_ledger_start = exclude_ledger_start or []
 
         # Department not to be imported
-        if department_code_jump is None: 
-            department_code_jump = []
+        department_code_jump = department_code_jump or []
 
         # Department that consider as to split in all contracts:
-        if split_on_all is None: 
-            split_on_all = []
+        split_on_all = split_on_all or []
 
         # Code for entry (ledger) operation:
         general_id = account_pool.get_account_id(
