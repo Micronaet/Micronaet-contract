@@ -48,7 +48,7 @@ class account_analytic_expense_deprecation(osv.osv):
     #                          XMLRPC function
     # -------------------------------------------------------------------------
     def schedule_csv_accounting_deprecation_movement_import(
-            self, cr, uid, force=False, context=None):
+            self, cr, uid, general_code='410100', force=False, context=None):
         ''' Import function that read in:
             force: delete previous elements
             context: context for this function            
@@ -76,69 +76,47 @@ class account_analytic_expense_deprecation(osv.osv):
             _logger.error(_('Cannot create analytic line, no ledge!'))
             return False
 
-        # Get file list:
-        path = os.path.expanduser(path)
-        trans_file = [
-            filename for filename in listdir(path) if
-                isfile(join(path, filename)) and filename[-3:] == 'csv']
-        trans_file.sort() # for have year correct order
+        # Check period to load:
+        _logger.info('Load previous imported periods')
+        periods_all = []
+        period_to_update = {}
+        error = [] # from here log error
+        
+        year_ids = self.search(cr, uid, [], context=context)
 
-        # Log parameter for operations:
-        if not trans_file:
-            _logger.warning(
-                _('File not found in transport folder: %s') % path)
-            return True
-        
-        # Load previous importation:
-        _logger.info('Load previous log record (deprecation)')
-        previous_db = {}
-        previous_ids = self.search(cr, uid, [], context=context)
-        for previous in self.browse(cr, uid, previous_ids, context=context):
-            previous_db[previous.period] = previous.id
-        
-        _logger.info('Start auto import of file deprecation')        
-        error = [] # from here log error              
-        for filename in trans_file:
-            try:
-                _logger.info('Load and import file %s' % filename)
-                period_to_update = {}
-                year = filename.split('.')[0]
-                if len(year) != 4 or not year.isdigit():    
-                    error.append(
-                        _('%s. Filename syntax error YYYY.csv: %s ') % (
-                            filename))
-                    _logger.error(error[-1])
+        current_period = '%s-%02d' % (
+            datetime.now().year, 
+            datetime.now().month,
+            )
+            
+        for year in self.browse(
+                cr, uid, year_ids, context=context):
+            
+            # Read total cost:
+            to_split = {}
+            for cost in year.cost_ids:
+                to_split[cost.department_id.id] = cost.total / 12.0 #month rate
+            
+            # Create database for period of the year
+            for month in range(1, 13): # all previous month
+                key = '%s-%02d' % (year.name, month)
+                if key >= current_period:
+                    continue # jump > current month
+                periods_all.append(key)
+
+            # Create period not present:
+            for period in year.period_ids:
+                key = '%s-%s' % (period.year_id.name, period.name)
+                periods[key] = period
+                if key in periods_all: # create month if not present
                     continue
                 
-                # Check which month are present:
-                for month in range(1, datetime.now().month) # all previous month
-                    key = '%s-%02d' % (year, month)
-                    if key not in previous_db: # create month if not present
-                        period_to_update[key] = previous_db[key] # save ID
+                # Create:        
+                try:
+                    department_id = period.department_id.id
+                    total = period.total
+                    
                 
-                # Delete previous log (and all analytic lines under
-                self.unlink(
-                    cr, uid, period_to_update.values(), context=context)
-
-                # Create DB for department with year costs:
-                costs = {} # for department
-                
-                i = -header
-                fullpath = join(path, filename)
-                f = open(fullpath, 'rb')
-                #TODO period_to_update
-                for line in f:
-                    i += 1
-                    if i <= 0: # jump header line
-                        continue
-                    line = line.strip().split(separator)
-
-                    # Parse columns: 
-                    if len(line) != 2:
-                        error.append(_('%s. Cols != 2') % i)
-                        _logger.error(error[-1])
-                        continue
-
                     code = csv_pool.decode_string(line[0]) # department:
                     amount = csv_pool.decode_float(line[1])
 
@@ -148,7 +126,7 @@ class account_analytic_expense_deprecation(osv.osv):
                         continue
                 f.close()
                 
-                for month in 
+                #for month in 
                 # Create lof element:
                 parent_id = self.create(cr, uid, {
                     'name': _('Import file: %s') % filename,
@@ -196,14 +174,6 @@ class account_analytic_expense_deprecation(osv.osv):
                     ##'activity_id', 'mail_raccomanded', 'location',
                     }, context=context)
                 
-                # History file:
-                os.rename(
-                    os.path.join(path, filename),
-                    os.path.join(path, 'history', '%s.%s' % (
-                        datetime.now().strftime('%Y%m%d.%H%M%S'),
-                        filename, )),
-                    )
-                    
                 # TODO write error in file
                 if error:
                     self.write(cr, uid, parent_id, {
@@ -218,10 +188,29 @@ class account_analytic_expense_deprecation(osv.osv):
 
     _columns = {
         'name': fields.char('Year', size=4, required=True),        
+        'force': fields.boolean('Force reload'),
         'error': fields.text('Error'), # TODO keep?
         'note': fields.text('Note'),
         }
 account_analytic_expense_deprecation()
+
+
+class account_analytic_expense_deprecation_cost(osv.osv):
+    ''' Add schedule method and override split method
+    '''
+    _name = 'account.analytic.expense.deprecation.cost'
+    _description = 'Year deprecation cost'
+    _rec_name = 'department_id'
+    _order = 'department_id'
+
+    _columns = {
+        'year_id': fields.many2one(
+            'account.analytic.expense.deprecation', 'Year'),        
+        'department_id': fields.many2one(
+            'hr.department', 'Department', required=True), 
+        'total': fields.float('Total for year', digits=(16, 2), required=True), 
+        }
+account_analytic_expense_deprecation_cost()
 
 class account_analytic_expense_deprecation_period(osv.osv):
     ''' Add schedule method and override split method
@@ -236,7 +225,7 @@ class account_analytic_expense_deprecation_period(osv.osv):
             'account.analytic.expense.deprecation', 'Year'), 
         'error': fields.text('Error'),
         }
-    
+            
     _defaults = {
         'datetime': lambda *x: datetime.now().strftime(
             DEFAULT_SERVER_DATETIME_FORMAT),
@@ -274,6 +263,9 @@ class account_analytic_expense_deprecation(osv.osv):
     _columns = {
         'period_ids': fields.one2many(
             'account.analytic.expense.deprecation.period', 
+            'year_id', 'Period'),
+        'cost_ids': fields.one2many(
+            'account.analytic.expense.deprecation.cost', 
             'year_id', 'Period'),
         }
 account_analytic_expense_deprecation()

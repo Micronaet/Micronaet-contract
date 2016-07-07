@@ -32,6 +32,7 @@
     'website': 'http://www.micronaet.it',
     'depends': [
         'base',
+        'account',
         'contract_manage',
         ],
     'init_xml': [], 
