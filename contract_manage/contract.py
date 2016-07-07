@@ -321,13 +321,12 @@ class account_analytic_expense(osv.osv):
         # -----------------
         # Department, ledger couple to jump:
         jump_item = jump_item or ()
-
+        _logger.info('Jump lines of (Dep., Ledger): %s' (jump_item, ))
+        
         # Import only cost account ledger (first char test)
         exclude_ledger_start = exclude_ledger_start or []
-
         # Department not to be imported
         department_code_jump = department_code_jump or []
-
         # Department that consider as to split in all contracts:
         split_on_all = split_on_all or []
 
@@ -419,6 +418,17 @@ class account_analytic_expense(osv.osv):
                 
                 partner_code = csv_pool.decode_string(line[12])
                 partner_text = csv_pool.decode_string(line[13])
+                
+                if jump_item and not contract_code and (
+                        department_code, account_code) in jump_item:
+                    # Note: jump if list is present and mach, no contract code     
+                    if log_warning:
+                        _logger.warning(_(
+                            '%s. Jump department %s - ledger %s element') % (
+                                department_code, 
+                                account_code,
+                                ))
+                    continue
 
                 # Get split type:
                 for key in code_catalog:
