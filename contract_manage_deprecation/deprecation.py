@@ -44,8 +44,24 @@ class account_analytic_expense_deprecation(osv.osv):
     _name = 'account.analytic.expense.deprecation'
     _description = 'Deprecation data'
     
+    def self.create_analytic_line_deprecation(self, cr, uid, department_id, 
+            total, general_account_id, period, context=None):
+        ''' Procedure for split cost passed
+        '''
+        # Pool used:
+        journal_pool = self.pool.get('account.analytic.journal')
+        line_pool = self.pool.get('account.analytic.line')
+        contract_pool = self.pool.get('account.analytic.account')
+        account_pool = self.pool.get('account.account')
+
+        # Purchase journal:
+        journal_id = journal_pool.get_journal_purchase(
+            cr, uid, context=context)
+        # TODO 
+        return True
+
     # -------------------------------------------------------------------------
-    #                          XMLRPC function
+    #                          Schedule function
     # -------------------------------------------------------------------------
     def schedule_csv_accounting_deprecation_movement_import(
             self, cr, uid, general_code='410100', force=False, context=None):
@@ -55,20 +71,9 @@ class account_analytic_expense_deprecation(osv.osv):
             Note: file period are coded in filename
         '''
         # TODO manage force!!
-        # pools used:
-        csv_pool = self.pool.get('csv.base')
-        account_pool = self.pool.get('account.account')
-        contract_pool = self.pool.get('account.analytic.account')
-        line_pool = self.pool.get('account.analytic.line')
-        journal_pool = self.pool.get('account.analytic.journal')
-
         # ---------------------------------------------------------------------
         # Read parameters for write analytic entry:
         # ---------------------------------------------------------------------
-        # Purchase journal:
-        journal_id = journal_pool.get_journal_purchase(
-            cr, uid, context=context)
-
         # Code for entry (ledger) operation:
         general_id = account_pool.get_account_id(
             cr, uid, general_code, context=context)
@@ -91,12 +96,13 @@ class account_analytic_expense_deprecation(osv.osv):
             
         for year in self.browse(
                 cr, uid, year_ids, context=context):
-            
-            # Read total cost:
+            # -----------------------------------------------------------------
+            # Read total cost to split:
+            # -----------------------------------------------------------------
             to_split = {}
             for cost in year.cost_ids:
                 to_split[cost.department_id.id] = cost.total / 12.0 #month rate
-            
+
             # Create database for period of the year
             for month in range(1, 13): # all previous month
                 key = '%s-%02d' % (year.name, month)
@@ -111,7 +117,16 @@ class account_analytic_expense_deprecation(osv.osv):
                 if key in periods_all: # create month if not present
                     continue
                 
-                # Create:        
+                # Create analytic line for department:
+                for department_id in to_split:
+                    # TODO create split function:
+                    self.create_analytic_line_deprecation(
+                        cr, uid, 
+                        department_id, # department for contract selection
+                        to_split[department_id] # total mont to split
+                        general_id,
+                        key, # for period
+                        context=context)
                 try:
                     department_id = period.department_id.id
                     total = period.total
@@ -124,7 +139,6 @@ class account_analytic_expense_deprecation(osv.osv):
                         error.append(_('%s. Contract code empty') % i)
                         _logger.error(error[-1])
                         continue
-                f.close()
                 
                 #for month in 
                 # Create lof element:
