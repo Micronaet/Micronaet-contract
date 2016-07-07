@@ -48,6 +48,7 @@ code_type_list = [
     ('generic', 'Generic expense'),
     ('voucher', 'Voucher'),
     ('transport', 'Transport'),
+    ('deprecation', 'Deprecation'),
     ]
     
 vehicle_type = [
