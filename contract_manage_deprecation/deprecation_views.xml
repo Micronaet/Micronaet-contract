@@ -1,0 +1,56 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data>
+        <record id="view_account_analytic_expense_km_form" model="ir.ui.view">
+            <field name="name">Import km</field>
+            <field name="model">account.analytic.expense.km</field>
+            <field name="type">form</field>
+            <field name="arch" type="xml">
+               <form string="Import transport" >
+                   <field name="datetime" />
+                   <field name="name" />
+                   <notebook colspan="4">
+                       <page string="Analytic line">
+                           <separator string="Analytic line" colspan="4"/>
+                           <field name="line_ids" colspan="4" nolabel="1" />
+                       </page>
+                       <page string="Error" attrs="{'invisible': [('error', '=', False)]}">
+                           <separator string="Error" colspan="4"/>
+                           <field name="error" colspan="4" nolabel="1"/>
+                       </page>
+                   </notebook>
+               </form>
+           </field>
+        </record>        
+
+        <record id="view_account_analytic_expense_km_tree" model="ir.ui.view">
+            <field name="name">Import km</field>
+            <field name="model">account.analytic.expense.km</field>
+            <field name="type">tree</field>
+            <field name="arch" type="xml">
+               <tree string="Import transport" colors="red:error!=False">
+                   <field name="datetime" />
+                   <field name="name" />
+                   <field name="error" invisible="1" />               
+               </tree>
+           </field>
+        </record>        
+     
+        <record id="action_account_analytic_expense_km" model="ir.actions.act_window">
+            <field name="name">Import transport</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">account.analytic.expense.km</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="view_id" ref="view_account_analytic_expense_km_tree"/>
+        </record>
+
+        <menuitem id="menu_account_analytic_expense_km" 
+             name="Transport import"
+             action="action_account_analytic_expense_km"
+             sequence="90"
+             parent="contract_manage.menu_analytic_expense" />
+        
+    </data>    
+</openerp>
+
