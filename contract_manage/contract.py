@@ -321,7 +321,7 @@ class account_analytic_expense(osv.osv):
         # -----------------
         # Department, ledger couple to jump:
         jump_item = jump_item or ()
-        _logger.info('Jump lines of (Dep., Ledger): %s' (jump_item, ))
+        _logger.info('Jump lines of (Dep., Ledger): %s' % (jump_item, ))
         
         # Import only cost account ledger (first char test)
         exclude_ledger_start = exclude_ledger_start or []
