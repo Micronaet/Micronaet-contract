@@ -30,6 +30,7 @@ from os import listdir
 from osv import fields, osv, expression, orm
 from datetime import datetime, timedelta
 from tools.translate import _
+from os.path import isfile, join
 from tools import (DEFAULT_SERVER_DATE_FORMAT, 
     DEFAULT_SERVER_DATETIME_FORMAT, 
     DATETIME_FORMATS_MAP, 
@@ -42,15 +43,13 @@ class account_analytic_expense_deprecation(osv.osv):
     '''
     _name = 'account.analytic.expense.deprecation'
     _description = 'Monthly deprecation split'
-    _rec_name = 'account_id'
-    _order = 'period'
-
+    _rec_name = 'name'
+    
     # -------------------------------------------------------------------------
     #                          XMLRPC function
     # -------------------------------------------------------------------------
-    def schedule_csv_accounting_transport_movement_import(
-            self, cr, uid, path='~/etl/deprecation', separator=';', header=0, 
-            force=False, general_code='410100', context=None):
+    def schedule_csv_accounting_deprecation_movement_import(
+            self, cr, uid, force=False, context=None):
         ''' Import function that read in:
             path: folder where all transport Km file are
             separator: csv file format have this column separator
@@ -61,8 +60,7 @@ class account_analytic_expense_deprecation(osv.osv):
             
             Note: file period are coded in filename
         '''
-        from os.path import isfile, join
-
+        # TODO manage force!!
         # pools used:
         csv_pool = self.pool.get('csv.base')
         account_pool = self.pool.get('account.account')
@@ -70,7 +68,9 @@ class account_analytic_expense_deprecation(osv.osv):
         line_pool = self.pool.get('account.analytic.line')
         journal_pool = self.pool.get('account.analytic.journal')
 
-        # Read parameters for write analytic enytry:
+        # ---------------------------------------------------------------------
+        # Read parameters for write analytic entry:
+        # ---------------------------------------------------------------------
         # Purchase journal:
         journal_id = journal_pool.get_journal_purchase(
             cr, uid, context=context)
@@ -87,15 +87,16 @@ class account_analytic_expense_deprecation(osv.osv):
         trans_file = [
             filename for filename in listdir(path) if
                 isfile(join(path, filename)) and filename[-3:] == 'csv']
+        trans_file.sort() # for have year correct order
 
+        # Log parameter for operations:
         if not trans_file:
             _logger.warning(
                 _('File not found in transport folder: %s') % path)
             return True
-
-        trans_file.sort() # for have last price correct
         
         # Load previous importation:
+        _logger.info('Load previous log record (deprecation)')
         previous_db = {}
         previous_ids = self.search(cr, uid, [], context=context)
         for previous in self.browse(cr, uid, previous_ids, context=context):
@@ -222,17 +223,30 @@ class account_analytic_expense_deprecation(osv.osv):
         return True
 
     _columns = {
-        'name': fields.char('Import', size=120, required=True), 
-        'period': fields.char('YYYY-MM', size=6, required=True), 
-        'datetime': fields.date('Import date'),
+        'name': fields.char('Year', size=4, required=True),        
+        'error': fields.text('Error'), # TODO keep?
+        }
+account_analytic_expense_deprecation()
+
+class account_analytic_expense_deprecation_period(osv.osv):
+    ''' Add schedule method and override split method
+    '''
+    _name = 'account.analytic.expense.deprecation.period'
+    _description = 'Monthly deprecation split'
+
+    _columns = {
+        'name': fields.char('MM', size=2, required=True), 
+        'datetime': fields.datetime('Import date'),
         'error': fields.text('Error'),
-         }
+        'year_id': fields.many2one(
+            'account.analytic.expense.deprecation', 'Year'), 
+        }
     
     _defaults = {
         'datetime': lambda *x: datetime.now().strftime(
             DEFAULT_SERVER_DATETIME_FORMAT),
-        }     
-account_analytic_expense_deprecation()
+        }        
+account_analytic_expense_deprecation_period()
 
 class account_analytic_line(osv.osv):
     ''' Extra fields for analytic line
@@ -241,10 +255,21 @@ class account_analytic_line(osv.osv):
     
     _columns = {
         'deprecation_import_id': fields.many2one(
-            'account.analytic.expense.deprecation', 'Import deprecation', 
-            ondelete='cascade'),
+            'account.analytic.expense.deprecation.period', 
+            'Import deprecation', ondelete='cascade'),
         }
 account_analytic_line()
+
+class account_analytic_expense_deprecation_period(osv.osv):
+    ''' Add schedule method and override split method
+    '''
+    _inherit = 'account.analytic.expense.deprecation.period'
+
+    _columns = {
+        'line_ids': fields.one2many(
+            'account.analytic.line', 'deprecation_import_id', 'Analytic line'),
+        }
+account_analytic_expense_deprecation_period()
 
 class account_analytic_expense_deprecation(osv.osv):
     ''' Add schedule method and override split method
@@ -252,9 +277,9 @@ class account_analytic_expense_deprecation(osv.osv):
     _inherit = 'account.analytic.expense.deprecation'
 
     _columns = {
-        'line_ids': fields.one2many(
-            'account.analytic.line', 'deprecation_import_id', 'Analytic line'),
+        'period_ids': fields.one2many(
+            'account.analytic.expense.deprecation.period', 
+            'year_id', 'Period'),
         }
-
 account_analytic_expense_deprecation()
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

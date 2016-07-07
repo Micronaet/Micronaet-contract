@@ -21,14 +21,13 @@
 ###############################################################################
 
 {
-    'name': 'Contract Manage: Transport cost',
+    'name': 'Contract Manage: Deprecation cost',
     'version': '0.0.1',
     'category': 'Generic Modules/Customization',
-    'description': """
-        Temp part for manage transport costs
-        Import a list of contract with Km for every month
-        Used for split transport costs
-        """,
+    'description': '''
+        Deprecation import cost taken in database part and splitted on all
+        contract open month by month
+        ''',
     'author': 'Micronaet s.r.l.',
     'website': 'http://www.micronaet.it',
     'depends': [
@@ -37,8 +36,7 @@
         ],
     'init_xml': [], 
     'update_xml': [
-        'security/ir.model.access.csv',
-        'transport_views.xml',
+        #'deprecation_views.xml',
         'scheduler.xml',
         ],
     'demo_xml': [],
