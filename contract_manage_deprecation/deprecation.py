@@ -37,25 +37,26 @@ from tools import (DEFAULT_SERVER_DATE_FORMAT,
 
 _logger = logging.getLogger(__name__)
 
-class account_analytic_expense_km(osv.osv):
+class account_analytic_expense_deprecation(osv.osv):
     ''' Add schedule method and override split method
     '''
-    _name = 'account.analytic.expense.km'
-    _description = 'Monthly transport km'
+    _name = 'account.analytic.expense.deprecation'
+    _description = 'Monthly deprecation split'
     _rec_name = 'account_id'
-    _order = 'month'
+    _order = 'period'
 
     # -------------------------------------------------------------------------
     #                          XMLRPC function
     # -------------------------------------------------------------------------
     def schedule_csv_accounting_transport_movement_import(
-            self, cr, uid, path='~/etl/transport', separator=';', header=0, 
-            general_code='410100', context=None):
+            self, cr, uid, path='~/etl/deprecation', separator=';', header=0, 
+            force=False, general_code='410100', context=None):
         ''' Import function that read in:
             path: folder where all transport Km file are
             separator: csv file format have this column separator
             header: and total line header passed
-            general_code: general account code
+            force: delete previous elements
+            general_code: general account code for create analytic line
             context: context for this function
             
             Note: file period are coded in filename
@@ -93,50 +94,44 @@ class account_analytic_expense_km(osv.osv):
             return True
 
         trans_file.sort() # for have last price correct
-        _logger.info('Start auto import of file expences')
+        
+        # Load previous importation:
+        previous_db = {}
+        previous_ids = self.search(cr, uid, [], context=context)
+        for previous in self.browse(cr, uid, previous_ids, context=context):
+            previous_db[previous.period] = previous.id
+        
+        _logger.info('Start auto import of file deprecation')        
+        error = [] # from here log error              
         for filename in trans_file:
-            try:            
+            try:
                 _logger.info('Load and import file %s' % filename)
-                error = [] # from here log error              
-                
-                # ----------------------------------
-                # Remove previous import if present:
-                # ----------------------------------
-                unlink_ids = line_pool.search(cr, uid, [
-                    ('csv_filename', '=', filename),
-                    ], context=context)
-                if unlink_ids:
-                    line_pool.unlink(cr, uid, unlink_ids, context=context)
-                    _logger.warning(
-                        'Removed previous costs: %s (file: %s)' % (
-                            len(unlink_ids),
-                            filename,
-                            ))
-                
-                # ------------------------------
-                # Get data period from filename:
-                # ------------------------------                
-                # Format file: COST|YY|MM|.|csv
-                period = filename[-8:-4]
-                if not period.isdigit():    
+                period_to_update = {}
+                year = filename.split('.')[0]
+                if len(year) != 4 or not year.isdigit():    
                     error.append(
-                        _('%s. Filename syntax error COSTYYMM.csv: %s') % (
+                        _('%s. Filename syntax error YYYY.csv: %s ') % (
                             filename))
                     _logger.error(error[-1])
                     continue
+                
+                # Check which month are present:
+                for month in range(1, datetime.now().month) # all previous month
+                    key = '%s-%02d' % (year, month)
+                    if key not in previous_db: # create month if not present
+                        period_to_update[key] = previous_db[key] # save ID
+                
+                # Delete previous log (and all analytic lines under
+                self.unlink(
+                    cr, uid, period_to_update.values(), context=context)
 
-                period_date = '20%s-%s-01' % (
-                    period[:2],
-                    period[2:],
-                    )
-                    
+                # Create DB for department with year costs:
+                costs = {} # for department
+                
                 i = -header
                 fullpath = join(path, filename)
                 f = open(fullpath, 'rb')
-
-                parent_id = self.create(cr, uid, {
-                    'name': _('Import file: %s') % filename,
-                    }, context=context)                    
+                #TODO period_to_update
                 for line in f:
                     i += 1
                     if i <= 0: # jump header line
@@ -144,59 +139,67 @@ class account_analytic_expense_km(osv.osv):
                     line = line.strip().split(separator)
 
                     # Parse columns: 
-                    if len(line) < 2:
-                        error.append(_('%s. Cols < 2') % i)
+                    if len(line) != 2:
+                        error.append(_('%s. Cols != 2') % i)
                         _logger.error(error[-1])
                         continue
-                        
-                    code = csv_pool.decode_string(line[0])
+
+                    code = csv_pool.decode_string(line[0]) # department:
                     amount = csv_pool.decode_float(line[1])
-                    
+
                     if not code:
                         error.append(_('%s. Contract code empty') % i)
                         _logger.error(error[-1])
                         continue
-                            
-                    # Search contract
-                    contract_ids = contract_pool.search(cr, uid, [
-                        ('code', '=', code)], context=context)
-
-                    if not contract_ids:
-                        error.append(
-                            _('%s. Contract not found on OpenERP: %s') % (
-                                i, code))
-                        _logger.error(error[-1])
-                        continue
-                
-                    elif len(contract_ids) > 1:
-                        error.append(
-                            _('%s. More than one contract found (%s): %s') % (
-                                i, len(contract_ids), code))
-                        _logger.error(error[-1])
-                        continue
-                    
-                    line_pool.create(cr, uid, {
-                        'amount': -amount,
-                        'user_id': uid,
-                        'name': _('Import: %s') % filename,
-                        'unit_amount': 1.0,
-                        'account_id': contract_ids[0],
-                        'general_account_id': general_id,
-                        'journal_id': journal_id, 
-                        'date': period_date,
-
-                        # Link to import record:
-                        'km_import_id': parent_id,
-                        'csv_filename': filename, # key for deletion
-
-                        # Not used:
-                        #'company_id', 'code', 'currency_id', 'move_id',
-                        #'product_id', 'product_uom_id', 'amount_currency',
-                        #'ref', 'to_invoice', 'invoice_id', 
-                        # 'extra_analytic_line_timesheet_id', 'import_type',
-                        ##'activity_id', 'mail_raccomanded', 'location',
-                        }, context=context)
                 f.close()
+                
+                for month in 
+                # Create lof element:
+                parent_id = self.create(cr, uid, {
+                    'name': _('Import file: %s') % filename,
+                    'period': '',# TODO
+                    }, context=context)                    
+
+                        
+                # Search contract
+                contract_ids = contract_pool.search(cr, uid, [
+                    ('code', '=', code)], context=context)
+
+                if not contract_ids:
+                    error.append(
+                        _('%s. Contract not found on OpenERP: %s') % (
+                            i, code))
+                    _logger.error(error[-1])
+                    continue
+            
+                elif len(contract_ids) > 1:
+                    error.append(
+                        _('%s. More than one contract found (%s): %s') % (
+                            i, len(contract_ids), code))
+                    _logger.error(error[-1])
+                    continue
+                
+                line_pool.create(cr, uid, {
+                    'amount': -amount,
+                    'user_id': uid,
+                    'name': _('Import: %s') % filename,
+                    'unit_amount': 1.0,
+                    'account_id': contract_ids[0],
+                    'general_account_id': general_id,
+                    'journal_id': journal_id, 
+                    'date': period_date,
+
+                    # Link to import record:
+                    'km_import_id': parent_id,
+                    'csv_filename': filename, # key for deletion
+
+                    # Not used:
+                    #'company_id', 'code', 'currency_id', 'move_id',
+                    #'product_id', 'product_uom_id', 'amount_currency',
+                    #'ref', 'to_invoice', 'invoice_id', 
+                    # 'extra_analytic_line_timesheet_id', 'import_type',
+                    ##'activity_id', 'mail_raccomanded', 'location',
+                    }, context=context)
                 
                 # History file:
                 os.rename(
@@ -218,142 +221,18 @@ class account_analytic_expense_km(osv.osv):
         _logger.info('End auto import of file transport')
         return True
 
-    # XXX OLD PROCEDURE FOR IMPORT MOVEMENT FILES NOW REPLATED WITH 
-    # FILENAME WITH PERIOD CODED
-    """    
-    def schedule_csv_accounting_transport_movement_import(
-            self, cr, uid, path='~/etl/transport', separator=';', header=0, 
-            general_code='410100', from_month=9, context=None):
-        ''' Import function that read in:
-            path: folder where all transport Km file are
-            separator: csv file format have this column separator
-            header: and total line header passed
-            general_code: general account code
-            from_month: number of colum for import extra discount
-            context: context for this function
-        '''
-        from os.path import isfile, join
-
-        # pools used:
-        csv_pool = self.pool.get('csv.base')
-        account_pool = self.pool.get('account.account')
-        contract_pool = self.pool.get('account.analytic.account')
-        line_pool = self.pool.get('account.analytic.line')
-        journal_pool = self.pool.get('account.analytic.journal')
-
-        # Read paramters for write analytic enytry:
-        # Purchase journal:
-        journal_id = journal_pool.get_journal_purchase(
-            cr, uid, context=context)
-
-        # Code for entry (ledger) operation:
-        general_id = account_pool.get_account_id(
-            cr, uid, general_code, context=context)
-        if not general_id:
-            _logger.error(_('Cannot create analytic line, no ledge!'))
-            return False
-
-        # Get file list:
-        path = os.path.expanduser(path)
-        trans_file = [
-            filename for filename in listdir(path) if
-                isfile(join(path, filename)) and filename[-3:] == 'csv']
-
-        if not trans_file:
-            _logger.warning(_('File not found in transport folder: %s') % path)
-            return True
-
-        trans_file.sort() # for have last price correct
-        _logger.info("Start auto import of file transport")            
-        for filename in trans_file:
-            try:            
-                _logger.info("Load and import file %s" % filename)
-                error = []
-                
-                i = -header
-                fullpath = join(path, filename)
-                f = open(fullpath, 'rb')
-
-                parent_id = self.create(cr, uid, {
-                    'name': _('Import file: %s') % filename,
-                    }, context=context)
-                for line in f:
-                    i += 1
-                    if i <= 0: # jump header line
-                        continue
-                    line = line.strip().split(separator)
-
-                    code = csv_pool.decode_string(line[0])
-                    # Search contract
-                    contract_ids = contract_pool.search(cr, uid, [
-                        ('code', '=', code)], context=context)
-
-                    if not contract_ids:
-                        _logger.error(
-                            _('%s. Code not found on OpenERP: %s') % (i, code))
-                        continue
-                
-                    elif len(contract_ids) > 1:
-                        _logger.error(
-                            _('%s. More than one code found (%s): %s') % (
-                                i, len(contract_ids), code))
-                        continue
-                    
-                    for i in range(from_month, len(line)):
-                        amount = csv_pool.decode_float(line[i])
-                        
-                        line_pool.create(cr, uid, {
-                            'amount': -amount,
-                            'user_id': uid,
-                            'name': _('Import: %s') % filename, # TODO
-                            'unit_amount': 1.0,
-                            'account_id': contract_ids[0],
-                            'general_account_id': general_id,
-                            'journal_id': journal_id, 
-                            'date': '2015-%02d-01' % i, # TODO
-
-                            # Link to import record:
-                            'km_import_id': parent_id,
-
-                            # Not used:
-                            #'company_id', 'code', 'currency_id', 'move_id',
-                            #'product_id', 'product_uom_id', 'amount_currency',
-                            #'ref', 'to_invoice', 'invoice_id', 
-                            # 'extra_analytic_line_timesheet_id', 'import_type',
-                            ##'activity_id', 'mail_raccomanded', 'location',
-                            }, context=context)
-                f.close()
-                
-                # History file:
-                os.rename(
-                    os.path.join(path, filename),
-                    os.path.join(path, 'history', '%s.%s' % (
-                        datetime.now().strftime('%Y%m%d.%H%M%S'),
-                        filename, )),
-                    )
-                    
-                # TODO write error in file
-                if error:
-                    self.write(cr, uid, parent_id, {
-                        'error': '\n'.join(error)}, context=context)
-            except:
-                _logger.error('No correct file format: %s' % filename)
-                _logger.error((sys.exc_info(), ))
-                
-        _logger.info("End auto import of file transport")
-        return True"""
-
     _columns = {
         'name': fields.char('Import', size=120, required=True), 
+        'period': fields.char('YYYY-MM', size=6, required=True), 
         'datetime': fields.date('Import date'),
-        'error': fields.text('Error'), 
+        'error': fields.text('Error'),
          }
     
     _defaults = {
         'datetime': lambda *x: datetime.now().strftime(
             DEFAULT_SERVER_DATETIME_FORMAT),
         }     
-account_analytic_expense_km()    
+account_analytic_expense_deprecation()
 
 class account_analytic_line(osv.osv):
     ''' Extra fields for analytic line
@@ -361,21 +240,21 @@ class account_analytic_line(osv.osv):
     _inherit = 'account.analytic.line'
     
     _columns = {
-        'km_import_id': fields.many2one(
-            'account.analytic.expense.km', 'Import Km', ondelete='cascade'),
-        'csv_filename': fields.char('CSV filename', size=80),     
+        'deprecation_import_id': fields.many2one(
+            'account.analytic.expense.deprecation', 'Import deprecation', 
+            ondelete='cascade'),
         }
 account_analytic_line()
 
-class account_analytic_expense_km(osv.osv):
+class account_analytic_expense_deprecation(osv.osv):
     ''' Add schedule method and override split method
     '''
-    _inherit = 'account.analytic.expense.km'
+    _inherit = 'account.analytic.expense.deprecation'
 
     _columns = {
         'line_ids': fields.one2many(
-            'account.analytic.line', 'km_import_id', 'Analytic line'),
+            'account.analytic.line', 'deprecation_import_id', 'Analytic line'),
         }
 
-account_analytic_expense_km()
+account_analytic_expense_deprecation()
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
