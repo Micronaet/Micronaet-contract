@@ -124,12 +124,16 @@ class account_analytic_expense_deprecation(osv.osv):
             context: context for this function            
             Note: file period are coded in filename
         '''
+        import pdb; pdb.set_trace()
         # TODO manage force!!
         _logger.info('Start split deprecation data')
         
         # Pool used:
         period_pool = self.pool.get(
             'account.analytic.expense.deprecation.period')
+        account_pool = self.pool.get(
+            'account.account')
+
         # ---------------------------------------------------------------------
         # Read parameters for write analytic entry:
         # ---------------------------------------------------------------------        
