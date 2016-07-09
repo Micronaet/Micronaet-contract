@@ -47,8 +47,9 @@ class account_analytic_expense_deprecation(osv.osv):
     # -------------------------------------------------------------------------
     #                          Utility function
     # -------------------------------------------------------------------------
-    def self.create_analytic_line_deprecation(self, cr, uid, department_id, 
-            total, general_account_id, period, error=None, context=None):
+    def create_analytic_line_deprecation(self, cr, uid, department_id, 
+            total, general_account_id, period, error=None, 
+            year_period_id, context=None):
         ''' Procedure for split cost passed
         '''
         # Init setup:
@@ -88,30 +89,28 @@ class account_analytic_expense_deprecation(osv.osv):
            
         rate = total / total_contract        
         for contract in contract_pool.browse(
-                cr, uid, contract_ids, context=context):
-                
-        
-        line_pool.create(cr, uid, {
-            'amount': -amount,
-            'user_id': uid,
-            'name': _('Deprecation period: %s') % period,
-            'unit_amount': 1.0,
-            'account_id': contract_ids[0],
-            'general_account_id': general_account_id,
-            'journal_id': journal_id, 
-            'date': period_date,
+                cr, uid, contract_ids, context=context):        
+            line_pool.create(cr, uid, {
+                'amount': -amount,
+                'user_id': uid,
+                'name': _('Deprecation period: %s') % period,
+                'unit_amount': 1.0,
+                'account_id': contract_ids[0],
+                'general_account_id': general_account_id,
+                'journal_id': journal_id, 
+                'date': period_date,
 
-            # Link to import record:
-            'km_import_id': parent_id,
-            'csv_filename': filename, # key for deletion
+                # Link to import record:
+                'year_period_id': year_period_id,
+                'csv_filename': filename, # key for deletion
 
-            # Not used:
-            #'company_id', 'code', 'currency_id', 'move_id',
-            #'product_id', 'product_uom_id', 'amount_currency',
-            #'ref', 'to_invoice', 'invoice_id', 
-            # 'extra_analytic_line_timesheet_id', 'import_type',
-            ##'activity_id', 'mail_raccomanded', 'location',
-            }, context=context)
+                # Not used:
+                #'company_id', 'code', 'currency_id', 'move_id',
+                #'product_id', 'product_uom_id', 'amount_currency',
+                #'ref', 'to_invoice', 'invoice_id', 
+                # 'extra_analytic_line_timesheet_id', 'import_type',
+                ##'activity_id', 'mail_raccomanded', 'location',
+                }, context=context)
                
         return True
 
@@ -138,13 +137,14 @@ class account_analytic_expense_deprecation(osv.osv):
 
         # Check period to load:
         _logger.info('Load previous imported periods')
+        period_mask = '%s-%02d'
         periods_all = []
         period_to_update = {}
         error = [] # from here log error
         
         year_ids = self.search(cr, uid, [], context=context)
 
-        current_period = '%s-%02d' % (
+        current_period = period_mask % (
             datetime.now().year, 
             datetime.now().month,
             )
@@ -154,13 +154,20 @@ class account_analytic_expense_deprecation(osv.osv):
             # -----------------------------------------------------------------
             # Read total cost to split:
             # -----------------------------------------------------------------
-            to_split = {}
+            to_split = {} # list of period to split
+
+            # Cost to split in period
             for cost in year.cost_ids:
                 to_split[cost.department_id.id] = cost.total / 12.0 #month rate
 
+            if not to_split:
+                error.append('Create department cost to split!')
+                _logger.error(error[-1])
+                return True
+
             # Create database for period of the year
             for month in range(1, 13): # all previous month
-                key = '%s-%02d' % (year.name, month)
+                key = period_mask % (year.name, month)
                 if key >= current_period:
                     continue # jump > current month
                 periods_all.append(key)
@@ -168,9 +175,8 @@ class account_analytic_expense_deprecation(osv.osv):
             # Create period not present:
             for period in year.period_ids:
                 key = '%s-%s' % (period.year_id.name, period.name)
-                periods[key] = period
                 if key in periods_all: # create month if not present
-                    continue
+                    continue # yet present
                 
                 # Create analytic line for department:
                 for department_id in to_split:
@@ -178,35 +184,29 @@ class account_analytic_expense_deprecation(osv.osv):
                     self.create_analytic_line_deprecation(
                         cr, uid, 
                         department_id, # department for contract selection
-                        to_split[department_id] # total mont to split
+                        to_split[department_id], # total mont to split
                         general_id,
                         key, # for period
                         error,
+                        period.id, # for link
                         context=context,
                         )
-                try:
-                    department_id = period.department_id.id
-                    total = period.total
-                    
-                
-                    code = csv_pool.decode_string(line[0]) # department:
-                    amount = csv_pool.decode_float(line[1])
-
-                    if not code:
-                        error.append(_('%s. Contract code empty') % i)
-                        _logger.error(error[-1])
-                        continue
-                
+                department_id = period.department_id.id
+                total = period.total
             
+                code = csv_pool.decode_string(line[0]) # department:
+                amount = csv_pool.decode_float(line[1])
+
+                if not code:
+                    error.append(_('%s. Contract code empty') % i)
+                    _logger.error(error[-1])
+                    continue
+                    
                 # TODO write error in file
                 if error:
-                    self.write(cr, uid, parent_id, {
+                    self.write(cr, uid, period.id, {
                         'error': '\n'.join(error)}, context=context)
-            except:
-                _logger.error('No correct file format: %s' % filename)
-                error.append('%s' % ((sys.exc_info(), )))
-                _logger.error(error[-1])
-                
+
         _logger.info('End auto import of file transport')
         return True
 
@@ -262,9 +262,9 @@ class account_analytic_line(osv.osv):
     _inherit = 'account.analytic.line'
     
     _columns = {
-        'deprecation_import_id': fields.many2one(
+        'year_period_id': fields.many2one(
             'account.analytic.expense.deprecation.period', 
-            'Import deprecation', ondelete='cascade'),
+            'Link for split period', ondelete='cascade'),
         }
 account_analytic_line()
 

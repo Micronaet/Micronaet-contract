@@ -1,18 +1,17 @@
 <?xml version="1.0" ?>
 <openerp>
     <data>
-        <record id="view_account_analytic_expense_km_form" model="ir.ui.view">
-            <field name="name">Import km</field>
-            <field name="model">account.analytic.expense.km</field>
-            <field name="type">form</field>
+        <record id="view_account_analytic_expense_deprecation_form" model="ir.ui.view">
+            <field name="name">Import deprecation</field>
+            <field name="model">account.analytic.expense.deprecation</field>
             <field name="arch" type="xml">
-               <form string="Import transport" >
-                   <field name="datetime" />
+               <form string="Deprecation cost" >
                    <field name="name" />
+                   <field name="force" />
                    <notebook colspan="4">
-                       <page string="Analytic line">
-                           <separator string="Analytic line" colspan="4"/>
-                           <field name="line_ids" colspan="4" nolabel="1" />
+                       <page string="Note">
+                           <separator string="Note" colspan="4"/>
+                           <field name="note" colspan="4" nolabel="1" />
                        </page>
                        <page string="Error" attrs="{'invisible': [('error', '=', False)]}">
                            <separator string="Error" colspan="4"/>
@@ -23,31 +22,29 @@
            </field>
         </record>        
 
-        <record id="view_account_analytic_expense_km_tree" model="ir.ui.view">
-            <field name="name">Import km</field>
-            <field name="model">account.analytic.expense.km</field>
-            <field name="type">tree</field>
+        <record id="view_account_analytic_expense_deprecation_tree" model="ir.ui.view">
+            <field name="name">Import deprecation</field>
+            <field name="model">account.analytic.expense.deprecation/field>
             <field name="arch" type="xml">
-               <tree string="Import transport" colors="red:error!=False">
-                   <field name="datetime" />
+               <tree string="Deprecation cost" colors="blue:force!=False">
                    <field name="name" />
-                   <field name="error" invisible="1" />               
+                   <field name="error" />
                </tree>
            </field>
         </record>        
      
-        <record id="action_account_analytic_expense_km" model="ir.actions.act_window">
-            <field name="name">Import transport</field>
+        <record id="action_account_analytic_expense_deprecation" model="ir.actions.act_window">
+            <field name="name">Import deprecation</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">account.analytic.expense.km</field>
+            <field name="res_model">account.analytic.expense.deprecation</field>
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
-            <field name="view_id" ref="view_account_analytic_expense_km_tree"/>
+            <field name="view_id" ref="view_account_analytic_expense_deprecation_tree"/>
         </record>
 
-        <menuitem id="menu_account_analytic_expense_km" 
-             name="Transport import"
-             action="action_account_analytic_expense_km"
+        <menuitem id="menu_account_analytic_expense_deprecation" 
+             name="Deprecation for year"
+             action="action_account_analytic_expense_deprecation"
              sequence="90"
              parent="contract_manage.menu_analytic_expense" />
         

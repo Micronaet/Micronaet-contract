@@ -1,0 +1,3 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+access_account_analytic_expense_deprecation_user,account.analytic.expense.deprecation,model_account_analytic_expense_deprecation,base.group_user,1,1,1,1
+access_account_analytic_expense_deprecation_cost_user,account.analytic.expense.deprecation.cost,model_account_analytic_expense_deprecation_cost,base.group_user,1,1,1,1

@@ -37,7 +37,8 @@
         ],
     'init_xml': [], 
     'update_xml': [
-        #'deprecation_views.xml',
+        'security/ir.model.access.csv',
+        'deprecation_views.xml',
         'scheduler.xml',
         ],
     'demo_xml': [],
