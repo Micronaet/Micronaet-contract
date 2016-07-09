@@ -48,8 +48,8 @@ class account_analytic_expense_deprecation(osv.osv):
     #                          Utility function
     # -------------------------------------------------------------------------
     def create_analytic_line_deprecation(self, cr, uid, department_id, 
-            total, general_account_id, period, error=None, 
-            year_period_id, context=None):
+            total, year_period_id, general_account_id, period, error=None, 
+             context=None):
         ''' Procedure for split cost passed
         '''
         # Init setup:
@@ -185,10 +185,10 @@ class account_analytic_expense_deprecation(osv.osv):
                         cr, uid, 
                         department_id, # department for contract selection
                         to_split[department_id], # total mont to split
+                        period.id, # for link
                         general_id,
                         key, # for period
                         error,
-                        period.id, # for link
                         context=context,
                         )
                 department_id = period.department_id.id
@@ -275,7 +275,7 @@ class account_analytic_expense_deprecation_period(osv.osv):
 
     _columns = {
         'line_ids': fields.one2many(
-            'account.analytic.line', 'deprecation_import_id', 'Analytic line'),
+            'account.analytic.line', 'year_period_id', 'Analytic line'),
         }
 account_analytic_expense_deprecation_period()
 
