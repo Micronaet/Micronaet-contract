@@ -125,9 +125,14 @@ class account_analytic_expense_deprecation(osv.osv):
             Note: file period are coded in filename
         '''
         # TODO manage force!!
+        _logger.info('Start split deprecation data')
+        
+        # Pool used:
+        period_pool = self.pool.get(
+            'account.analytic.expense.deprecation.period')
         # ---------------------------------------------------------------------
         # Read parameters for write analytic entry:
-        # ---------------------------------------------------------------------
+        # ---------------------------------------------------------------------        
         # Code for entry (ledger) operation:
         general_id = account_pool.get_account_id(
             cr, uid, general_code, context=context)
@@ -139,8 +144,7 @@ class account_analytic_expense_deprecation(osv.osv):
         _logger.info('Load previous imported periods')
         period_mask = '%s-%02d'
         periods_all = []
-        period_to_update = {}
-        error = [] # from here log error
+        period_to_update = {} # XXX used?
         
         year_ids = self.search(cr, uid, [], context=context)
 
@@ -149,8 +153,7 @@ class account_analytic_expense_deprecation(osv.osv):
             datetime.now().month,
             )
             
-        for year in self.browse(
-                cr, uid, year_ids, context=context):
+        for year in self.browse(cr, uid, year_ids, context=context):
             # -----------------------------------------------------------------
             # Read total cost to split:
             # -----------------------------------------------------------------
@@ -161,9 +164,8 @@ class account_analytic_expense_deprecation(osv.osv):
                 to_split[cost.department_id.id] = cost.total / 12.0 #month rate
 
             if not to_split:
-                error.append('Create department cost to split!')
-                _logger.error(error[-1])
-                return True
+                _logger.error('Create department cost to split!')
+                continue
 
             # Create database for period of the year
             for month in range(1, 13): # all previous month
@@ -174,40 +176,29 @@ class account_analytic_expense_deprecation(osv.osv):
 
             # Create period not present:
             for period in year.period_ids:
+                error = [] # from here log error
                 key = '%s-%s' % (period.year_id.name, period.name)
                 if key in periods_all: # create month if not present
                     continue # yet present
                 
                 # Create analytic line for department:
-                for department_id in to_split:
+                for department_id, rate in to_split.iteritems():
                     # TODO create split function:
                     self.create_analytic_line_deprecation(
                         cr, uid, 
                         department_id, # department for contract selection
-                        to_split[department_id], # total mont to split
+                        rate, # total mont to split
                         period.id, # for link
                         general_id,
                         key, # for period
-                        error,
+                        error, # for update data
                         context=context,
                         )
-                department_id = period.department_id.id
-                total = period.total
-            
-                code = csv_pool.decode_string(line[0]) # department:
-                amount = csv_pool.decode_float(line[1])
 
-                if not code:
-                    error.append(_('%s. Contract code empty') % i)
-                    _logger.error(error[-1])
-                    continue
-                    
-                # TODO write error in file
                 if error:
-                    self.write(cr, uid, period.id, {
+                    period_pool.write(cr, uid, period.id, {
                         'error': '\n'.join(error)}, context=context)
-
-        _logger.info('End auto import of file transport')
+        _logger.info('End split deprecation data!')
         return True
 
     _columns = {
