@@ -53,8 +53,10 @@ class account_analytic_expense_deprecation(osv.osv):
         ''' Procedure for split cost passed
         '''
         # Init setup:
-        error = error or []        
-        note = note or []
+        if type(error) != list:
+            error = []        
+        if type(note) != list:    
+            note = []
         
         # Pool used:
         journal_pool = self.pool.get('account.analytic.journal')
@@ -81,6 +83,9 @@ class account_analytic_expense_deprecation(osv.osv):
             # header filter: 
             ('department_id', '=', department.id), # department filter
             ('state', 'not in', ('cancel', )), # status test
+            ('not_working', '=', False),
+            ('is_recover', '=', False),
+            #('is_contract', '=', True),
             
             # period from and to:
             '|',
@@ -136,17 +141,16 @@ class account_analytic_expense_deprecation(osv.osv):
                     ##'activity_id', 'mail_raccomanded', 'location',
                     }, context=context)
                 note.append('Contract: %s [%s - %s]' % (
-                    contract.code,
-                    contract.date_start,
-                    contract.date,
+                    contract.code or '?',
+                    contract.date_start or '?',
+                    contract.date or '?',
                     ))
             else:
                 note.append('NO >> Contract: %s [%s - %s]' % (
-                    contract.code,
-                    contract.date_start,
-                    contract.date,
+                    contract.code or '?',
+                    contract.date_start or '?',
+                    contract.date or '?',
                     ))
-
         return True
 
     # -------------------------------------------------------------------------
@@ -245,9 +249,9 @@ class account_analytic_expense_deprecation(osv.osv):
                 if error:
                     period_pool.write(cr, uid, period_id, {
                         'error': '\n'.join(error)}, context=context)
-                #if note:
-                #    period_pool.write(cr, uid, period_id, {
-                #        'note': '\n'.join(note)}, context=context)
+                if note:
+                    period_pool.write(cr, uid, period_id, {
+                        'note': '\n'.join(note)}, context=context)
         _logger.info('End split deprecation data!')
         return True
 
