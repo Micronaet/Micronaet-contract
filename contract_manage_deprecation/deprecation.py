@@ -68,8 +68,15 @@ class account_analytic_expense_deprecation(osv.osv):
 
         # Search contract
         import pdb; pdb.set_trace()
-        start_period = ''
-        end_period = ''
+        start_period = '%s-01' % period
+        period_list = period.split('-')
+        if period_list[1] == '12':
+            end_period = '%s-01-01' % (int(period_list[0]) + 1)   
+        else:
+            end_period = '%s-%s-01' % (
+                period_list[0],
+                int(period_list[1]) + 1,
+                )
         contract_ids = contract_pool.search(cr, uid, [
             # header filter: 
             ('department_id', '=', department_id), # department filter
@@ -137,7 +144,6 @@ class account_analytic_expense_deprecation(osv.osv):
             context: context for this function            
             Note: file period are coded in filename
         '''
-        import pdb; pdb.set_trace()
         # TODO manage force!!
         _logger.info('Start split deprecation data')
         
@@ -182,7 +188,7 @@ class account_analytic_expense_deprecation(osv.osv):
             #                    Check period to create
             # -----------------------------------------------------------------
             # Create database for period of the year
-            periods_all = [
+            period_all = [
                 period_mask % (year.name, month) for month in range(1, 13)\
                     if period_mask % (year.name, month) < current_period]
 
@@ -193,21 +199,22 @@ class account_analytic_expense_deprecation(osv.osv):
 
             # Create period record not present:
             period2update = {}
+            
             for period in period_all:
-                if period in period_all:
-                    continue
-                period2update[period] = period_pool.create(cr, uid, {
+                if period in period_present:
+                    continue # jump, yet present
+
+                # Create and after update with costs:
+                period_id = period2update[period] = period_pool.create(cr, uid, {
                     'name': period[-2:], # MM
                     'datetime': datetime.now().strftime(
                         DEFAULT_SERVER_DATETIME_FORMAT),
                     'year_id': year.id,
                     }, context=context)
 
-            error = [] # from here log error
-            for period, period_id in period2update.itetitems():
-                # Create analytic line for department:
+                # Append analytic line created:
+                error = [] # from here log error
                 for department_id, rate in to_split.iteritems():
-                    # TODO create split function:
                     self.create_analytic_line_deprecation(
                         cr, uid, 
                         department_id, # department for contract selection
@@ -218,7 +225,6 @@ class account_analytic_expense_deprecation(osv.osv):
                         error, # for update data
                         context=context,
                         )
-
                 if error:
                     period_pool.write(cr, uid, period_id, {
                         'error': '\n'.join(error)}, context=context)
