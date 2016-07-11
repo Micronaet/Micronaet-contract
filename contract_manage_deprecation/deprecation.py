@@ -139,13 +139,13 @@ class account_analytic_expense_deprecation(osv.osv):
                     contract.code,
                     contract.date_start,
                     contract.date,
-                    )
+                    ))
             else:
                 note.append('NO >> Contract: %s [%s - %s]' % (
                     contract.code,
                     contract.date_start,
                     contract.date,
-                    )
+                    ))
 
         return True
 
