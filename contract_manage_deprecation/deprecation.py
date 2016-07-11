@@ -160,15 +160,15 @@ class account_analytic_expense_deprecation(osv.osv):
         # Check period to load:
         _logger.info('Load previous imported periods')
         period_mask = '%s-%02d'
-        periods_all = []
-        period_to_update = {} # XXX used?
-
+        
         current_period = period_mask % (
             datetime.now().year, 
             datetime.now().month,
             )
         year_ids = self.search(cr, uid, [], context=context)
         for year in self.browse(cr, uid, year_ids, context=context):
+            periods_all = [] # reset every year
+            
             # -----------------------------------------------------------------
             #                    Read total cost to split:
             # -----------------------------------------------------------------
@@ -180,6 +180,11 @@ class account_analytic_expense_deprecation(osv.osv):
                 _logger.error('Cannot create department cost to split!')
                 continue
 
+            for period in year.period_ids:
+                key = '%s-%s' % (period.year_id.name, period.name)
+                if key not 
+                period_present = 
+            
             # Create database for period of the year
             for month in range(1, 13): # all previous month
                 key = period_mask % (year.name, month)
@@ -187,13 +192,20 @@ class account_analytic_expense_deprecation(osv.osv):
                     continue # jump > current month
                 periods_all.append(key)
 
-            # Create period not present:
+            # Create period not present:      
+            period2update = {}      
             for period in year.period_ids:
                 error = [] # from here log error
                 key = '%s-%s' % (period.year_id.name, period.name)
-                if key in periods_all: # create month if not present
-                    continue # yet present # TODO manage force procedure
-                
+                if key not in periods_all: # create month if not present
+                    period2update[period] = period_pool.create(cr, uid, {
+                        'name': period[-2:], # MM
+                        'datetime': datetime.now().strftime(
+                            DEFAULT_SERVER_DATETIME_FORMAT),
+                        'year_id': year.id,
+                        }, context=context)
+
+            for period, period_id in period2update.itetitems(): # remain                
                 # Create analytic line for department:
                 for department_id, rate in to_split.iteritems():
                     # TODO create split function:
