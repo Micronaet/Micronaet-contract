@@ -233,7 +233,6 @@ class account_analytic_expense_deprecation(osv.osv):
         }
 account_analytic_expense_deprecation()
 
-
 class account_analytic_expense_deprecation_cost(osv.osv):
     ''' Add schedule method and override split method
     '''
