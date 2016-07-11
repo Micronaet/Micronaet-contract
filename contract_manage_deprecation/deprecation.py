@@ -80,7 +80,7 @@ class account_analytic_expense_deprecation(osv.osv):
         contract_ids = contract_pool.search(cr, uid, [
             # header filter: 
             ('department_id', '=', department_id), # department filter
-            ('state', 'not in', ('cancel')), # status test
+            ('state', 'not in', ('cancel', )), # status test
             
             # period from and to:
             '|',
