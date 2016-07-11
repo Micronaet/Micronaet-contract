@@ -67,16 +67,16 @@ class account_analytic_expense_deprecation(osv.osv):
         # TODO 
 
         # Search contract
-        import pdb; pdb.set_trace()
         start_period = '%s-01' % period
         period_list = period.split('-')
         if period_list[1] == '12':
             end_period = '%s-01-01' % (int(period_list[0]) + 1)   
         else:
-            end_period = '%s-%s-01' % (
+            end_period = '%s-%02d-01' % (
                 period_list[0],
                 int(period_list[1]) + 1,
                 )
+        import pdb; pdb.set_trace()
         contract_ids = contract_pool.search(cr, uid, [
             # header filter: 
             ('department_id', '=', department_id), # department filter
