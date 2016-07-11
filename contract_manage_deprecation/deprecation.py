@@ -76,7 +76,6 @@ class account_analytic_expense_deprecation(osv.osv):
                 period_list[0],
                 int(period_list[1]) + 1,
                 )
-        import pdb; pdb.set_trace()
         contract_ids = contract_pool.search(cr, uid, [
             # header filter: 
             ('department_id', '=', department_id), # department filter
@@ -87,10 +86,11 @@ class account_analytic_expense_deprecation(osv.osv):
             ('date_start', '=', False),
             ('date_start', '<', end_period),
             '|',
-            ('date_end', '=', False),
-            ('date_end', '>=', start_period),
+            ('date', '=', False),
+            ('date', '>=', start_period),
             
             ], context=context)
+        import pdb; pdb.set_trace()
 
         if len(contract_ids) > 1:
             error.append(_('No contract found for split data!'))
