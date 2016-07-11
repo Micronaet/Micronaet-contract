@@ -92,7 +92,7 @@ class account_analytic_expense_deprecation(osv.osv):
             ], context=context)
         import pdb; pdb.set_trace()
 
-        if len(contract_ids) > 1:
+        if not contract_ids:
             error.append(_('No contract found for split data!'))
             _logger.error(error[-1])
             return
@@ -123,7 +123,6 @@ class account_analytic_expense_deprecation(osv.osv):
 
                     # Link to import record:
                     'year_period_id': year_period_id,
-                    'csv_filename': filename, # key for deletion
 
                     # Not used:
                     #'company_id', 'code', 'currency_id', 'move_id',
