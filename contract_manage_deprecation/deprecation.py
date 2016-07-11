@@ -239,14 +239,15 @@ class account_analytic_expense_deprecation(osv.osv):
                         general_id,
                         period, # for period
                         error, # for update data
+                        note, # extra note data
                         context=context,
                         )
                 if error:
                     period_pool.write(cr, uid, period_id, {
                         'error': '\n'.join(error)}, context=context)
-                if note:
-                    period_pool.write(cr, uid, period_id, {
-                        'note': '\n'.join(note)}, context=context)
+                #if note:
+                #    period_pool.write(cr, uid, period_id, {
+                #        'note': '\n'.join(note)}, context=context)
         _logger.info('End split deprecation data!')
         return True
 
@@ -287,7 +288,7 @@ class account_analytic_expense_deprecation_period(osv.osv):
         'datetime': fields.datetime('Import date'),
         'year_id': fields.many2one(
             'account.analytic.expense.deprecation', 'Year',
-            ondelete='cascade'), 
+            ondelete='cascade'),
         'error': fields.text('Error'),
         'note': fields.text('Note'),
         }

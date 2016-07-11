@@ -30,14 +30,14 @@
                                    <field name="name" />
                                    <field name="datetime" />
 
-                                   <separator string="Error" colspan="4" attrs="{'invisible': [('error', '=', False)]}" />
-                                   <field name="error" colspan="4" nolabel="1" attrs="{'invisible': [('error', '=', False)]}"/>
+                                   <!--<separator string="Error" colspan="4" attrs="{'invisible': [('error', '=', False)]}" />
+                                   <field name="error" colspan="4" nolabel="1" attrs="{'invisible': [('error', '=', False)]}"/>-->
                                    
                                    <separator string="Analytic line" colspan="4"/>
                                    <field name="line_ids" colspan="4" nolabel="1"/>
 
-                                   <separator string="Note" colspan="4" attrs="{'invisible': [('note', '=', False)]}" />
-                                   <field name="note" colspan="4" nolabel="1" attrs="{'invisible': [('note', '=', False)]}"/>
+                                   <!--<separator string="Note" colspan="4" attrs="{'invisible': [('note', '=', False)]}" />
+                                   <field name="note" colspan="4" nolabel="1" attrs="{'invisible': [('note', '=', False)]}"/>-->
                                </form>                               
                            </field>
                        </page>
