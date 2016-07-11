@@ -167,45 +167,44 @@ class account_analytic_expense_deprecation(osv.osv):
             )
         year_ids = self.search(cr, uid, [], context=context)
         for year in self.browse(cr, uid, year_ids, context=context):
-            periods_all = [] # reset every year
-            
             # -----------------------------------------------------------------
             #                    Read total cost to split:
             # -----------------------------------------------------------------
             # Cost to split in period
-            to_split = {} # list of period to split
+            to_split = {} # list of period to split            
             for cost in year.cost_ids:
                 to_split[cost.department_id.id] = cost.total / 12.0 # monthly
             if not to_split:
                 _logger.error('Cannot create department cost to split!')
                 continue
 
-            for period in year.period_ids:
-                key = '%s-%s' % (period.year_id.name, period.name)
-                if key not 
-                period_present = 
-            
+            # -----------------------------------------------------------------
+            #                    Check period to create
+            # -----------------------------------------------------------------
             # Create database for period of the year
-            for month in range(1, 13): # all previous month
-                key = period_mask % (year.name, month)
-                if key >= current_period:
-                    continue # jump > current month
-                periods_all.append(key)
+            periods_all = [
+                period_mask % (year.name, month) for month in range(1, 13)\
+                    if key < current_period]
 
-            # Create period not present:      
-            period2update = {}      
-            for period in year.period_ids:
-                error = [] # from here log error
-                key = '%s-%s' % (period.year_id.name, period.name)
-                if key not in periods_all: # create month if not present
-                    period2update[period] = period_pool.create(cr, uid, {
-                        'name': period[-2:], # MM
-                        'datetime': datetime.now().strftime(
-                            DEFAULT_SERVER_DATETIME_FORMAT),
-                        'year_id': year.id,
-                        }, context=context)
+            # Read period present: # TODO manage force here!
+            period_present = [
+                '%s-%s' % (period.year_id.name, period.name) for \
+                    period in year.period_ids]
 
-            for period, period_id in period2update.itetitems(): # remain                
+            # Create period record not present:
+            period2update = {}
+            for period in period_all:
+                if period in period_all:
+                    continue
+                period2update[period] = period_pool.create(cr, uid, {
+                    'name': period[-2:], # MM
+                    'datetime': datetime.now().strftime(
+                        DEFAULT_SERVER_DATETIME_FORMAT),
+                    'year_id': year.id,
+                    }, context=context)
+
+            error = [] # from here log error
+            for period, period_id in period2update.itetitems():
                 # Create analytic line for department:
                 for department_id, rate in to_split.iteritems():
                     # TODO create split function:
@@ -213,15 +212,15 @@ class account_analytic_expense_deprecation(osv.osv):
                         cr, uid, 
                         department_id, # department for contract selection
                         rate, # total mont to split
-                        period.id, # for link
+                        period_id, # for link
                         general_id,
-                        key, # for period
+                        period, # for period
                         error, # for update data
                         context=context,
                         )
 
                 if error:
-                    period_pool.write(cr, uid, period.id, {
+                    period_pool.write(cr, uid, period_id, {
                         'error': '\n'.join(error)}, context=context)
         _logger.info('End split deprecation data!')
         return True
