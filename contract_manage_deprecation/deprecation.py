@@ -48,12 +48,13 @@ class account_analytic_expense_deprecation(osv.osv):
     #                          Utility function
     # -------------------------------------------------------------------------
     def create_analytic_line_deprecation(self, cr, uid, department, 
-            total, year_period_id, general_account_id, period, error=None, 
-             context=None):
+            total, year_period_id, general_account_id, period, error=None,
+            note=None, context=None):
         ''' Procedure for split cost passed
         '''
         # Init setup:
-        error = error or []
+        error = error or []        
+        note = note or []
         
         # Pool used:
         journal_pool = self.pool.get('account.analytic.journal')
@@ -134,6 +135,18 @@ class account_analytic_expense_deprecation(osv.osv):
                     # 'extra_analytic_line_timesheet_id', 'import_type',
                     ##'activity_id', 'mail_raccomanded', 'location',
                     }, context=context)
+                note.append('Contract: %s [%s - %s]' % (
+                    contract.code,
+                    contract.date_start,
+                    contract.date,
+                    )
+            else:
+                note.append('NO >> Contract: %s [%s - %s]' % (
+                    contract.code,
+                    contract.date_start,
+                    contract.date,
+                    )
+
         return True
 
     # -------------------------------------------------------------------------
@@ -216,6 +229,7 @@ class account_analytic_expense_deprecation(osv.osv):
 
                 # Append analytic line created:
                 error = [] # from here log error
+                note = [] # from here log error
                 for department, rate in to_split.iteritems():
                     self.create_analytic_line_deprecation(
                         cr, uid, 
@@ -230,6 +244,9 @@ class account_analytic_expense_deprecation(osv.osv):
                 if error:
                     period_pool.write(cr, uid, period_id, {
                         'error': '\n'.join(error)}, context=context)
+                if note:
+                    period_pool.write(cr, uid, period_id, {
+                        'note': '\n'.join(note)}, context=context)
         _logger.info('End split deprecation data!')
         return True
 
@@ -272,6 +289,7 @@ class account_analytic_expense_deprecation_period(osv.osv):
             'account.analytic.expense.deprecation', 'Year',
             ondelete='cascade'), 
         'error': fields.text('Error'),
+        'note': fields.text('Note'),
         }
             
     _defaults = {
