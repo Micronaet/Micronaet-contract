@@ -85,6 +85,7 @@ class account_analytic_expense_deprecation(osv.osv):
             ('state', 'not in', ('cancel', )), # status test
             ('not_working', '=', False),
             ('is_recover', '=', False),
+            ('code', '=ilike', period[:4] + '%'), # TODO manage better!!
             #('is_contract', '=', True),
             
             # period from and to:
