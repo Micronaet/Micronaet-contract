@@ -47,7 +47,7 @@ class account_analytic_expense_deprecation(osv.osv):
     # -------------------------------------------------------------------------
     #                          Utility function
     # -------------------------------------------------------------------------
-    def create_analytic_line_deprecation(self, cr, uid, department_id, 
+    def create_analytic_line_deprecation(self, cr, uid, department, 
             total, year_period_id, general_account_id, period, error=None, 
              context=None):
         ''' Procedure for split cost passed
@@ -78,7 +78,7 @@ class account_analytic_expense_deprecation(osv.osv):
                 )
         contract_ids = contract_pool.search(cr, uid, [
             # header filter: 
-            ('department_id', '=', department_id), # department filter
+            ('department_id', '=', department.id), # department filter
             ('state', 'not in', ('cancel', )), # status test
             
             # period from and to:
@@ -90,7 +90,6 @@ class account_analytic_expense_deprecation(osv.osv):
             ('date', '>=', start_period),
             
             ], context=context)
-        import pdb; pdb.set_trace()
 
         if not contract_ids:
             error.append(_('No contract found for split data!'))
@@ -114,7 +113,11 @@ class account_analytic_expense_deprecation(osv.osv):
                 line_pool.create(cr, uid, {
                     'amount': -amount,
                     'user_id': uid,
-                    'name': _('Deprecation period: %s') % period,
+                    'name': _('Deprecation period %s (dep.: %s, rate: %s') % (
+                        period,
+                        department.name,
+                        rate,
+                        ),
                     'unit_amount': 1.0,
                     'account_id': contract.id,
                     'general_account_id': general_account_id,
@@ -178,7 +181,7 @@ class account_analytic_expense_deprecation(osv.osv):
             # Cost to split in period
             to_split = {} # list of period to split            
             for cost in year.cost_ids:
-                to_split[cost.department_id.id] = cost.total / 12.0 # monthly
+                to_split[cost.department_id] = cost.total / 12.0 # monthly
             if not to_split:
                 _logger.error('Cannot create department cost to split!')
                 continue
@@ -213,10 +216,10 @@ class account_analytic_expense_deprecation(osv.osv):
 
                 # Append analytic line created:
                 error = [] # from here log error
-                for department_id, rate in to_split.iteritems():
+                for department, rate in to_split.iteritems():
                     self.create_analytic_line_deprecation(
                         cr, uid, 
-                        department_id, # department for contract selection
+                        department, # department for contract selection
                         rate, # total mont to split
                         period_id, # for link
                         general_id,
@@ -248,7 +251,8 @@ class account_analytic_expense_deprecation_cost(osv.osv):
 
     _columns = {
         'year_id': fields.many2one(
-            'account.analytic.expense.deprecation', 'Year'),        
+            'account.analytic.expense.deprecation', 'Year', 
+            ondelete='cascade'),
         'department_id': fields.many2one(
             'hr.department', 'Department', required=True), 
         'total': fields.float('Total for year', digits=(16, 2), required=True), 
@@ -265,7 +269,8 @@ class account_analytic_expense_deprecation_period(osv.osv):
         'name': fields.char('MM', size=2, required=True), 
         'datetime': fields.datetime('Import date'),
         'year_id': fields.many2one(
-            'account.analytic.expense.deprecation', 'Year'), 
+            'account.analytic.expense.deprecation', 'Year',
+            ondelete='cascade'), 
         'error': fields.text('Error'),
         }
             
