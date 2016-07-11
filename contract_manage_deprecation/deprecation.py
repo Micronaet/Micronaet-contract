@@ -184,7 +184,7 @@ class account_analytic_expense_deprecation(osv.osv):
             # Create database for period of the year
             periods_all = [
                 period_mask % (year.name, month) for month in range(1, 13)\
-                    if key < current_period]
+                    if period_mask % (year.name, month) < current_period]
 
             # Read period present: # TODO manage force here!
             period_present = [
