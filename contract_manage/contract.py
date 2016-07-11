@@ -424,7 +424,7 @@ class account_analytic_expense(osv.osv):
                     # Note: jump if list is present and mach, no contract code     
                     if log_warning:
                         _logger.warning(_(
-                            '%s. Jump department %s - ledger %s element') % (
+                            '%s. >>Jump department %s - ledger %s element') % (
                                 department_code, 
                                 account_code,
                                 ))

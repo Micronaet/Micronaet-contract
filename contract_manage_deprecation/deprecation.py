@@ -67,10 +67,22 @@ class account_analytic_expense_deprecation(osv.osv):
         # TODO 
 
         # Search contract
+        import pdb; pdb.set_trace()
+        start_period = ''
+        end_period = ''
         contract_ids = contract_pool.search(cr, uid, [
+            # header filter: 
             ('department_id', '=', department_id), # department filter
-            ('state', 'in', ('cancel')), # status test
-            # period from and to! 
+            ('state', 'not in', ('cancel')), # status test
+            
+            # period from and to:
+            '|',
+            ('date_start', '=', False),
+            ('date_start', '<', end_period),
+            '|',
+            ('date_end', '=', False),
+            ('date_end', '>=', start_period),
+            
             ], context=context)
 
         if len(contract_ids) > 1:
@@ -79,7 +91,7 @@ class account_analytic_expense_deprecation(osv.osv):
             return
         
         total_contract = sum([
-            contract.total for contract in contract_pool.browse(
+            contract.total_amount for contract in contract_pool.browse(
                 cr, uid, contract_ids, context=context)])
             
         if not total_contract:
@@ -87,31 +99,32 @@ class account_analytic_expense_deprecation(osv.osv):
             _logger.error(error[-1])
             return
            
-        rate = total / total_contract        
+        rate = total / total_contract      
         for contract in contract_pool.browse(
                 cr, uid, contract_ids, context=context):        
-            line_pool.create(cr, uid, {
-                'amount': -amount,
-                'user_id': uid,
-                'name': _('Deprecation period: %s') % period,
-                'unit_amount': 1.0,
-                'account_id': contract_ids[0],
-                'general_account_id': general_account_id,
-                'journal_id': journal_id, 
-                'date': period_date,
+            amount = rate * contract.total_amount
+            if amount:    
+                line_pool.create(cr, uid, {
+                    'amount': -amount,
+                    'user_id': uid,
+                    'name': _('Deprecation period: %s') % period,
+                    'unit_amount': 1.0,
+                    'account_id': contract.id,
+                    'general_account_id': general_account_id,
+                    'journal_id': journal_id, 
+                    'date': start_period,
 
-                # Link to import record:
-                'year_period_id': year_period_id,
-                'csv_filename': filename, # key for deletion
+                    # Link to import record:
+                    'year_period_id': year_period_id,
+                    'csv_filename': filename, # key for deletion
 
-                # Not used:
-                #'company_id', 'code', 'currency_id', 'move_id',
-                #'product_id', 'product_uom_id', 'amount_currency',
-                #'ref', 'to_invoice', 'invoice_id', 
-                # 'extra_analytic_line_timesheet_id', 'import_type',
-                ##'activity_id', 'mail_raccomanded', 'location',
-                }, context=context)
-               
+                    # Not used:
+                    #'company_id', 'code', 'currency_id', 'move_id',
+                    #'product_id', 'product_uom_id', 'amount_currency',
+                    #'ref', 'to_invoice', 'invoice_id', 
+                    # 'extra_analytic_line_timesheet_id', 'import_type',
+                    ##'activity_id', 'mail_raccomanded', 'location',
+                    }, context=context)
         return True
 
     # -------------------------------------------------------------------------
@@ -149,26 +162,22 @@ class account_analytic_expense_deprecation(osv.osv):
         period_mask = '%s-%02d'
         periods_all = []
         period_to_update = {} # XXX used?
-        
-        year_ids = self.search(cr, uid, [], context=context)
 
         current_period = period_mask % (
             datetime.now().year, 
             datetime.now().month,
             )
-            
+        year_ids = self.search(cr, uid, [], context=context)
         for year in self.browse(cr, uid, year_ids, context=context):
             # -----------------------------------------------------------------
-            # Read total cost to split:
+            #                    Read total cost to split:
             # -----------------------------------------------------------------
-            to_split = {} # list of period to split
-
             # Cost to split in period
+            to_split = {} # list of period to split
             for cost in year.cost_ids:
-                to_split[cost.department_id.id] = cost.total / 12.0 #month rate
-
+                to_split[cost.department_id.id] = cost.total / 12.0 # monthly
             if not to_split:
-                _logger.error('Create department cost to split!')
+                _logger.error('Cannot create department cost to split!')
                 continue
 
             # Create database for period of the year
@@ -183,7 +192,7 @@ class account_analytic_expense_deprecation(osv.osv):
                 error = [] # from here log error
                 key = '%s-%s' % (period.year_id.name, period.name)
                 if key in periods_all: # create month if not present
-                    continue # yet present
+                    continue # yet present # TODO manage force procedure
                 
                 # Create analytic line for department:
                 for department_id, rate in to_split.iteritems():
