@@ -172,7 +172,7 @@ class account_analytic_account(osv.osv):
                 ref = "%s/%s-%s-(%s)" % (document, series, number, date[:4])                   
                 ref_line = "%s-R%s" % (ref, sequence) # row
                 
-                if document in ('FT', 'NF'):
+                if document in ('FT', 'NF', 'CO'):
                     operator = +1
                 elif document in ('NC', 'FF'):
                     operator = -1
