@@ -600,6 +600,7 @@ class account_analytic_expense(osv.osv):
         # TODO choose a period for not reload every time all records?
         _logger.info(_('Assign contract to entry:'))
         unlink_line_ids = [] # element not found during this sync (to delete)
+        # TODO unlink only year current!!!
         record_ids = self.search(cr, uid, [], context=context)
         
         # Loop on all accounting lines:
